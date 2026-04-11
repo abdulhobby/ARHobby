@@ -30,7 +30,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, process.env.ADMIN_URL],
+  origin: [
+    process.env.FRONTEND_URL, 
+    process.env.ADMIN_URL,
+    "https://arhobby.onrender.com",
+    "https://adminarhobby.onrender.com"
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']

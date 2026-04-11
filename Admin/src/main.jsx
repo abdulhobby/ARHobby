@@ -9,13 +9,13 @@ import { store } from './app/store.js';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
 import './index.css';
 
-const basename = import.meta.env.MODE === 'production' ? '/admin' : '/';
+// const basename = import.meta.env.MODE === 'production' ? '/admin' : '/';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
       <Provider store={store}>
-        <BrowserRouter basename={basename}>
+        <BrowserRouter>
           <App />
           {/* Toast Notifications */}
           <Toaster
