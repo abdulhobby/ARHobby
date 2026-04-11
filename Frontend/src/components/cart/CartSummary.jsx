@@ -1,3 +1,4 @@
+// CartSummary.jsx
 import { formatCurrency } from '../../utils/helpers';
 import { FiTruck, FiShield, FiGift } from 'react-icons/fi';
 
@@ -15,8 +16,7 @@ const CartSummary = ({ cart, discount, shippingCharge }) => {
 
   return (
     <div
-      className="bg-bg-primary rounded-2xl border-2 border-border-light shadow-sm overflow-hidden 
-                 sticky top-24"
+      className="bg-bg-primary rounded-2xl border-2 border-border-light shadow-sm overflow-hidden"
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary-dark p-5 sm:p-6 relative overflow-hidden">

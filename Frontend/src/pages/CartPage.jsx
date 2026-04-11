@@ -54,7 +54,7 @@ const CartPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-secondary">
+    <div className="min-h-screen bg-bg-secondary pb-24 lg:pb-8">
       <SEO title="Shopping Cart" />
       
       {/* Header */}
@@ -142,13 +142,13 @@ const CartPage = () => {
             </div>
           </div>
 
-          {/* Cart Summary Section */}
+          {/* Cart Summary Section - No sticky positioning to prevent overlap */}
           <div className="lg:w-96 flex-shrink-0">
-            <div className="lg:sticky lg:top-24 space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Cart Summary */}
               <CartSummary cart={cart} />
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Moved outside sticky container */}
               <div className="bg-white rounded-2xl border border-border-light shadow-sm p-4 sm:p-6 space-y-3">
                 <Link 
                   to="/checkout"

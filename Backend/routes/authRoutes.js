@@ -43,7 +43,7 @@ const router = express.Router();
 // User Registration
 router.post(
   '/register',
-  rateLimit(5, 60 * 60 * 1000),
+  rateLimit(50, 30 * 60 * 1000), // ✅ 50 per hour
   validateRegistration,
   asyncHandler(register)
 );
@@ -51,15 +51,15 @@ router.post(
 // User Login
 router.post(
   '/login',
-  rateLimit(10, 15 * 60 * 1000),
+  rateLimit(50, 15 * 60 * 1000), // ✅ 50 per 15 min
   validateLogin,
   asyncHandler(login)
 );
 
-// Admin Login
+// Admin Login (more strict but still usable)
 router.post(
   '/admin/login',
-  rateLimit(10, 15 * 60 * 1000),
+  rateLimit(30, 15 * 60 * 1000), // ✅ 30 per 15 min
   validateLogin,
   asyncHandler(adminLogin)
 );
