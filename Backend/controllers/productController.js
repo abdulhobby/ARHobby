@@ -2,7 +2,6 @@
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import cloudinary from '../config/cloudinary.js';
-import ApiFeatures from '../utils/apiFeatures.js';
 
 export const createProduct = async (req, res) => {
   try {
@@ -70,33 +69,26 @@ export const createProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const resultPerPage = 12;
-
-    // Apply default sort to show newest first if no sort parameter provided
-    if (!req.query.sort) {
-      req.query.sort = '-createdAt'; // Newest first
-    }
-
-    const countQuery = Product.find({ isActive: true });
-    const countFeatures = new ApiFeatures(countQuery, req.query).search().filter();
-    const totalProducts = await countFeatures.query.countDocuments();
-
-    const apiFeatures = new ApiFeatures(
-      Product.find({ isActive: true }).populate('category', 'name slug'),
-      req.query
-    ).search().filter().sort().paginate(resultPerPage);
-
-    const products = await apiFeatures.query;
-
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || resultPerPage;
+
+    // Count total products
+    const totalProducts = await Product.countDocuments({ isActive: true });
+
+    // Get products with proper sorting
+    const products = await Product.find({ isActive: true })
+      .populate('category', 'name slug')
+      .sort({ createdAt: -1, _id: -1 }) // ✅ NEWEST FIRST
+      .limit(resultPerPage)
+      .skip((page - 1) * resultPerPage)
+      .lean(); // ✅ Better performance
 
     res.status(200).json({
       success: true,
       products,
       totalProducts,
       page,
-      pages: Math.ceil(totalProducts / limit),
-      resultPerPage: limit
+      pages: Math.ceil(totalProducts / resultPerPage),
+      resultPerPage
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -107,11 +99,6 @@ export const getAllProductsAdmin = async (req, res) => {
   try {
     const resultPerPage = 20;
 
-    // Apply default sort to show newest first for admin too
-    if (!req.query.sort) {
-      req.query.sort = '-createdAt';
-    }
-
     const countQuery = Product.find();
     const countFeatures = new ApiFeatures(countQuery, req.query).search().filter();
     const totalProducts = await countFeatures.query.countDocuments();
@@ -119,7 +106,7 @@ export const getAllProductsAdmin = async (req, res) => {
     const apiFeatures = new ApiFeatures(
       Product.find().populate('category', 'name slug'),
       req.query
-    ).search().filter().sort().paginate(resultPerPage);
+    ).search().filter().sort().paginate(resultPerPage); // ✅ Removed the duplicate .sort() call
 
     const products = await apiFeatures.query;
 
@@ -179,11 +166,6 @@ export const getProductsByCategory = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Category not found' });
     }
 
-    // Apply default sort to show newest first
-    if (!req.query.sort) {
-      req.query.sort = '-createdAt';
-    }
-
     const resultPerPage = 12;
 
     const countQuery = Product.find({ isActive: true, category: category._id });
@@ -193,7 +175,7 @@ export const getProductsByCategory = async (req, res) => {
     const apiFeatures = new ApiFeatures(
       Product.find({ isActive: true, category: category._id }).populate('category', 'name slug'),
       req.query
-    ).search().filter().sort().paginate(resultPerPage);
+    ).search().filter().sort().paginate(resultPerPage); // ✅ Removed the duplicate .sort() call
 
     const products = await apiFeatures.query;
     const page = Number(req.query.page) || 1;
@@ -217,7 +199,7 @@ export const getFeaturedProducts = async (req, res) => {
   try {
     const products = await Product.find({ isActive: true, isFeatured: true })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1 }) // Newest first
+      .sort({ createdAt: -1, _id: -1 }) // ✅ Newest first with _id as tiebreaker
       .limit(Number(req.query.limit) || 8);
 
     res.status(200).json({ success: true, products });
@@ -226,46 +208,62 @@ export const getFeaturedProducts = async (req, res) => {
   }
 };
 
+// controllers/productController.js
+
+// backend/controllers/productController.js - Update getNewProducts
 export const getNewProducts = async (req, res) => {
   try {
     const resultPerPage = Number(req.query.limit) || 12;
     const page = Number(req.query.page) || 1;
 
+    // Products marked as new OR created in last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const countQuery = Product.find({
+    const query = {
       isActive: true,
       $or: [
         { isNew: true },
         { createdAt: { $gte: thirtyDaysAgo } }
       ]
-    });
+    };
 
-    const totalProducts = await countQuery.countDocuments();
+    // Add optional filters
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+    
+    if (req.query.minPrice || req.query.maxPrice) {
+      query.price = {};
+      if (req.query.minPrice) query.price.$gte = parseFloat(req.query.minPrice);
+      if (req.query.maxPrice) query.price.$lte = parseFloat(req.query.maxPrice);
+    }
 
-    const products = await Product.find({
-      isActive: true,
-      $or: [
-        { isNew: true },
-        { createdAt: { $gte: thirtyDaysAgo } }
-      ]
-    })
+    const totalProducts = await Product.countDocuments(query);
+
+    const products = await Product.find(query)
       .populate('category', 'name slug')
-      .sort({ createdAt: -1, _id: -1 }) // Newest first, most recent ID first
+      .sort({ createdAt: -1, _id: -1 })
       .limit(resultPerPage)
       .skip((page - 1) * resultPerPage);
 
+    // Ensure we return products even if empty
     res.status(200).json({
       success: true,
-      products,
-      totalProducts,
-      page,
-      pages: Math.ceil(totalProducts / resultPerPage),
-      resultPerPage
+      products: products || [],
+      totalProducts: totalProducts || 0,
+      page: page,
+      pages: Math.ceil(totalProducts / resultPerPage) || 1,
+      resultPerPage: resultPerPage
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error in getNewProducts:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message,
+      products: [],
+      totalProducts: 0
+    });
   }
 };
 
@@ -273,7 +271,7 @@ export const getLatestProducts = async (req, res) => {
   try {
     const products = await Product.find({ isActive: true })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1 }) // Newest first
+      .sort({ createdAt: -1, _id: -1 }) // ✅ Newest first
       .limit(Number(req.query.limit) || 8);
 
     res.status(200).json({ success: true, products });
@@ -295,7 +293,7 @@ export const getRelatedProducts = async (req, res) => {
       isActive: true
     })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1 }) // Show newest related products first
+      .sort({ createdAt: -1, _id: -1 }) // ✅ Newest first
       .limit(Number(req.query.limit) || 4);
 
     res.status(200).json({ success: true, products });
@@ -416,3 +414,106 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+class ApiFeatures {
+  constructor(query, queryStr) {
+    this.query = query;
+    this.queryStr = queryStr;
+  }
+
+  search() {
+    const keyword = this.queryStr.keyword
+      ? {
+          $or: [
+            { name: { $regex: this.queryStr.keyword, $options: 'i' } },
+            { description: { $regex: this.queryStr.keyword, $options: 'i' } },
+            { tags: { $regex: this.queryStr.keyword, $options: 'i' } }
+          ]
+        }
+      : {};
+
+    this.query = this.query.find({ ...keyword });
+    return this;
+  }
+
+  filter() {
+    const queryCopy = { ...this.queryStr };
+
+    const removeFields = ['keyword', 'page', 'limit', 'sort', 'fields'];
+    removeFields.forEach((key) => delete queryCopy[key]);
+
+    if (queryCopy.category) {
+      this.query = this.query.find({ category: queryCopy.category });
+      delete queryCopy.category;
+    }
+
+    if (queryCopy.stockStatus) {
+      this.query = this.query.find({ stockStatus: queryCopy.stockStatus });
+      delete queryCopy.stockStatus;
+    }
+
+    if (queryCopy.condition) {
+      this.query = this.query.find({ condition: queryCopy.condition });
+      delete queryCopy.condition;
+    }
+
+    if (queryCopy.country) {
+      this.query = this.query.find({ country: { $regex: queryCopy.country, $options: 'i' } });
+      delete queryCopy.country;
+    }
+
+    if (queryCopy.rarity) {
+      this.query = this.query.find({ rarity: queryCopy.rarity });
+      delete queryCopy.rarity;
+    }
+
+    if (queryCopy.minPrice || queryCopy.maxPrice) {
+      const priceFilter = {};
+      if (queryCopy.minPrice) priceFilter.$gte = Number(queryCopy.minPrice);
+      if (queryCopy.maxPrice) priceFilter.$lte = Number(queryCopy.maxPrice);
+      this.query = this.query.find({ price: priceFilter });
+      delete queryCopy.minPrice;
+      delete queryCopy.maxPrice;
+    }
+
+    if (queryCopy.isFeatured) {
+      this.query = this.query.find({ isFeatured: queryCopy.isFeatured === 'true' });
+      delete queryCopy.isFeatured;
+    }
+
+    return this;
+  }
+
+  sort() {
+    if (this.queryStr.sort) {
+      const sortMapping = {
+        'price-low-high': { price: 1, _id: 1 },
+        'price-high-low': { price: -1, _id: -1 },
+        'new-to-old': { createdAt: -1, _id: -1 }, // ✅ Newest first
+        'old-to-new': { createdAt: 1, _id: 1 },
+        'a-z': { name: 1, _id: 1 },
+        'z-a': { name: -1, _id: -1 },
+        'featured': { isFeatured: -1, createdAt: -1, _id: -1 }
+      };
+
+      const sortOption = sortMapping[this.queryStr.sort] || { createdAt: -1, _id: -1 };
+      this.query = this.query.sort(sortOption);
+    } else {
+      // ✅ Default: Newest products first
+      this.query = this.query.sort({ createdAt: -1, _id: -1 });
+    }
+
+    return this;
+  }
+
+  paginate(resultPerPage) {
+    const currentPage = Number(this.queryStr.page) || 1;
+    const limit = Number(this.queryStr.limit) || resultPerPage;
+    const skip = (currentPage - 1) * limit;
+
+    this.query = this.query.limit(limit).skip(skip);
+    return this;
+  }
+}
+
+export default ApiFeatures;

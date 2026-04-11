@@ -49,12 +49,16 @@ export const userAPI = {
   })
 };
 
+// frontend/src/services/api.js (Updated productAPI section)
 export const productAPI = {
   getAll: (params) => API.get('/products', { params }),
   getBySlug: (slug) => API.get(`/products/slug/${slug}`),
   getByCategory: (slug, params) => API.get(`/products/category/${slug}`, { params }),
   getFeatured: (params) => API.get('/products/featured', { params }),
-  getNew: (params) => API.get('/products/new', { params }), // New API
+  getNew: (params) => {
+    console.log('Fetching new products with params:', params);
+    return API.get('/products/new', { params });
+  },
   getLatest: (params) => API.get('/products/latest', { params }),
   getRelated: (id, params) => API.get(`/products/related/${id}`, { params })
 };

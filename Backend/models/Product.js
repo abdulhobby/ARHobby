@@ -181,8 +181,6 @@ productSchema.pre('save', function() {
     this.seo = this.seo || {};
     this.seo.ogImage = this.images[0].url;
   }
-
-  // next();
 });
 
 // Generate Product Schema Markup
@@ -222,12 +220,17 @@ productSchema.methods.generateSchemaMarkup = function() {
   };
 };
 
-// Indexes for SEO and search
+// ✅ IMPORTANT: Indexes for performance and proper sorting
 productSchema.index({ name: 'text', description: 'text', tags: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
-productSchema.index({ createdAt: -1 });
 productSchema.index({ slug: 1 });
 productSchema.index({ 'seo.metaTitle': 'text', 'seo.metaKeywords': 'text' });
+
+// ✅ CRITICAL FIX: Compound index for default sorting (newest first)
+productSchema.index({ createdAt: -1, _id: -1 });
+productSchema.index({ isActive: 1, createdAt: -1, _id: -1 }); // For active products
+productSchema.index({ isFeatured: -1, createdAt: -1, _id: -1 }); // For featured products
+productSchema.index({ category: 1, isActive: 1, createdAt: -1, _id: -1 }); // For category filtering
 
 export default mongoose.model('Product', productSchema);

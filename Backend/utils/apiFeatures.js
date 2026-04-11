@@ -68,24 +68,28 @@ class ApiFeatures {
   }
 
   sort() {
-    if (this.queryStr.sort) {
-      const sortMapping = {
-        'price-low-high': { price: 1 },
-        'price-high-low': { price: -1 },
-        'new-to-old': { createdAt: -1 },
-        'old-to-new': { createdAt: 1 },
-        'a-z': { name: 1 },
-        'z-a': { name: -1 },
-        'featured': { isFeatured: -1, createdAt: -1 }
-      };
+  if (this.queryStr.sort) {
+    const sortMapping = {
+      'price-low-high': { price: 1 },
+      'price-high-low': { price: -1 },
+      'new-to-old': { createdAt: -1, _id: -1 }, // ✅ FIX
+      'old-to-new': { createdAt: 1, _id: 1 },
+      'a-z': { name: 1 },
+      'z-a': { name: -1 },
+      'featured': { isFeatured: -1, createdAt: -1, _id: -1 }
+    };
 
-      const sortOption = sortMapping[this.queryStr.sort] || { createdAt: -1 };
-      this.query = this.query.sort(sortOption);
-    } else {
-      this.query = this.query.sort({ createdAt: -1 });
-    }
-    return this;
+    const sortOption = sortMapping[this.queryStr.sort] || { createdAt: -1, _id: -1 };
+
+    this.query = this.query.sort(sortOption);
+
+  } else {
+    // ✅ DEFAULT FIX
+    this.query = this.query.sort({ createdAt: -1, _id: -1 });
   }
+
+  return this;
+}
 
   paginate(resultPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;

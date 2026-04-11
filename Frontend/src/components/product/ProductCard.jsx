@@ -159,15 +159,6 @@ const ProductCard = ({ product }) => {
 
           {/* Content */}
           <div className="p-4 sm:p-5">
-            {/* Rating */}
-            <div className="flex items-center gap-1 mb-2">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar key={i} className="w-3 h-3 fill-current text-warning" />
-                ))}
-              </div>
-              <span className="text-xs text-text-light">(127)</span>
-            </div>
 
             {/* Product Name */}
             <h3
