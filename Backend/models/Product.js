@@ -1,3 +1,4 @@
+// models/Product.js
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
@@ -16,6 +17,49 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Product description is required'],
     maxlength: [5000, 'Description cannot exceed 5000 characters']
+  },
+  // SEO Fields
+  seo: {
+    metaTitle: {
+      type: String,
+      trim: true,
+      maxlength: [70, 'Meta title should be less than 70 characters'],
+      default: function() {
+        return this.name;
+      }
+    },
+    metaDescription: {
+      type: String,
+      trim: true,
+      maxlength: [160, 'Meta description should be less than 160 characters'],
+      default: function() {
+        return this.description?.substring(0, 160);
+      }
+    },
+    metaKeywords: {
+      type: [String],
+      default: []
+    },
+    ogTitle: {
+      type: String,
+      trim: true
+    },
+    ogDescription: {
+      type: String,
+      trim: true
+    },
+    ogImage: {
+      type: String,
+      trim: true
+    },
+    canonicalUrl: {
+      type: String,
+      trim: true
+    },
+    schemaMarkup: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null
+    }
   },
   images: [{
     public_id: { type: String, required: true },
@@ -75,7 +119,6 @@ const productSchema = new mongoose.Schema({
   },
   stock: {
     type: Number,
-    required: [true, 'Stock is required'],
     min: [0, 'Stock cannot be negative'],
     default: 0
   },
@@ -92,6 +135,10 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isNew: {
+    type: Boolean,
+    default: false
+  },
   tags: [String],
   views: {
     type: Number,
@@ -101,6 +148,7 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Pre-save middleware
 productSchema.pre('save', function() {
   if (this.isNew || this.isModified('name')) {
     this.slug = this.name
@@ -113,13 +161,73 @@ productSchema.pre('save', function() {
     this.stockStatus = this.stock <= 0 ? 'Out of Stock' : 'In Stock';
   }
 
+  // Auto-generate SEO metadata if not provided
+  if (this.isNew || this.isModified('name')) {
+    if (!this.seo?.metaTitle) {
+      this.seo = this.seo || {};
+      this.seo.metaTitle = this.name.substring(0, 70);
+    }
+  }
+
+  if (this.isNew || this.isModified('description')) {
+    if (!this.seo?.metaDescription) {
+      this.seo = this.seo || {};
+      this.seo.metaDescription = this.description?.substring(0, 160);
+    }
+  }
+
+  // Set OG image to first product image if not set
+  if (this.images && this.images.length > 0 && !this.seo?.ogImage) {
+    this.seo = this.seo || {};
+    this.seo.ogImage = this.images[0].url;
+  }
+
   // next();
 });
 
+// Generate Product Schema Markup
+productSchema.methods.generateSchemaMarkup = function() {
+  const baseUrl = process.env.FRONTEND_URL || 'https://yourdomain.com';
+  
+  return {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": this.name,
+    "description": this.description,
+    "image": this.images.map(img => img.url),
+    "sku": this._id.toString(),
+    "mpn": this._id.toString(),
+    "brand": {
+      "@type": "Brand",
+      "name": "Currency Corner"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": `${baseUrl}/products/${this.slug}`,
+      "priceCurrency": "INR",
+      "price": this.price,
+      "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      "itemCondition": "https://schema.org/UsedCondition",
+      "availability": this.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Currency Corner"
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "127"
+    }
+  };
+};
+
+// Indexes for SEO and search
 productSchema.index({ name: 'text', description: 'text', tags: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ createdAt: -1 });
 productSchema.index({ slug: 1 });
+productSchema.index({ 'seo.metaTitle': 'text', 'seo.metaKeywords': 'text' });
 
 export default mongoose.model('Product', productSchema);

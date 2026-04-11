@@ -1,3 +1,4 @@
+// pages/ProductDetailPage.jsx
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +8,8 @@ import ProductImageGallery from '../components/product/ProductImageGallery';
 import ProductCard from '../components/product/ProductCard';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
-import { formatCurrency } from '../utils/helpers';
+import Breadcrumb from '../components/common/Breadcrumb';
+import { formatCurrency, generateProductSchema } from '../utils/helpers';
 import { 
   FiShoppingCart, 
   FiMinus, 
@@ -22,7 +24,10 @@ import {
   FiAlertCircle,
   FiHeart,
   FiShare2,
-  FiInfo
+  FiInfo,
+  FiStar,
+  FiAward,
+  FiClock
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -33,10 +38,14 @@ const ProductDetailPage = () => {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProductBySlug(slug));
-    return () => { dispatch(clearProduct()); };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return () => { 
+      dispatch(clearProduct());
+    };
   }, [slug, dispatch]);
 
   useEffect(() => {
@@ -54,20 +63,26 @@ const ProductDetailPage = () => {
       toast.error('Please login to add items to cart');
       return;
     }
+    if (product.stockStatus === 'Out of Stock') {
+      toast.error('Product is out of stock');
+      return;
+    }
     dispatch(addToCart({ productId: product._id, quantity }))
       .unwrap()
-      .then(() => toast.success('Added to cart'))
+      .then(() => toast.success(`Added ${quantity} item(s) to cart`))
       .catch((err) => toast.error(err));
   };
 
   const handleShare = async () => {
+    const shareData = {
+      title: product.name,
+      text: `Check out this amazing collectible: ${product.name}`,
+      url: window.location.href,
+    };
+    
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: product.name,
-          text: product.description?.substring(0, 100),
-          url: window.location.href,
-        });
+        await navigator.share(shareData);
       } catch (err) {
         console.log('Share cancelled');
       }
@@ -77,28 +92,83 @@ const ProductDetailPage = () => {
     }
   };
 
-  const getStockStatusConfig = (status) => {
-    const configs = {
-      'In Stock': {
-        bg: 'bg-success/10',
-        text: 'text-success',
-        border: 'border-success/20',
-        icon: FiCheck,
-      },
-      'Out of Stock': {
-        bg: 'bg-error/10',
-        text: 'text-error',
-        border: 'border-error/20',
-        icon: FiAlertCircle,
-      },
-      'Low Stock': {
+  const handleWishlist = () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add to wishlist');
+      return;
+    }
+    setIsWishlisted(!isWishlisted);
+    toast.success(isWishlisted ? 'Removed from wishlist' : 'Added to wishlist');
+  };
+
+  const getStockStatusConfig = (status, stock) => {
+    if (stock > 0 && stock <= 5) {
+      return {
+        status: 'Low Stock',
         bg: 'bg-warning/10',
         text: 'text-warning',
         border: 'border-warning/20',
         icon: FiAlertCircle,
+        message: `Only ${stock} left in stock!`
+      };
+    }
+    
+    const configs = {
+      'In Stock': {
+        status: 'In Stock',
+        bg: 'bg-success/10',
+        text: 'text-success',
+        border: 'border-success/20',
+        icon: FiCheck,
+        message: 'Ready to ship'
+      },
+      'Out of Stock': {
+        status: 'Out of Stock',
+        bg: 'bg-error/10',
+        text: 'text-error',
+        border: 'border-error/20',
+        icon: FiAlertCircle,
+        message: 'Currently unavailable'
       },
     };
     return configs[status] || configs['In Stock'];
+  };
+
+  // Generate SEO schema data
+  const getProductSchema = () => {
+    if (!product) return null;
+    
+    return {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      condition: product.condition,
+      sku: product._id,
+      image: product.images?.[0]?.url,
+      url: window.location.href,
+      brand: 'AR Hobby',
+      category: product.category?.name,
+      ...product.seo?.schemaMarkup
+    };
+  };
+
+  // Generate meta keywords from product data
+  const getMetaKeywords = () => {
+    const keywords = [
+      product.name,
+      product.category?.name,
+      product.country,
+      product.year,
+      product.condition,
+      product.material,
+      product.rarity,
+      'collectible currency',
+      'rare coin',
+      'numismatics',
+      ...(product.tags || [])
+    ];
+    return [...new Set(keywords.filter(Boolean))].join(', ');
   };
 
   if (loading) {
@@ -134,64 +204,51 @@ const ProductDetailPage = () => {
 
   if (!product) return null;
 
-  const stockConfig = getStockStatusConfig(product.stockStatus);
+  const stockConfig = getStockStatusConfig(product.stockStatus, product.stock);
   const StockIcon = stockConfig.icon;
   const discountPercentage = product.comparePrice && product.comparePrice > product.price
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0;
 
   const specifications = [
-    { label: 'Country', value: product.country },
-    { label: 'Year', value: product.year },
-    { label: 'Condition', value: product.condition },
-    { label: 'Denomination', value: product.denomination },
-    { label: 'Material', value: product.material },
-    { label: 'Weight', value: product.weight },
-    { label: 'Dimensions', value: product.dimensions },
-    { label: 'Rarity', value: product.rarity },
+    { label: 'Country of Origin', value: product.country, icon: FiHome },
+    { label: 'Year of Issue', value: product.year, icon: FiClock },
+    { label: 'Condition', value: product.condition, icon: FiAward },
+    { label: 'Denomination', value: product.denomination, icon: FiPackage },
+    { label: 'Material', value: product.material, icon: FiStar },
+    { label: 'Weight', value: product.weight, icon: FiPackage },
+    { label: 'Dimensions', value: product.dimensions, icon: FiInfo },
+    { label: 'Rarity Grade', value: product.rarity, icon: FiAward },
   ].filter(spec => spec.value);
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'Shop', path: '/shop' },
+    ...(product.category ? [{ label: product.category.name, path: `/category/${product.category.slug}` }] : []),
+    { label: product.name, path: null }
+  ];
 
   return (
     <div className="min-h-screen bg-bg-secondary">
-      <SEO title={product.name} description={product.description?.substring(0, 160)} />
+      {/* Full SEO Implementation */}
+      <SEO
+        title={product.seo?.metaTitle || product.name}
+        description={product.seo?.metaDescription || product.description?.substring(0, 160)}
+        keywords={getMetaKeywords()}
+        image={product.seo?.ogImage || product.images?.[0]?.url}
+        url={`${import.meta.env.VITE_SITE_URL || window.location.origin}/product/${product.slug}`}
+        type="product"
+        publishedTime={product.createdAt}
+        modifiedTime={product.updatedAt}
+        author="AR Hobby"
+        section={product.category?.name}
+        tags={[...(product.tags || []), product.category?.name, product.country, product.condition].filter(Boolean)}
+        productData={getProductSchema()}
+        canonicalUrl={product.seo?.canonicalUrl}
+      />
 
-      {/* Breadcrumb */}
-      <div className="bg-white border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <nav className="flex items-center flex-wrap gap-2 text-sm">
-            <Link 
-              to="/" 
-              className="flex items-center gap-1 text-text-secondary hover:text-primary 
-                       transition-colors duration-300 cursor-pointer"
-            >
-              <FiHome className="w-4 h-4" />
-              <span className="hidden sm:inline">Home</span>
-            </Link>
-            <FiChevronRight className="w-4 h-4 text-text-light" />
-            <Link 
-              to="/shop" 
-              className="text-text-secondary hover:text-primary transition-colors duration-300 cursor-pointer"
-            >
-              Shop
-            </Link>
-            {product.category && (
-              <>
-                <FiChevronRight className="w-4 h-4 text-text-light" />
-                <Link 
-                  to={`/category/${product.category?.slug}`}
-                  className="text-text-secondary hover:text-primary transition-colors duration-300 cursor-pointer"
-                >
-                  {product.category?.name}
-                </Link>
-              </>
-            )}
-            <FiChevronRight className="w-4 h-4 text-text-light" />
-            <span className="text-text-primary font-medium truncate max-w-[150px] sm:max-w-none">
-              {product.name}
-            </span>
-          </nav>
-        </div>
-      </div>
+      {/* Breadcrumb with Schema */}
+      <Breadcrumb items={breadcrumbItems} />
 
       {/* Main Product Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -199,17 +256,24 @@ const ProductDetailPage = () => {
           
           {/* Product Images */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
+            <div className="relative bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <ProductImageGallery images={product.images} />
               
               {/* Discount Badge */}
               {discountPercentage > 0 && (
                 <div className="absolute top-4 left-4 z-10">
-                  <span className="px-3 py-1.5 bg-error text-white text-sm font-bold rounded-lg shadow-lg">
+                  <span className="px-3 py-1.5 bg-error text-white text-sm font-bold rounded-lg shadow-lg animate-pulse">
                     {discountPercentage}% OFF
                   </span>
                 </div>
               )}
+              
+              {/* Trust Badge */}
+              <div className="absolute bottom-4 left-4 right-4 z-10">
+                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 text-white text-xs text-center">
+                  🔒 100% Authentic Guaranteed
+                </div>
+              </div>
             </div>
           </div>
 
@@ -251,47 +315,46 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Stock Status */}
-            <div className="flex items-center gap-4">
-              <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-                             ${stockConfig.bg} ${stockConfig.text} border ${stockConfig.border}`}>
-                <StockIcon className="w-4 h-4" />
-                {product.stockStatus}
-              </span>
-              {product.stock > 0 && product.stock <= 10 && (
-                <span className="text-sm text-warning font-medium">
-                  Only {product.stock} left!
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-4">
+                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+                               ${stockConfig.bg} ${stockConfig.text} border ${stockConfig.border}`}>
+                  <StockIcon className="w-4 h-4" />
+                  {stockConfig.status}
                 </span>
+                <span className="text-sm text-text-secondary">{stockConfig.message}</span>
+              </div>
+              {product.stock > 0 && product.stock <= 10 && (
+                <div className="w-full bg-error/10 rounded-full h-1.5">
+                  <div 
+                    className="bg-error h-1.5 rounded-full transition-all duration-500"
+                    style={{ width: `${(product.stock / 10) * 100}%` }}
+                  />
+                </div>
               )}
             </div>
 
             {/* Short Description */}
             {product.description && (
-              <p className="text-text-secondary leading-relaxed line-clamp-3">
-                {product.description}
-              </p>
-            )}
-
-            {/* Specifications Grid */}
-            {specifications.length > 0 && (
               <div className="bg-bg-secondary rounded-2xl p-5 border border-border">
-                <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
-                  <FiInfo className="w-4 h-4 text-primary" />
-                  Quick Specifications
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {specifications.slice(0, 6).map((spec, index) => (
-                    <div key={index} className="flex flex-col">
-                      <span className="text-xs text-text-light uppercase tracking-wider">
-                        {spec.label}
-                      </span>
-                      <span className="text-sm font-medium text-text-primary mt-0.5">
-                        {spec.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-text-secondary leading-relaxed line-clamp-3">
+                  {product.description}
+                </p>
               </div>
             )}
+
+            {/* Key Features */}
+            <div className="grid grid-cols-2 gap-3">
+              {specifications.slice(0, 4).map((spec, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-bg-secondary rounded-xl">
+                  <spec.icon className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-text-light">{spec.label}</span>
+                    <span className="text-sm font-semibold text-text-primary">{spec.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             {/* Add to Cart Section */}
             {product.stockStatus === 'In Stock' && (
@@ -326,12 +389,13 @@ const ProductDetailPage = () => {
                   </div>
                 </div>
 
-                {/* Stock Info */}
-                {product.stock > 0 && (
-                  <p className="text-sm text-text-secondary text-center">
-                    <span className="font-medium text-text-primary">{product.stock}</span> items available
-                  </p>
-                )}
+                {/* Total Price */}
+                <div className="flex justify-between items-center pt-2 border-t border-border">
+                  <span className="text-text-secondary">Total Amount:</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {formatCurrency(product.price * quantity)}
+                  </span>
+                </div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-3">
@@ -348,12 +412,16 @@ const ProductDetailPage = () => {
                   </button>
                   
                   <button 
-                    className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-border
-                             text-text-secondary hover:text-error hover:border-error/30 hover:bg-error/5
-                             transition-all duration-300 cursor-pointer"
+                    onClick={handleWishlist}
+                    className={`w-14 h-14 flex items-center justify-center rounded-xl border-2
+                             transition-all duration-300 cursor-pointer
+                             ${isWishlisted 
+                               ? 'border-error bg-error/10 text-error' 
+                               : 'border-border text-text-secondary hover:text-error hover:border-error/30 hover:bg-error/5'
+                             }`}
                     title="Add to Wishlist"
                   >
-                    <FiHeart className="w-5 h-5" />
+                    <FiHeart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                   </button>
                   
                   <button 
@@ -377,6 +445,12 @@ const ProductDetailPage = () => {
                 <p className="text-sm text-text-secondary">
                   This item is out of stock. Please check back later or browse similar products.
                 </p>
+                <button 
+                  onClick={() => toast.success('We\'ll notify you when back in stock!')}
+                  className="mt-4 px-6 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary hover:text-white transition-all duration-300"
+                >
+                  Notify Me When Available
+                </button>
               </div>
             )}
 
@@ -390,7 +464,7 @@ const ProductDetailPage = () => {
               <div className="flex flex-col items-center text-center p-3 bg-bg-secondary rounded-xl">
                 <FiTruck className="w-6 h-6 text-primary mb-2" />
                 <span className="text-xs font-medium text-text-primary">Free Shipping</span>
-                <span className="text-xs text-text-light">On ₹500+</span>
+                <span className="text-xs text-text-light">On ₹1000+</span>
               </div>
               <div className="flex flex-col items-center text-center p-3 bg-bg-secondary rounded-xl">
                 <FiPackage className="w-6 h-6 text-primary mb-2" />
@@ -399,8 +473,8 @@ const ProductDetailPage = () => {
               </div>
               <div className="flex flex-col items-center text-center p-3 bg-bg-secondary rounded-xl">
                 <FiRefreshCw className="w-6 h-6 text-primary mb-2" />
-                <span className="text-xs font-medium text-text-primary">Easy Returns</span>
-                <span className="text-xs text-text-light">7 Days</span>
+                <span className="text-xs font-medium text-text-primary">Real Collection</span>
+                <span className="text-xs text-text-light">100% Authentic</span>
               </div>
             </div>
           </div>
@@ -411,19 +485,24 @@ const ProductDetailPage = () => {
           <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
             {/* Tab Headers */}
             <div className="flex border-b border-border overflow-x-auto scrollbar-none">
-              {['description', 'specifications', 'shipping'].map((tab) => (
+              {[
+                { id: 'description', label: 'Product Description', icon: FiInfo },
+                { id: 'specifications', label: 'Technical Specifications', icon: FiPackage },
+                { id: 'shipping', label: 'Shipping & Returns', icon: FiTruck }
+              ].map((tab) => (
                 <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-all duration-300
-                            cursor-pointer relative
-                            ${activeTab === tab 
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap 
+                            transition-all duration-300 cursor-pointer relative
+                            ${activeTab === tab.id 
                               ? 'text-primary' 
                               : 'text-text-secondary hover:text-text-primary'
                             }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  {activeTab === tab && (
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                  {activeTab === tab.id && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></span>
                   )}
                 </button>
@@ -434,16 +513,29 @@ const ProductDetailPage = () => {
             <div className="p-6">
               {activeTab === 'description' && (
                 <div className="prose prose-green max-w-none">
-                  <p className="text-text-secondary leading-relaxed whitespace-pre-line">
+                  <div className="text-text-secondary leading-relaxed whitespace-pre-line">
                     {product.description}
-                  </p>
+                  </div>
                   {product.additionalInfo && (
                     <div className="mt-6 pt-6 border-t border-border">
-                      <h3 className="text-lg font-semibold text-text-primary mb-3">
+                      <h3 className="text-lg font-semibold text-text-primary mb-3 flex items-center gap-2">
+                        <FiInfo className="w-5 h-5 text-primary" />
                         Additional Information
                       </h3>
-                      <p className="text-text-secondary leading-relaxed whitespace-pre-line">
+                      <div className="text-text-secondary leading-relaxed whitespace-pre-line">
                         {product.additionalInfo}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Historical Context */}
+                  {product.year && product.country && (
+                    <div className="mt-6 p-4 bg-bg-secondary rounded-xl">
+                      <h4 className="font-semibold text-text-primary mb-2">Historical Context</h4>
+                      <p className="text-sm text-text-secondary">
+                        This {product.denomination || 'coin'} from {product.country} dates back to {product.year}, 
+                        representing a significant piece of numismatic history. {product.condition} condition 
+                        makes it a valuable addition to any collection.
                       </p>
                     </div>
                   )}
@@ -451,23 +543,40 @@ const ProductDetailPage = () => {
               )}
 
               {activeTab === 'specifications' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {specifications.length > 0 ? (
-                    specifications.map((spec, index) => (
-                      <div 
-                        key={index}
-                        className="flex justify-between items-center py-3 px-4 bg-bg-secondary 
-                                 rounded-xl border border-border"
-                      >
-                        <span className="text-text-secondary">{spec.label}</span>
-                        <span className="font-semibold text-text-primary">{spec.value}</span>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {specifications.length > 0 ? (
+                      specifications.map((spec, index) => (
+                        <div 
+                          key={index}
+                          className="flex items-center gap-4 py-3 px-4 bg-bg-secondary rounded-xl border border-border"
+                        >
+                          <spec.icon className="w-5 h-5 text-primary flex-shrink-0" />
+                          <div className="flex-1">
+                            <span className="text-text-secondary text-sm">{spec.label}</span>
+                            <span className="font-semibold text-text-primary block">{spec.value}</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-text-secondary col-span-2 text-center py-8">
+                        No specifications available for this product.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Certification */}
+                  <div className="bg-success/5 border border-success/20 rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <FiShield className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-semibold text-text-primary mb-1">Authenticity Guarantee</h4>
+                        <p className="text-sm text-text-secondary">
+                          All banknotes and coins sold on AR Hobby are guaranteed to be 100% authentic.
+                        </p>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-text-secondary col-span-2 text-center py-8">
-                      No specifications available for this product.
-                    </p>
-                  )}
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -478,27 +587,29 @@ const ProductDetailPage = () => {
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Free Shipping</h4>
                       <p className="text-sm text-text-secondary">
-                        Free shipping on orders above ₹500. Standard delivery takes 5-7 business days.
+                        Free shipping on all orders above ₹1000. Standard delivery takes 5-7 business days.
                       </p>
                     </div>
                   </div>
+                  
                   <div className="flex items-start gap-4 p-4 bg-bg-secondary rounded-xl">
                     <FiPackage className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Secure Packaging</h4>
                       <p className="text-sm text-text-secondary">
-                        All items are carefully packaged to ensure safe delivery. Collectibles receive 
-                        extra protection with bubble wrap and rigid packaging.
+                        All items are carefully packaged to ensure they arrive in perfect condition.
                       </p>
                     </div>
                   </div>
+                  
                   <div className="flex items-start gap-4 p-4 bg-bg-secondary rounded-xl">
                     <FiRefreshCw className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Returns & Refunds</h4>
                       <p className="text-sm text-text-secondary">
-                        7-day return policy for damaged or incorrect items. Please contact us within 
-                        24 hours of delivery for any issues.
+                        Once an item has been shipped, returns will not be accepted. Please contact us 
+                        immediately if there are any issues with your order. We will do our best to 
+                        resolve any problems, but we cannot accept returns or cancellations after shipping.
                       </p>
                     </div>
                   </div>
@@ -508,22 +619,22 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* Related Products */}
+        {/* Related Products with SEO */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
-                  Related Products
+                  You May Also Like
                 </h2>
-                <p className="text-text-secondary mt-1">You might also like these</p>
+                <p className="text-text-secondary mt-1">Discover similar collectibles from our collection</p>
               </div>
               <Link 
                 to="/shop"
                 className="hidden sm:flex items-center gap-2 text-primary hover:text-primary-dark 
                          font-medium transition-colors duration-300 cursor-pointer"
               >
-                View All
+                View All Products
                 <FiChevronRight className="w-4 h-4" />
               </Link>
             </div>

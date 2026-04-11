@@ -97,7 +97,7 @@ const RegisterPage = () => {
 
   const benefits = [
     { icon: FiGift, title: 'Exclusive Offers', description: 'Get special discounts on rare collectibles' },
-    { icon: FiTruck, title: 'Free Shipping', description: 'Free delivery on orders above ₹500' },
+    { icon: FiTruck, title: 'Free Shipping', description: 'Free delivery on orders above ₹1000' },
     { icon: FiShield, title: 'Secure Shopping', description: '100% authentic products guaranteed' },
     { icon: FiAward, title: 'Loyalty Rewards', description: 'Earn points on every purchase' },
   ];
@@ -348,12 +348,8 @@ const RegisterPage = () => {
                 />
                 <label htmlFor="terms" className="text-sm text-text-secondary cursor-pointer">
                   I agree to the{' '}
-                  <Link to="/terms" className="text-primary hover:text-primary-dark font-medium">
+                  <Link to="/terms-and-conditions" className="text-primary hover:text-primary-dark font-medium">
                     Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-primary hover:text-primary-dark font-medium">
-                    Privacy Policy
                   </Link>
                 </label>
               </div>

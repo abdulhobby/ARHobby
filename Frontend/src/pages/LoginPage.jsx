@@ -222,7 +222,7 @@ const LoginPage = () => {
               '100% Authentic Items',
               'Secure Transactions',
               'Expert Curation',
-              'Worldwide Shipping'
+              'India Post Shipping'
             ].map((feature, index) => (
               <div key={index} className="flex items-center justify-center gap-3">
                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">

@@ -17,7 +17,7 @@ const NewArrivals = () => {
   const { newProducts, loading } = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(fetchNewProducts({ limit: 8 }));
+    dispatch(fetchNewProducts({ limit: 20 }));
   }, [dispatch]);
 
   if (loading && newProducts.length === 0) {
@@ -53,7 +53,7 @@ const NewArrivals = () => {
 
         {/* Products Grid - Desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {newProducts.slice(0, 4).map((product) => (
+          {newProducts.slice(0, 20).map((product) => (
             <ProductCard key={product._id} product={product} isNew={true} />
           ))}
         </div>

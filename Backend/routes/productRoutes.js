@@ -1,5 +1,4 @@
 // routes/productRoutes.js
-
 import express from 'express';
 import {
   createProduct,
@@ -21,12 +20,10 @@ import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-// ==================== ADMIN ROUTES (MOVE TO TOP) ====================
-
+// ==================== ADMIN ROUTES ====================
 router.get('/admin', protectAdmin, getAllProductsAdmin);
 
 // ==================== PUBLIC ROUTES ====================
-
 router.get('/', getAllProducts);
 router.get('/featured', getFeaturedProducts);
 router.get('/new', getNewProducts);
@@ -39,7 +36,6 @@ router.get('/slug/:slug', getProductBySlug);
 router.get('/:id', getProductById);
 
 // ==================== ADMIN ACTIONS ====================
-
 router.post(
   '/',
   protectAdmin,

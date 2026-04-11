@@ -9,7 +9,9 @@ export const createProduct = async (req, res) => {
     const {
       name, description, category, country, year, condition,
       denomination, material, weight, dimensions, rarity,
-      additionalInfo, price, comparePrice, stock, isFeatured, tags
+      additionalInfo, price, comparePrice, stock, isFeatured, isNew, tags,
+      seoMetaTitle, seoMetaDescription, seoMetaKeywords, 
+      seoOgTitle, seoOgDescription, seoCanonicalUrl
     } = req.body;
 
     const categoryExists = await Category.findById(category);
@@ -24,13 +26,24 @@ export const createProduct = async (req, res) => {
         const dataURI = `data:${file.mimetype};base64,${b64}`;
         const result = await cloudinary.uploader.upload(dataURI, {
           folder: 'currency-corner/products',
-          width: 800,
-          height: 800,
+          width: 1200,
+          height: 1200,
           crop: 'limit'
         });
         images.push({ public_id: result.public_id, url: result.secure_url });
       }
     }
+
+    // Prepare SEO data
+    const seoData = {
+      metaTitle: seoMetaTitle || name.substring(0, 70),
+      metaDescription: seoMetaDescription || description?.substring(0, 160),
+      metaKeywords: seoMetaKeywords ? seoMetaKeywords.split(',').map(k => k.trim()) : [],
+      ogTitle: seoOgTitle || name,
+      ogDescription: seoOgDescription || description?.substring(0, 160),
+      ogImage: images.length > 0 ? images[0].url : '',
+      canonicalUrl: seoCanonicalUrl || ''
+    };
 
     const product = await Product.create({
       name, description, images, category, country, year, condition,
@@ -38,9 +51,14 @@ export const createProduct = async (req, res) => {
       additionalInfo, price, comparePrice,
       stock: stock || 0,
       isFeatured: isFeatured === 'true',
-      isNew: true, // Mark new products as new
-      tags: tags ? (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags) : []
+      isNew: isNew === 'true',
+      tags: tags ? (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags) : [],
+      seo: seoData
     });
+
+    // Generate and save schema markup
+    product.seo.schemaMarkup = product.generateSchemaMarkup();
+    await product.save();
 
     await product.populate('category', 'name slug');
     res.status(201).json({ success: true, product, message: 'Product created successfully' });
@@ -52,6 +70,11 @@ export const createProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const resultPerPage = 12;
+
+    // Apply default sort to show newest first if no sort parameter provided
+    if (!req.query.sort) {
+      req.query.sort = '-createdAt'; // Newest first
+    }
 
     const countQuery = Product.find({ isActive: true });
     const countFeatures = new ApiFeatures(countQuery, req.query).search().filter();
@@ -84,6 +107,11 @@ export const getAllProductsAdmin = async (req, res) => {
   try {
     const resultPerPage = 20;
 
+    // Apply default sort to show newest first for admin too
+    if (!req.query.sort) {
+      req.query.sort = '-createdAt';
+    }
+
     const countQuery = Product.find();
     const countFeatures = new ApiFeatures(countQuery, req.query).search().filter();
     const totalProducts = await countFeatures.query.countDocuments();
@@ -114,12 +142,15 @@ export const getAllProductsAdmin = async (req, res) => {
 export const getProductBySlug = async (req, res) => {
   try {
     const product = await Product.findOne({ slug: req.params.slug, isActive: true })
-      .populate('category', 'name slug');
+      .populate('category', 'name slug description');
 
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
+    // Update schema markup with current data
+    product.seo.schemaMarkup = product.generateSchemaMarkup();
+    
     product.views += 1;
     await product.save({ validateBeforeSave: false });
 
@@ -148,7 +179,11 @@ export const getProductsByCategory = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Category not found' });
     }
 
-    const queryWithCategory = { ...req.query, category: category._id };
+    // Apply default sort to show newest first
+    if (!req.query.sort) {
+      req.query.sort = '-createdAt';
+    }
+
     const resultPerPage = 12;
 
     const countQuery = Product.find({ isActive: true, category: category._id });
@@ -182,7 +217,7 @@ export const getFeaturedProducts = async (req, res) => {
   try {
     const products = await Product.find({ isActive: true, isFeatured: true })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }) // Newest first
       .limit(Number(req.query.limit) || 8);
 
     res.status(200).json({ success: true, products });
@@ -196,7 +231,6 @@ export const getNewProducts = async (req, res) => {
     const resultPerPage = Number(req.query.limit) || 12;
     const page = Number(req.query.page) || 1;
 
-    // Products marked as new, created in last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -218,7 +252,7 @@ export const getNewProducts = async (req, res) => {
       ]
     })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1, _id: -1 })
+      .sort({ createdAt: -1, _id: -1 }) // Newest first, most recent ID first
       .limit(resultPerPage)
       .skip((page - 1) * resultPerPage);
 
@@ -239,7 +273,7 @@ export const getLatestProducts = async (req, res) => {
   try {
     const products = await Product.find({ isActive: true })
       .populate('category', 'name slug')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 }) // Newest first
       .limit(Number(req.query.limit) || 8);
 
     res.status(200).json({ success: true, products });
@@ -261,6 +295,7 @@ export const getRelatedProducts = async (req, res) => {
       isActive: true
     })
       .populate('category', 'name slug')
+      .sort({ createdAt: -1 }) // Show newest related products first
       .limit(Number(req.query.limit) || 4);
 
     res.status(200).json({ success: true, products });
@@ -280,9 +315,12 @@ export const updateProduct = async (req, res) => {
       name, description, category, country, year, condition,
       denomination, material, weight, dimensions, rarity,
       additionalInfo, price, comparePrice, stock, isFeatured, isActive, isNew, tags,
+      seoMetaTitle, seoMetaDescription, seoMetaKeywords,
+      seoOgTitle, seoOgDescription, seoCanonicalUrl,
       removeImages
     } = req.body;
 
+    // Update basic fields
     if (name) product.name = name;
     if (description) product.description = description;
     if (category) product.category = category;
@@ -306,6 +344,19 @@ export const updateProduct = async (req, res) => {
     if (isNew !== undefined) product.isNew = isNew === 'true' || isNew === true;
     if (tags) product.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags;
 
+    // Update SEO fields
+    if (seoMetaTitle !== undefined) product.seo.metaTitle = seoMetaTitle;
+    if (seoMetaDescription !== undefined) product.seo.metaDescription = seoMetaDescription;
+    if (seoMetaKeywords !== undefined) {
+      product.seo.metaKeywords = typeof seoMetaKeywords === 'string' 
+        ? seoMetaKeywords.split(',').map(k => k.trim()) 
+        : seoMetaKeywords;
+    }
+    if (seoOgTitle !== undefined) product.seo.ogTitle = seoOgTitle;
+    if (seoOgDescription !== undefined) product.seo.ogDescription = seoOgDescription;
+    if (seoCanonicalUrl !== undefined) product.seo.canonicalUrl = seoCanonicalUrl;
+
+    // Handle image removal
     if (removeImages) {
       const imagesToRemove = typeof removeImages === 'string' ? JSON.parse(removeImages) : removeImages;
       for (const publicId of imagesToRemove) {
@@ -314,19 +365,28 @@ export const updateProduct = async (req, res) => {
       }
     }
 
+    // Add new images
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const b64 = Buffer.from(file.buffer).toString('base64');
         const dataURI = `data:${file.mimetype};base64,${b64}`;
         const result = await cloudinary.uploader.upload(dataURI, {
           folder: 'currency-corner/products',
-          width: 800,
-          height: 800,
+          width: 1200,
+          height: 1200,
           crop: 'limit'
         });
         product.images.push({ public_id: result.public_id, url: result.secure_url });
       }
+      
+      // Update OG image if no custom OG image is set
+      if (!seoOgTitle && !seoOgDescription && product.images.length > 0) {
+        product.seo.ogImage = product.images[0].url;
+      }
     }
+
+    // Update schema markup
+    product.seo.schemaMarkup = product.generateSchemaMarkup();
 
     await product.save();
     await product.populate('category', 'name slug');
