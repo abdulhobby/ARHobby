@@ -1,0 +1,579 @@
+/* index.css */
+@import "tailwindcss";
+
+@theme {
+  /* Primary Green Colors */
+  --color-primary: #16a34a;
+  --color-primary-light: #22c55e;
+  --color-primary-dark: #15803d;
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+  
+  /* Secondary Colors (Dark/Black) */
+  --color-secondary: #111827;
+  --color-secondary-light: #1f2937;
+  
+  /* Accent */
+  --color-accent: #ffffff;
+  
+  /* Text Colors */
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-light: #6b7280;
+  --color-text-white: #ffffff;
+  
+  /* Background Colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f0fdf4;
+  --color-bg-tertiary: #dcfce7;
+  
+  /* Border Colors */
+  --color-border: #d1d5db;
+  --color-border-light: #e5e7eb;
+  --color-border-green: #86efac;
+  
+  /* Status Colors */
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+}
+
+/* ==================== Base Styles ==================== */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  line-height: 1.6;
+}
+
+/* ==================== Selection Color ==================== */
+::selection {
+  background-color: var(--color-primary-200);
+  color: var(--color-primary-900);
+}
+
+::-moz-selection {
+  background-color: var(--color-primary-200);
+  color: var(--color-primary-900);
+}
+
+/* ==================== Custom Scrollbar ==================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==================== Focus Styles ==================== */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ==================== Number Input Spinner Removal ==================== */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ==================== Animations ==================== */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(100%); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes slideInLeft {
+  from { 
+    opacity: 0; 
+    transform: translateX(-100%); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    transform: translateX(-100%); 
+  }
+  100% { 
+    transform: translateX(200%); 
+  }
+}
+
+@keyframes pulse-green {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); 
+  }
+  50% { 
+    box-shadow: 0 0 0 15px rgba(22, 163, 74, 0); 
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-5px); 
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes spin-slow {
+  from { 
+    transform: rotate(0deg); 
+  }
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+@keyframes squareSpin {
+  0% { 
+    transform: rotate(0deg); 
+    border-radius: 0%; 
+  }
+  25% { 
+    transform: rotate(90deg); 
+    border-radius: 25%; 
+  }
+  50% { 
+    transform: rotate(180deg); 
+    border-radius: 50%; 
+  }
+  75% { 
+    transform: rotate(270deg); 
+    border-radius: 25%; 
+  }
+  100% { 
+    transform: rotate(360deg); 
+    border-radius: 0%; 
+  }
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2s infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.loader-square {
+  animation: squareSpin 1.5s ease-in-out infinite;
+}
+
+/* ==================== Gradient Backgrounds ==================== */
+.bg-gradient-green {
+  background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-primary-100) 100%);
+}
+
+.bg-gradient-green-dark {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+}
+
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, var(--color-primary-50) 0%, transparent 70%);
+}
+
+/* ==================== Card Hover Effects ==================== */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(22, 163, 74, 0.15);
+}
+
+/* ==================== Button Base Styles ==================== */
+.btn-primary {
+  @apply bg-primary text-white font-semibold py-3 px-6 rounded-xl cursor-pointer 
+         transition-all duration-300 hover:bg-primary-dark hover:shadow-lg 
+         hover:shadow-primary/30 active:scale-95 disabled:opacity-50 
+         disabled:cursor-not-allowed disabled:hover:scale-100;
+}
+
+.btn-secondary {
+  @apply bg-white text-primary font-semibold py-3 px-6 rounded-xl cursor-pointer 
+         border-2 border-primary transition-all duration-300 
+         hover:bg-primary-50 active:scale-95;
+}
+
+.btn-outline {
+  @apply bg-transparent text-primary font-medium py-2 px-4 rounded-lg cursor-pointer 
+         border border-primary transition-all duration-300 
+         hover:bg-primary hover:text-white active:scale-95;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-text-secondary font-medium py-2 px-4 rounded-lg cursor-pointer 
+         transition-all duration-300 hover:bg-bg-secondary hover:text-primary;
+}
+
+/* ==================== Input Styles ==================== */
+.input-field {
+  @apply w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary
+         placeholder:text-text-light transition-all duration-300
+         focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20;
+}
+
+.input-error {
+  @apply border-error focus:border-error focus:ring-error/20;
+}
+
+.input-success {
+  @apply border-success focus:border-success focus:ring-success/20;
+}
+
+.select-field {
+  @apply w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary
+         cursor-pointer transition-all duration-300
+         focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20
+         appearance-none;
+}
+
+.textarea-field {
+  @apply w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary
+         placeholder:text-text-light transition-all duration-300 resize-none
+         focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20;
+}
+
+/* ==================== Label Styles ==================== */
+.label-text {
+  @apply block text-sm font-medium text-text-primary mb-2;
+}
+
+.label-required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+/* ==================== Link Styles ==================== */
+.link-primary {
+  @apply text-primary hover:text-primary-dark font-medium transition-colors duration-300 cursor-pointer;
+}
+
+.link-underline {
+  @apply text-primary hover:text-primary-dark font-medium transition-all duration-300 cursor-pointer
+         underline underline-offset-4 decoration-primary/30 hover:decoration-primary;
+}
+
+/* ==================== Badge Styles ==================== */
+.badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-primary {
+  @apply bg-primary/10 text-primary border border-primary/20;
+}
+
+.badge-success {
+  @apply bg-success/10 text-success border border-success/20;
+}
+
+.badge-error {
+  @apply bg-error/10 text-error border border-error/20;
+}
+
+.badge-warning {
+  @apply bg-warning/10 text-warning border border-warning/20;
+}
+
+.badge-info {
+  @apply bg-info/10 text-info border border-info/20;
+}
+
+/* ==================== Skeleton Loading ==================== */
+.skeleton {
+  @apply bg-border animate-pulse rounded;
+}
+
+.skeleton-text {
+  @apply h-4 bg-border animate-pulse rounded;
+}
+
+.skeleton-image {
+  @apply bg-border animate-pulse rounded-xl;
+}
+
+/* ==================== Container Styles ==================== */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* ==================== Section Styles ==================== */
+.section-padding {
+  @apply py-12 sm:py-16 lg:py-20;
+}
+
+.section-title {
+  @apply text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary;
+}
+
+.section-subtitle {
+  @apply text-text-secondary mt-2 max-w-2xl;
+}
+
+/* ==================== Glass Effect ==================== */
+.glass {
+  @apply bg-white/80 backdrop-blur-lg border border-white/20;
+}
+
+.glass-dark {
+  @apply bg-secondary/80 backdrop-blur-lg border border-white/10;
+}
+
+/* ==================== Shadow Utilities ==================== */
+.shadow-green {
+  box-shadow: 0 10px 40px rgba(22, 163, 74, 0.15);
+}
+
+.shadow-green-lg {
+  box-shadow: 0 20px 60px rgba(22, 163, 74, 0.2);
+}
+
+/* ==================== Text Utilities ==================== */
+.text-gradient {
+  @apply bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ==================== Aspect Ratio Utilities ==================== */
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-product {
+  aspect-ratio: 4 / 5;
+}
+
+/* ==================== Safe Area for Mobile ==================== */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ==================== Print Styles ==================== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+/* ==================== Reduced Motion ==================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Add to your global CSS file (e.g., index.css or App.css) */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}

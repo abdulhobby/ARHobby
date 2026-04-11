@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/* Theme tokens */
+@theme {
+  --color-border: #e5e7eb;
+}
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+  }
+
+  .scrollbar-thumb-gray-800::-webkit-scrollbar-thumb {
+    background-color: #1f2937;
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+/* Custom Animations */
+@layer utilities {
+  @keyframes slide-in-from-top {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoom-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .animate-slide-in { animation: slide-in-from-top 0.2s ease-out; }
+  .animate-zoom-in  { animation: zoom-in 0.2s ease-out; }
+  .animate-fade-in  { animation: fade-in 0.2s ease-out; }
+}
+
+/* Base Styles */
+@layer base {
+  * {
+    /* FIX: use CSS var directly — @apply border-border is invalid in Tailwind v4 */
+    border-color: var(--color-border);
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  *:focus        { outline: none; }
+  *:focus-visible { @apply outline-none ring-2 ring-black ring-offset-2; }
+}
+
+/* Component Styles */
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg font-medium;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 cursor-pointer font-medium;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all duration-200;
+  }
+
+  .card  { @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6; }
+  .badge { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium; }
+
+  .badge-success { @apply bg-green-100 text-green-700; }
+  .badge-warning { @apply bg-yellow-100 text-yellow-700; }
+  .badge-danger  { @apply bg-red-100 text-red-700; }
+  .badge-info    { @apply bg-blue-100 text-blue-700; }
+}
+
+/* Print Styles */
+@media print {
+  body       { @apply bg-white; }
+  .no-print  { display: none !important; }
+}
+
+/* Loading Spinner */
+.spinner {
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Text Clamp Utilities */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Custom Select Arrow */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+/* Transitions */
+.transition-base { transition: all 0.2s ease-in-out; }
+
+/* Glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Hover Lift */
+.hover-lift       { transition: transform 0.2s; }
+.hover-lift:hover { transform: translateY(-4px); }
+
+/* Elegant Shadows */
+.shadow-elegant    { box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06); }
+.shadow-elegant-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05); }
+
+/* Checkbox / Radio */
+input[type='checkbox'],
+input[type='radio'] { cursor: pointer; }
+
+/* FIX: .table-wrapper — replaced @apply scrollbar-* with direct CSS.
+   Custom @layer utilities classes cannot be used with @apply in Tailwind v4. */
+.table-wrapper {
+  overflow-x: auto;
+}
+.table-wrapper::-webkit-scrollbar        { width: 6px; height: 6px; }
+.table-wrapper::-webkit-scrollbar-track  { background-color: transparent; }
+.table-wrapper::-webkit-scrollbar-thumb  { background-color: #d1d5db; border-radius: 3px; }
+.table-wrapper::-webkit-scrollbar-thumb:hover { background-color: #9ca3af; }
+
+/* Truncate Text */
+.truncate-tooltip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}
