@@ -332,6 +332,8 @@ export const updateOrderStatus = async (req, res) => {
 
 export const getNewOrders = async (req, res) => {
   try {
+    console.log('🔥 getNewOrders called');
+
     const newOrders = await Order.find({ isViewed: false })
       .populate('user', 'name email')
       .sort({ createdAt: -1 })
@@ -340,8 +342,14 @@ export const getNewOrders = async (req, res) => {
     const count = await Order.countDocuments({ isViewed: false });
 
     res.status(200).json({ success: true, orders: newOrders, count });
+
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('❌ REAL ERROR:', error); // 🔥 THIS IS KEY
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 

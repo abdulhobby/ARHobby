@@ -67,7 +67,7 @@ export const cartAPI = {
 
 export const orderAPI = {
   getAll: (params) => API.get('/orders/admin/all', { params }),
-  getById: (id) => API.get(`/orders/${id}`),
+  getById: (id) => API.get(`/orders/admin/${id}`),
   updateStatus: (id, data) => API.put(`/orders/admin/${id}/status`, data),
   getNew: () => API.get('/orders/admin/new'),
   markViewed: (id) => API.put(`/orders/admin/${id}/viewed`),
