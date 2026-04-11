@@ -175,3 +175,10 @@ input[type='radio'] { cursor: pointer; }
   white-space: nowrap;
   cursor: help;
 }
+
+/* Add to your global CSS file */
+@media (min-width: 1024px) {
+  .lg\:ml-64 {
+    margin-left: 16rem; /* 256px - same as sidebar width */
+  }
+}

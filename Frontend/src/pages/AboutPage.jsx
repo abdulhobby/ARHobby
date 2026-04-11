@@ -93,7 +93,7 @@ const AboutPage = () => {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 animate-fade-in">
               <GiCoinflip className="w-5 h-5 text-primary-300" />
-              <span className="text-sm font-medium text-primary-100">Established 2020</span>
+              <span className="text-sm font-medium text-primary-100">Established in 2025</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in">
               About <span className="text-primary-300">AR Hobby</span>

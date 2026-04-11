@@ -5,7 +5,6 @@ import SEO from '../components/common/SEO';
 import {
   FiMail,
   FiPhone,
-  FiMapPin,
   FiMessageSquare,
   FiSend,
   FiUser,
@@ -14,6 +13,7 @@ import {
   FiExternalLink,
   FiCheckCircle
 } from 'react-icons/fi';
+import { FaCoins } from "react-icons/fa";
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import emailjs from '@emailjs/browser';
@@ -101,9 +101,9 @@ const ContactPage = () => {
 
   const contactInfo = [
     {
-      icon: FiMapPin,
-      title: "Visit Us",
-      description: "Prayagraj, Uttar Pradesh, India",
+      icon: FaCoins,
+      title: "100%",
+      description: "Authentic Currencies",
       color: "bg-blue-500"
     },
     {
@@ -116,8 +116,8 @@ const ContactPage = () => {
     {
       icon: FiMail,
       title: "Email Us",
-      description: "arhobby@gmail.com",
-      link: "mailto:arhobby@gmail.com",
+      description: "arhobby4@gmail.com",
+      link: "mailto:arhobby4@gmail.com",
       color: "bg-amber-500"
     },
     {

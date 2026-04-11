@@ -155,7 +155,7 @@ const Footer = () => {
                 className="flex items-center gap-3 text-gray-400 hover:text-primary-light text-sm sm:text-base transition-colors duration-300"
               >
                 <FiMail className="text-primary-light text-lg flex-shrink-0" />
-                <span>arhobby@email.com</span>
+                <span>arhobby4@gmail.com</span>
               </a>
             </div>
           </div>

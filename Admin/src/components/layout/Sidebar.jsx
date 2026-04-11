@@ -35,15 +35,21 @@ const Sidebar = ({ isOpen, onClose }) => {
       
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 h-full w-64 bg-black text-white z-50
+        fixed lg:sticky lg:top-0
+        top-0 left-0 
+        h-screen w-64 
+        bg-black text-white 
+        z-50
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static
+        lg:translate-x-0
         border-r border-gray-800
         flex flex-col
+        overflow-hidden
+        flex-shrink-0
       `}>
-        {/* Header */}
-        <div className="p-6 border-b border-gray-800 relative">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 p-6 border-b border-gray-800 relative">
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
             AR Hobby
           </h1>
@@ -59,8 +65,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+        {/* Navigation - Scrollable */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
           <ul className="space-y-1">
             {menuItems.map((item) => (
               <li key={item.path}>
@@ -95,11 +101,11 @@ const Sidebar = ({ isOpen, onClose }) => {
           </ul>
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-800">
+        {/* Footer - Fixed at bottom */}
+        <div className="flex-shrink-0 p-4 border-t border-gray-800 bg-black">
           <div className="px-4 py-3 bg-gray-900 rounded-lg">
             <p className="text-xs text-gray-400">Version 1.0.0</p>
-            <p className="text-xs text-gray-500 mt-1">© 2024 AR Hobby</p>
+            <p className="text-xs text-gray-500 mt-1">© 2025 AR Hobby</p>
           </div>
         </div>
       </aside>

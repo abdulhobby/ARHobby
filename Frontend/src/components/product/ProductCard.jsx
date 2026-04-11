@@ -35,7 +35,7 @@ const ProductCard = ({ product }) => {
 
   return (
     <div
-      className="group relative bg-bg-primary rounded-2xl border-2 border-border-light 
+      className="group relative bg-transparent rounded-2xl border-2 border-border-light 
                  hover:border-primary/40 shadow-sm hover:shadow-xl 
                  transition-all duration-500 ease-out overflow-hidden
                  transform hover:-translate-y-2"
@@ -121,15 +121,6 @@ const ProductCard = ({ product }) => {
 
         {/* Content */}
         <div className="p-4 sm:p-5">
-          {/* Category */}
-          {product.category?.name && (
-            <p
-              className="text-[10px] sm:text-xs font-semibold text-primary uppercase tracking-wider 
-                        mb-1.5"
-            >
-              {product.category.name}
-            </p>
-          )}
 
           {/* Product Name */}
           <h3
@@ -139,20 +130,6 @@ const ProductCard = ({ product }) => {
           >
             {product.name}
           </h3>
-
-          {/* Country & Year */}
-          {product.country && (
-            <p className="text-[11px] sm:text-xs text-text-light mb-3 flex items-center gap-1.5">
-              <span className="w-1 h-1 bg-primary-300 rounded-full"></span>
-              {product.country}
-              {product.year && (
-                <>
-                  <span className="text-border">•</span>
-                  {product.year}
-                </>
-              )}
-            </p>
-          )}
 
           {/* Price */}
           <div className="flex items-center gap-2.5 flex-wrap">

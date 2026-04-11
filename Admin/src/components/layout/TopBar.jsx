@@ -18,7 +18,7 @@ const TopBar = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+    <header className="flex-shrink-0 bg-white border-b border-gray-200 shadow-sm z-30">
       <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4">
         {/* Left section */}
         <div className="flex items-center gap-4">
