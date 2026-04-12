@@ -229,7 +229,7 @@ const ProductDetailPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-secondary">
+    <div className="bg-bg-secondary py-8 sm:py-5">
       {/* Full SEO Implementation */}
       <SEO
         title={product.seo?.metaTitle || product.name}

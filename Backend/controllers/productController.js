@@ -211,23 +211,48 @@ export const getAllProductsAdmin = async (req, res) => {
   }
 };
 
+// controllers/productController.js - Update getProductBySlug
+
 export const getProductBySlug = async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug, isActive: true })
+    const { slug } = req.params;
+    
+    // First try to find by exact slug
+    let product = await Product.findOne({ slug: slug, isActive: true })
       .populate('category', 'name slug description');
-
+    
+    // If not found, try to find by name (for backward compatibility)
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      // Try to extract name from slug (remove the timestamp part)
+      const lastDashIndex = slug.lastIndexOf('-');
+      let productName = slug;
+      if (lastDashIndex > -1) {
+        productName = slug.substring(0, lastDashIndex);
+      }
+      
+      product = await Product.findOne({ 
+        name: { $regex: new RegExp(`^${productName.replace(/-/g, ' ')}$`, 'i') },
+        isActive: true 
+      }).populate('category', 'name slug description');
+    }
+    
+    if (!product) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Product not found with the provided slug' 
+      });
     }
 
     // Update schema markup with current data
     product.seo.schemaMarkup = product.generateSchemaMarkup();
-
+    
+    // Increment views
     product.views += 1;
     await product.save({ validateBeforeSave: false });
 
     res.status(200).json({ success: true, product });
   } catch (error) {
+    console.error('Error in getProductBySlug:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

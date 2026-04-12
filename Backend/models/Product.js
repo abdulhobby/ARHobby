@@ -191,13 +191,18 @@ productSchema.virtual('newRemainingTime').get(function() {
 });
 
 // Pre-save middleware
-productSchema.pre('save', function() {
-  // Generate slug
-  if (this.isNew || this.isModified('name')) {
-    this.slug = this.name
+productSchema.pre('save', function(next) {
+  // Generate slug from name
+  if (this.isModified('name') || !this.slug) {
+    // Create base slug from name
+    let baseSlug = this.name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+      .replace(/^-+|-+$/g, '');
+    
+    // Add timestamp for uniqueness (but keep it clean)
+    const timestamp = Date.now().toString(36);
+    this.slug = `${baseSlug}-${timestamp}`;
   }
 
   // Update stock status
@@ -205,29 +210,24 @@ productSchema.pre('save', function() {
     this.stockStatus = this.stock <= 0 ? 'Out of Stock' : 'In Stock';
   }
 
-  // ✅ NEW: When isNew changes from false to true, set newMarkedAt
-  if (this.isModified('isNew') && this.isNew === true) {
+  // Handle isNew marking
+  if (this.isModified('isNew') && this.isNew === true && !this.newMarkedAt) {
     this.newMarkedAt = new Date();
   }
   
-  // ✅ NEW: When isNew is set to false, clear newMarkedAt
   if (this.isModified('isNew') && this.isNew === false) {
     this.newMarkedAt = null;
   }
 
   // Auto-generate SEO metadata if not provided
-  if (this.isNew || this.isModified('name')) {
-    if (!this.seo?.metaTitle) {
-      this.seo = this.seo || {};
-      this.seo.metaTitle = this.name.substring(0, 70);
-    }
+  if (!this.seo?.metaTitle && this.name) {
+    this.seo = this.seo || {};
+    this.seo.metaTitle = this.name.substring(0, 70);
   }
 
-  if (this.isNew || this.isModified('description')) {
-    if (!this.seo?.metaDescription) {
-      this.seo = this.seo || {};
-      this.seo.metaDescription = this.description?.substring(0, 160);
-    }
+  if (!this.seo?.metaDescription && this.description) {
+    this.seo = this.seo || {};
+    this.seo.metaDescription = this.description?.substring(0, 160);
   }
 
   // Set OG image to first product image if not set
@@ -235,6 +235,8 @@ productSchema.pre('save', function() {
     this.seo = this.seo || {};
     this.seo.ogImage = this.images[0].url;
   }
+  
+  // next();
 });
 
 // ✅ NEW: Auto-expire old new products (run this as a scheduled job)
