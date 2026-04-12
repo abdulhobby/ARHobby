@@ -7,17 +7,17 @@ import SubCategory from '../models/SubCategory.js';
 export const getFilterOptions = async (req, res) => {
   try {
     // Get distinct countries from active products
-    const countries = await Product.distinct('country', { 
-      country: { $ne: null, $ne: '' }, 
-      isActive: true 
+    const countries = await Product.distinct('country', {
+      country: { $ne: null, $ne: '' },
+      isActive: true
     });
-    
+
     // Get distinct materials from active products
-    const materials = await Product.distinct('material', { 
-      material: { $ne: null, $ne: '' }, 
-      isActive: true 
+    const materials = await Product.distinct('material', {
+      material: { $ne: null, $ne: '' },
+      isActive: true
     });
-    
+
     // Get active sub-categories with their names
     const subCategories = await SubCategory.find({ isActive: true })
       .select('name _id slug category')
@@ -25,9 +25,9 @@ export const getFilterOptions = async (req, res) => {
       .lean();
 
     // Get distinct conditions
-    const conditions = await Product.distinct('condition', { 
-      condition: { $ne: null, $ne: '' }, 
-      isActive: true 
+    const conditions = await Product.distinct('condition', {
+      condition: { $ne: null, $ne: '' },
+      isActive: true
     });
 
     res.status(200).json({
@@ -39,8 +39,8 @@ export const getFilterOptions = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in getFilterOptions:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: error.message,
       countries: [],
       materials: [],
@@ -57,44 +57,44 @@ export const getAllProducts = async (req, res) => {
 
     // Build filter object
     const filter = { isActive: true };
-    
+
     // Apply category filter
     if (req.query.category) {
       filter.category = req.query.category;
     }
-    
-    // ✅ Apply sub-category filter
+
+    // Apply sub-category filter
     if (req.query.subCategory) {
       filter.subCategories = req.query.subCategory;
     }
-    
-    // ✅ Apply country filter
+
+    // Apply country filter
     if (req.query.country && req.query.country !== '') {
       filter.country = req.query.country;
     }
-    
-    // ✅ Apply material filter
+
+    // Apply material filter
     if (req.query.material && req.query.material !== '') {
       filter.material = req.query.material;
     }
-    
+
     // Apply stock status filter
     if (req.query.stockStatus && req.query.stockStatus !== '') {
       filter.stockStatus = req.query.stockStatus;
     }
-    
+
     // Apply condition filter
     if (req.query.condition && req.query.condition !== '') {
       filter.condition = req.query.condition;
     }
-    
+
     // Apply price range filter
     if (req.query.minPrice || req.query.maxPrice) {
       filter.price = {};
       if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
       if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
     }
-    
+
     // Apply search filter
     if (req.query.keyword) {
       filter.$or = [
@@ -103,12 +103,12 @@ export const getAllProducts = async (req, res) => {
         { tags: { $regex: req.query.keyword, $options: 'i' } }
       ];
     }
-    
+
     console.log('Applied filters:', JSON.stringify(filter, null, 2));
-    
+
     // Count total products
     const totalProducts = await Product.countDocuments(filter);
-    
+
     // Build sort object
     let sortObj = { createdAt: -1, _id: -1 };
     if (req.query.sort) {
@@ -122,21 +122,48 @@ export const getAllProducts = async (req, res) => {
       };
       sortObj = sortMapping[req.query.sort] || sortObj;
     }
-    
-    // Get products with pagination
+
+    // Get products with pagination - explicitly select fields
     const products = await Product.find(filter)
       .populate('category', 'name slug')
       .populate('subCategories', 'name slug')
+      .select('name slug description price comparePrice images stock stockStatus isFeatured isNew newMarkedAt createdAt category subCategories country material condition') // ✅ Added isNew and newMarkedAt
       .sort(sortObj)
       .limit(resultPerPage)
       .skip((page - 1) * resultPerPage)
       .lean();
-    
+
+    // ✅ Add computed fields to each product
+    const productsWithMeta = products.map(product => {
+      const now = new Date();
+      const markedDate = product.newMarkedAt ? new Date(product.newMarkedAt) : null;
+      let remainingHours = 0;
+      let isNewValid = false;
+
+      if (product.isNew && markedDate) {
+        const hoursSinceMarked = (now - markedDate) / (1000 * 60 * 60);
+        remainingHours = Math.max(0, 48 - hoursSinceMarked);
+        isNewValid = remainingHours > 0;
+      }
+
+      return {
+        ...product,
+        isNewValid,
+        newRemainingHours: Math.floor(remainingHours),
+        newRemainingTime: remainingHours > 0
+          ? remainingHours < 24
+            ? `${Math.floor(remainingHours)}h remaining`
+            : `${Math.floor(remainingHours / 24)}d remaining`
+          : null
+      };
+    });
+
     console.log(`Found ${products.length} products out of ${totalProducts} total`);
-    
+    console.log(`Products marked as new: ${productsWithMeta.filter(p => p.isNew).length}`);
+
     res.status(200).json({
       success: true,
-      products,
+      products: productsWithMeta,
       totalProducts,
       page,
       pages: Math.ceil(totalProducts / resultPerPage),
@@ -347,7 +374,7 @@ export const getAllProductsAdmin = async (req, res) => {
 
     // Build filter object for admin (include inactive products)
     const filter = {};
-    
+
     // ✅ Search filter
     if (req.query.keyword) {
       filter.$or = [
@@ -356,27 +383,27 @@ export const getAllProductsAdmin = async (req, res) => {
         { tags: { $regex: req.query.keyword, $options: 'i' } }
       ];
     }
-    
+
     // ✅ Category filter
     if (req.query.category) {
       filter.category = req.query.category;
     }
-    
+
     // ✅ Sub-Category filter
     if (req.query.subCategory) {
       filter.subCategories = req.query.subCategory;
     }
-    
+
     // ✅ Country filter
     if (req.query.country && req.query.country !== '') {
       filter.country = { $regex: req.query.country, $options: 'i' };
     }
-    
+
     // ✅ Material filter
     if (req.query.material && req.query.material !== '') {
       filter.material = { $regex: req.query.material, $options: 'i' };
     }
-    
+
     // ✅ Stock Status filter
     if (req.query.stockStatus && req.query.stockStatus !== '') {
       if (req.query.stockStatus === 'Low Stock') {
@@ -386,34 +413,34 @@ export const getAllProductsAdmin = async (req, res) => {
         filter.stockStatus = req.query.stockStatus;
       }
     }
-    
+
     // ✅ Featured filter
     if (req.query.isFeatured && req.query.isFeatured !== '') {
       filter.isFeatured = req.query.isFeatured === 'true';
     }
-    
+
     // ✅ Condition filter
     if (req.query.condition && req.query.condition !== '') {
       filter.condition = req.query.condition;
     }
-    
+
     // ✅ Rarity filter
     if (req.query.rarity && req.query.rarity !== '') {
       filter.rarity = req.query.rarity;
     }
-    
+
     // ✅ Price range filter
     if (req.query.minPrice || req.query.maxPrice) {
       filter.price = {};
       if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
       if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
     }
-    
+
     console.log('Admin filters applied:', JSON.stringify(filter, null, 2));
-    
+
     // Count total products with filters
     const totalProducts = await Product.countDocuments(filter);
-    
+
     // Build sort object
     let sortObj = { createdAt: -1, _id: -1 };
     if (req.query.sort) {
@@ -429,7 +456,7 @@ export const getAllProductsAdmin = async (req, res) => {
       };
       sortObj = sortMapping[req.query.sort] || { createdAt: -1, _id: -1 };
     }
-    
+
     // Get products with pagination
     const products = await Product.find(filter)
       .populate('category', 'name slug')
@@ -452,19 +479,18 @@ export const getAllProductsAdmin = async (req, res) => {
   }
 };
 
-// controllers/productController.js - Update getProductBySlug
-
 export const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
     // First try to find by exact slug
     let product = await Product.findOne({ slug: slug, isActive: true })
-      .populate('category', 'name slug description');
+      .populate('category', 'name slug description')
+      .populate('subCategories', 'name slug')
+      .select('-__v'); // Exclude version field
 
     // If not found, try to find by name (for backward compatibility)
     if (!product) {
-      // Try to extract name from slug (remove the timestamp part)
       const lastDashIndex = slug.lastIndexOf('-');
       let productName = slug;
       if (lastDashIndex > -1) {
@@ -474,7 +500,9 @@ export const getProductBySlug = async (req, res) => {
       product = await Product.findOne({
         name: { $regex: new RegExp(`^${productName.replace(/-/g, ' ')}$`, 'i') },
         isActive: true
-      }).populate('category', 'name slug description');
+      })
+        .populate('category', 'name slug description')
+        .populate('subCategories', 'name slug');
     }
 
     if (!product) {
@@ -484,6 +512,18 @@ export const getProductBySlug = async (req, res) => {
       });
     }
 
+    // ✅ Calculate new product validity
+    const now = new Date();
+    const markedDate = product.newMarkedAt ? new Date(product.newMarkedAt) : null;
+    let remainingHours = 0;
+    let isNewValid = false;
+
+    if (product.isNew && markedDate) {
+      const hoursSinceMarked = (now - markedDate) / (1000 * 60 * 60);
+      remainingHours = Math.max(0, 48 - hoursSinceMarked);
+      isNewValid = remainingHours > 0;
+    }
+
     // Update schema markup with current data
     product.seo.schemaMarkup = product.generateSchemaMarkup();
 
@@ -491,7 +531,17 @@ export const getProductBySlug = async (req, res) => {
     product.views += 1;
     await product.save({ validateBeforeSave: false });
 
-    res.status(200).json({ success: true, product });
+    // Convert to object and add computed fields
+    const productObj = product.toObject();
+    productObj.isNewValid = isNewValid;
+    productObj.newRemainingHours = Math.floor(remainingHours);
+    productObj.newRemainingTime = remainingHours > 0
+      ? remainingHours < 24
+        ? `${Math.floor(remainingHours)}h remaining`
+        : `${Math.floor(remainingHours / 24)}d remaining`
+      : null;
+
+    res.status(200).json({ success: true, product: productObj });
   } catch (error) {
     console.error('Error in getProductBySlug:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -612,11 +662,11 @@ export const getNewProducts = async (req, res) => {
     const resultPerPage = Number(req.query.limit) || 12;
     const page = Number(req.query.page) || 1;
 
-    // ✅ Only get products that are marked as new AND not expired
+    // ✅ Only get products that are marked as new AND have a marking date
     const query = {
       isActive: true,
       isNew: true,
-      newMarkedAt: { $ne: null } // Ensure it has a marking date
+      newMarkedAt: { $ne: null }
     };
 
     // Add optional filters
@@ -634,25 +684,52 @@ export const getNewProducts = async (req, res) => {
 
     const products = await Product.find(query)
       .populate('category', 'name slug')
-      .sort({ newMarkedAt: -1, _id: -1 }) // Sort by newest marked first
+      .select('name slug description price comparePrice images stock stockStatus isNew newMarkedAt createdAt category country material condition')
+      .sort({ newMarkedAt: -1, _id: -1 })
       .limit(resultPerPage)
-      .skip((page - 1) * resultPerPage);
+      .skip((page - 1) * resultPerPage)
+      .lean();
 
-    // ✅ Add remaining time info to each product
+    // ✅ Calculate remaining time for each product
+    const now = new Date();
     const productsWithRemainingTime = products.map(product => {
-      const productObj = product.toObject();
-      productObj.newRemainingHours = product.newRemainingHours;
-      productObj.newRemainingTime = product.newRemainingTime;
-      productObj.isNewValid = product.isNewValid;
-      return productObj;
+      let remainingHours = 0;
+      let isNewValid = false;
+      let remainingTime = null;
+      
+      if (product.newMarkedAt) {
+        const markedDate = new Date(product.newMarkedAt);
+        const hoursSinceMarked = (now - markedDate) / (1000 * 60 * 60);
+        remainingHours = Math.max(0, 48 - hoursSinceMarked);
+        isNewValid = remainingHours > 0;
+        
+        if (isNewValid) {
+          if (remainingHours < 24) {
+            remainingTime = `${Math.floor(remainingHours)}h remaining`;
+          } else {
+            const days = Math.floor(remainingHours / 24);
+            remainingTime = `${days}d remaining`;
+          }
+        }
+      }
+      
+      return {
+        ...product,
+        newRemainingHours: Math.floor(remainingHours),
+        newRemainingTime: remainingTime,
+        isNewValid: isNewValid
+      };
     });
+
+    // ✅ Filter out expired products (optional - if you want to hide expired ones)
+    const validProducts = productsWithRemainingTime.filter(p => p.isNewValid === true);
 
     res.status(200).json({
       success: true,
-      products: productsWithRemainingTime,
-      totalProducts: totalProducts || 0,
+      products: validProducts,
+      totalProducts: validProducts.length,
       page: page,
-      pages: Math.ceil(totalProducts / resultPerPage) || 1,
+      pages: Math.ceil(validProducts.length / resultPerPage) || 1,
       resultPerPage: resultPerPage
     });
   } catch (error) {

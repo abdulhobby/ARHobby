@@ -181,7 +181,7 @@ const Header = () => {
                     <span
                       className="absolute -top-0.5 -right-0.5 bg-primary text-text-white text-[10px] 
                                  font-bold w-5 h-5 rounded-full flex items-center justify-center 
-                                 shadow-md animate-pulse"
+                                 shadow-md"
                     >
                       {cartItemCount}
                     </span>
