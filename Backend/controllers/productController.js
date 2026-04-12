@@ -2,11 +2,157 @@
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
 import cloudinary from '../config/cloudinary.js';
+import SubCategory from '../models/SubCategory.js';
 
+export const getFilterOptions = async (req, res) => {
+  try {
+    // Get distinct countries from active products
+    const countries = await Product.distinct('country', { 
+      country: { $ne: null, $ne: '' }, 
+      isActive: true 
+    });
+    
+    // Get distinct materials from active products
+    const materials = await Product.distinct('material', { 
+      material: { $ne: null, $ne: '' }, 
+      isActive: true 
+    });
+    
+    // Get active sub-categories with their names
+    const subCategories = await SubCategory.find({ isActive: true })
+      .select('name _id slug category')
+      .sort({ name: 1 })
+      .lean();
+
+    // Get distinct conditions
+    const conditions = await Product.distinct('condition', { 
+      condition: { $ne: null, $ne: '' }, 
+      isActive: true 
+    });
+
+    res.status(200).json({
+      success: true,
+      countries: countries.filter(c => c && c.trim()).sort(),
+      materials: materials.filter(m => m && m.trim()).sort(),
+      subCategories: subCategories || [],
+      conditions: conditions.filter(c => c && c.trim()).sort()
+    });
+  } catch (error) {
+    console.error('Error in getFilterOptions:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message,
+      countries: [],
+      materials: [],
+      subCategories: []
+    });
+  }
+};
+
+
+export const getAllProducts = async (req, res) => {
+  try {
+    const resultPerPage = 12;
+    const page = Number(req.query.page) || 1;
+
+    // Build filter object
+    const filter = { isActive: true };
+    
+    // Apply category filter
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    
+    // ✅ Apply sub-category filter
+    if (req.query.subCategory) {
+      filter.subCategories = req.query.subCategory;
+    }
+    
+    // ✅ Apply country filter
+    if (req.query.country && req.query.country !== '') {
+      filter.country = req.query.country;
+    }
+    
+    // ✅ Apply material filter
+    if (req.query.material && req.query.material !== '') {
+      filter.material = req.query.material;
+    }
+    
+    // Apply stock status filter
+    if (req.query.stockStatus && req.query.stockStatus !== '') {
+      filter.stockStatus = req.query.stockStatus;
+    }
+    
+    // Apply condition filter
+    if (req.query.condition && req.query.condition !== '') {
+      filter.condition = req.query.condition;
+    }
+    
+    // Apply price range filter
+    if (req.query.minPrice || req.query.maxPrice) {
+      filter.price = {};
+      if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
+      if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
+    }
+    
+    // Apply search filter
+    if (req.query.keyword) {
+      filter.$or = [
+        { name: { $regex: req.query.keyword, $options: 'i' } },
+        { description: { $regex: req.query.keyword, $options: 'i' } },
+        { tags: { $regex: req.query.keyword, $options: 'i' } }
+      ];
+    }
+    
+    console.log('Applied filters:', JSON.stringify(filter, null, 2));
+    
+    // Count total products
+    const totalProducts = await Product.countDocuments(filter);
+    
+    // Build sort object
+    let sortObj = { createdAt: -1, _id: -1 };
+    if (req.query.sort) {
+      const sortMapping = {
+        'price-low-high': { price: 1, _id: 1 },
+        'price-high-low': { price: -1, _id: -1 },
+        'new-to-old': { createdAt: -1, _id: -1 },
+        'old-to-new': { createdAt: 1, _id: 1 },
+        'a-z': { name: 1, _id: 1 },
+        'z-a': { name: -1, _id: -1 }
+      };
+      sortObj = sortMapping[req.query.sort] || sortObj;
+    }
+    
+    // Get products with pagination
+    const products = await Product.find(filter)
+      .populate('category', 'name slug')
+      .populate('subCategories', 'name slug')
+      .sort(sortObj)
+      .limit(resultPerPage)
+      .skip((page - 1) * resultPerPage)
+      .lean();
+    
+    console.log(`Found ${products.length} products out of ${totalProducts} total`);
+    
+    res.status(200).json({
+      success: true,
+      products,
+      totalProducts,
+      page,
+      pages: Math.ceil(totalProducts / resultPerPage),
+      resultPerPage
+    });
+  } catch (error) {
+    console.error('Error in getAllProducts:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Updated createProduct with subCategories
 export const createProduct = async (req, res) => {
   try {
     const {
-      name, description, category, country, year, condition,
+      name, description, category, subCategories, country, year, condition,
       denomination, material, weight, dimensions, rarity,
       additionalInfo, price, comparePrice, stock, isFeatured, isNew, tags,
       seoMetaTitle, seoMetaDescription, seoMetaKeywords,
@@ -16,6 +162,22 @@ export const createProduct = async (req, res) => {
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       return res.status(400).json({ success: false, message: 'Invalid category' });
+    }
+
+    // Validate sub-categories if provided
+    let subCategoryIds = [];
+    if (subCategories) {
+      const subCategoryArray = typeof subCategories === 'string'
+        ? JSON.parse(subCategories)
+        : subCategories;
+
+      if (subCategoryArray && subCategoryArray.length > 0) {
+        const validSubCategories = await SubCategory.find({
+          _id: { $in: subCategoryArray },
+          isActive: true
+        });
+        subCategoryIds = validSubCategories.map(sc => sc._id);
+      }
     }
 
     let images = [];
@@ -45,12 +207,12 @@ export const createProduct = async (req, res) => {
     };
 
     const product = await Product.create({
-      name, description, images, category, country, year, condition,
-      denomination, material, weight, dimensions, rarity,
+      name, description, images, category, subCategories: subCategoryIds,
+      country, year, condition, denomination, material, weight, dimensions, rarity,
       additionalInfo, price, comparePrice,
       stock: stock || 0,
       isFeatured: isFeatured === 'true' || isFeatured === true,
-      isNew: isNew === 'true' || isNew === true, // ✅ Fixed boolean conversion
+      isNew: isNew === 'true' || isNew === true,
       tags: tags ? (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags) : [],
       seo: seoData
     });
@@ -60,43 +222,133 @@ export const createProduct = async (req, res) => {
     await product.save();
 
     await product.populate('category', 'name slug');
+    await product.populate('subCategories', 'name slug');
+
     res.status(201).json({ success: true, product, message: 'Product created successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const getAllProducts = async (req, res) => {
+// Updated updateProduct with subCategories
+export const updateProduct = async (req, res) => {
   try {
-    const resultPerPage = 12;
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const {
+      name, description, subCategories, country, year, condition,
+      denomination, material, weight, dimensions, rarity,
+      additionalInfo, price, comparePrice, stock, isFeatured, isActive, isNew, tags,
+      seoMetaTitle, seoMetaDescription, seoMetaKeywords,
+      seoOgTitle, seoOgDescription, seoCanonicalUrl,
+      removeImages
+    } = req.body;
+
+    // Update basic fields
+    if (name) product.name = name;
+    if (description) product.description = description;
+
+    // Update sub-categories
+    if (subCategories) {
+      const subCategoryArray = typeof subCategories === 'string'
+        ? JSON.parse(subCategories)
+        : subCategories;
+
+      if (subCategoryArray && subCategoryArray.length > 0) {
+        const validSubCategories = await SubCategory.find({
+          _id: { $in: subCategoryArray },
+          isActive: true
+        });
+        product.subCategories = validSubCategories.map(sc => sc._id);
+      } else {
+        product.subCategories = [];
+      }
+    }
+
+    if (country !== undefined) product.country = country;
+    if (year !== undefined) product.year = year;
+    if (condition) product.condition = condition;
+    if (denomination !== undefined) product.denomination = denomination;
+    if (material !== undefined) product.material = material;
+    if (weight !== undefined) product.weight = weight;
+    if (dimensions !== undefined) product.dimensions = dimensions;
+    if (rarity) product.rarity = rarity;
+    if (additionalInfo !== undefined) product.additionalInfo = additionalInfo;
+    if (price !== undefined) product.price = price;
+    if (comparePrice !== undefined) product.comparePrice = comparePrice;
+    if (stock !== undefined) {
+      product.stock = stock;
+      product.stockStatus = stock > 0 ? 'In Stock' : 'Out of Stock';
+    }
+    if (isFeatured !== undefined) product.isFeatured = isFeatured === 'true' || isFeatured === true;
+    if (isActive !== undefined) product.isActive = isActive === 'true' || isActive === true;
+    if (isNew !== undefined) product.isNew = isNew === 'true' || isNew === true;
+    if (tags) product.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags;
+
+    // Update SEO fields
+    if (seoMetaTitle !== undefined) product.seo.metaTitle = seoMetaTitle;
+    if (seoMetaDescription !== undefined) product.seo.metaDescription = seoMetaDescription;
+    if (seoMetaKeywords !== undefined) {
+      product.seo.metaKeywords = typeof seoMetaKeywords === 'string'
+        ? seoMetaKeywords.split(',').map(k => k.trim())
+        : seoMetaKeywords;
+    }
+    if (seoOgTitle !== undefined) product.seo.ogTitle = seoOgTitle;
+    if (seoOgDescription !== undefined) product.seo.ogDescription = seoOgDescription;
+    if (seoCanonicalUrl !== undefined) product.seo.canonicalUrl = seoCanonicalUrl;
+
+    // Handle image removal
+    if (removeImages) {
+      const imagesToRemove = typeof removeImages === 'string' ? JSON.parse(removeImages) : removeImages;
+      for (const publicId of imagesToRemove) {
+        await cloudinary.uploader.destroy(publicId);
+        product.images = product.images.filter(img => img.public_id !== publicId);
+      }
+    }
+
+    // Add new images
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const b64 = Buffer.from(file.buffer).toString('base64');
+        const dataURI = `data:${file.mimetype};base64,${b64}`;
+        const result = await cloudinary.uploader.upload(dataURI, {
+          folder: 'currency-corner/products',
+          width: 1200,
+          height: 1200,
+          crop: 'limit'
+        });
+        product.images.push({ public_id: result.public_id, url: result.secure_url });
+      }
+
+      if (!seoOgTitle && !seoOgDescription && product.images.length > 0) {
+        product.seo.ogImage = product.images[0].url;
+      }
+    }
+
+    product.seo.schemaMarkup = product.generateSchemaMarkup();
+    await product.save();
+    await product.populate('subCategories', 'name slug');
+
+    res.status(200).json({ success: true, product, message: 'Product updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Also update getAllProductsAdmin if it exists
+// controllers/productController.js - Update getAllProductsAdmin
+export const getAllProductsAdmin = async (req, res) => {
+  try {
+    const resultPerPage = 20;
     const page = Number(req.query.page) || 1;
 
-    // Build filter object
-    const filter = { isActive: true };
-
-    // Apply category filter
-    if (req.query.category) {
-      filter.category = req.query.category;
-    }
-
-    // Apply stock status filter
-    if (req.query.stockStatus && req.query.stockStatus !== '') {
-      filter.stockStatus = req.query.stockStatus;
-    }
-
-    // Apply condition filter
-    if (req.query.condition && req.query.condition !== '') {
-      filter.condition = req.query.condition;
-    }
-
-    // Apply price range filter
-    if (req.query.minPrice || req.query.maxPrice) {
-      filter.price = {};
-      if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
-      if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
-    }
-
-    // Apply search filter
+    // Build filter object for admin (include inactive products)
+    const filter = {};
+    
+    // ✅ Search filter
     if (req.query.keyword) {
       filter.$or = [
         { name: { $regex: req.query.keyword, $options: 'i' } },
@@ -104,35 +356,87 @@ export const getAllProducts = async (req, res) => {
         { tags: { $regex: req.query.keyword, $options: 'i' } }
       ];
     }
-
-    console.log('Applied filters:', filter); // Debug log
-
-    // Count total products
+    
+    // ✅ Category filter
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    
+    // ✅ Sub-Category filter
+    if (req.query.subCategory) {
+      filter.subCategories = req.query.subCategory;
+    }
+    
+    // ✅ Country filter
+    if (req.query.country && req.query.country !== '') {
+      filter.country = { $regex: req.query.country, $options: 'i' };
+    }
+    
+    // ✅ Material filter
+    if (req.query.material && req.query.material !== '') {
+      filter.material = { $regex: req.query.material, $options: 'i' };
+    }
+    
+    // ✅ Stock Status filter
+    if (req.query.stockStatus && req.query.stockStatus !== '') {
+      if (req.query.stockStatus === 'Low Stock') {
+        filter.stock = { $gt: 0, $lte: 5 };
+        filter.stockStatus = 'In Stock';
+      } else {
+        filter.stockStatus = req.query.stockStatus;
+      }
+    }
+    
+    // ✅ Featured filter
+    if (req.query.isFeatured && req.query.isFeatured !== '') {
+      filter.isFeatured = req.query.isFeatured === 'true';
+    }
+    
+    // ✅ Condition filter
+    if (req.query.condition && req.query.condition !== '') {
+      filter.condition = req.query.condition;
+    }
+    
+    // ✅ Rarity filter
+    if (req.query.rarity && req.query.rarity !== '') {
+      filter.rarity = req.query.rarity;
+    }
+    
+    // ✅ Price range filter
+    if (req.query.minPrice || req.query.maxPrice) {
+      filter.price = {};
+      if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
+      if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
+    }
+    
+    console.log('Admin filters applied:', JSON.stringify(filter, null, 2));
+    
+    // Count total products with filters
     const totalProducts = await Product.countDocuments(filter);
-
+    
     // Build sort object
     let sortObj = { createdAt: -1, _id: -1 };
     if (req.query.sort) {
       const sortMapping = {
-        'price-low-high': { price: 1, _id: 1 },
-        'price-high-low': { price: -1, _id: -1 },
-        'new-to-old': { createdAt: -1, _id: -1 },
-        'old-to-new': { createdAt: 1, _id: 1 },
-        'a-z': { name: 1, _id: 1 },
-        'z-a': { name: -1, _id: -1 }
+        '-createdAt': { createdAt: -1, _id: -1 },
+        'createdAt': { createdAt: 1, _id: 1 },
+        '-price': { price: -1, _id: -1 },
+        'price': { price: 1, _id: 1 },
+        'name': { name: 1, _id: 1 },
+        '-name': { name: -1, _id: -1 },
+        '-views': { views: -1, _id: -1 },
+        '-stock': { stock: -1, _id: -1 }
       };
-      sortObj = sortMapping[req.query.sort] || sortObj;
+      sortObj = sortMapping[req.query.sort] || { createdAt: -1, _id: -1 };
     }
-
+    
     // Get products with pagination
     const products = await Product.find(filter)
       .populate('category', 'name slug')
+      .populate('subCategories', 'name slug')
       .sort(sortObj)
       .limit(resultPerPage)
-      .skip((page - 1) * resultPerPage)
-      .lean();
-
-    console.log(`Found ${products.length} products out of ${totalProducts} total`); // Debug log
+      .skip((page - 1) * resultPerPage);
 
     res.status(200).json({
       success: true,
@@ -143,70 +447,7 @@ export const getAllProducts = async (req, res) => {
       resultPerPage
     });
   } catch (error) {
-    console.error('Error in getAllProducts:', error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// Also update getAllProductsAdmin if it exists
-export const getAllProductsAdmin = async (req, res) => {
-  try {
-    const resultPerPage = 20;
-
-    // Build filter for admin (include inactive products)
-    const filter = {};
-
-    if (req.query.category) filter.category = req.query.category;
-    if (req.query.stockStatus && req.query.stockStatus !== '') filter.stockStatus = req.query.stockStatus;
-    if (req.query.condition && req.query.condition !== '') filter.condition = req.query.condition;
-
-    if (req.query.minPrice || req.query.maxPrice) {
-      filter.price = {};
-      if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
-      if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
-    }
-
-    if (req.query.keyword) {
-      filter.$or = [
-        { name: { $regex: req.query.keyword, $options: 'i' } },
-        { description: { $regex: req.query.keyword, $options: 'i' } },
-        { tags: { $regex: req.query.keyword, $options: 'i' } }
-      ];
-    }
-
-    const totalProducts = await Product.countDocuments(filter);
-
-    let sortObj = { createdAt: -1, _id: -1 };
-    if (req.query.sort) {
-      const sortMapping = {
-        'price-low-high': { price: 1, _id: 1 },
-        'price-high-low': { price: -1, _id: -1 },
-        'new-to-old': { createdAt: -1, _id: -1 },
-        'old-to-new': { createdAt: 1, _id: 1 },
-        'a-z': { name: 1, _id: 1 },
-        'z-a': { name: -1, _id: -1 }
-      };
-      sortObj = sortMapping[req.query.sort] || sortObj;
-    }
-
-    const products = await Product.find(filter)
-      .populate('category', 'name slug')
-      .sort(sortObj)
-      .limit(resultPerPage)
-      .skip((Number(req.query.page) - 1) * resultPerPage);
-
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || resultPerPage;
-
-    res.status(200).json({
-      success: true,
-      products,
-      totalProducts,
-      page,
-      pages: Math.ceil(totalProducts / limit),
-      resultPerPage: limit
-    });
-  } catch (error) {
+    console.error('Error in getAllProductsAdmin:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -216,11 +457,11 @@ export const getAllProductsAdmin = async (req, res) => {
 export const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-    
+
     // First try to find by exact slug
     let product = await Product.findOne({ slug: slug, isActive: true })
       .populate('category', 'name slug description');
-    
+
     // If not found, try to find by name (for backward compatibility)
     if (!product) {
       // Try to extract name from slug (remove the timestamp part)
@@ -229,23 +470,23 @@ export const getProductBySlug = async (req, res) => {
       if (lastDashIndex > -1) {
         productName = slug.substring(0, lastDashIndex);
       }
-      
-      product = await Product.findOne({ 
+
+      product = await Product.findOne({
         name: { $regex: new RegExp(`^${productName.replace(/-/g, ' ')}$`, 'i') },
-        isActive: true 
+        isActive: true
       }).populate('category', 'name slug description');
     }
-    
+
     if (!product) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Product not found with the provided slug' 
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found with the provided slug'
       });
     }
 
     // Update schema markup with current data
     product.seo.schemaMarkup = product.generateSchemaMarkup();
-    
+
     // Increment views
     product.views += 1;
     await product.save({ validateBeforeSave: false });
@@ -283,24 +524,24 @@ export const getProductsByCategory = async (req, res) => {
 
     // Build filter
     const filter = { isActive: true, category: category._id };
-    
+
     // Apply stock status filter
     if (req.query.stockStatus && req.query.stockStatus !== '') {
       filter.stockStatus = req.query.stockStatus;
     }
-    
+
     // Apply condition filter
     if (req.query.condition && req.query.condition !== '') {
       filter.condition = req.query.condition;
     }
-    
+
     // Apply price range filter
     if (req.query.minPrice || req.query.maxPrice) {
       filter.price = {};
       if (req.query.minPrice) filter.price.$gte = Number(req.query.minPrice);
       if (req.query.maxPrice) filter.price.$lte = Number(req.query.maxPrice);
     }
-    
+
     // Apply search filter
     if (req.query.keyword) {
       filter.$or = [
@@ -309,11 +550,16 @@ export const getProductsByCategory = async (req, res) => {
         { tags: { $regex: req.query.keyword, $options: 'i' } }
       ];
     }
-    
+
     const totalProducts = await Product.countDocuments(filter);
-    
+
     // Build sort object
-    let sortObj = { createdAt: -1, _id: -1 };
+    let sortObj = {
+      isNew: -1,
+      newMarkedAt: -1,
+      createdAt: -1,
+      _id: -1
+    };
     if (req.query.sort) {
       const sortMapping = {
         'price-low-high': { price: 1, _id: 1 },
@@ -325,7 +571,7 @@ export const getProductsByCategory = async (req, res) => {
       };
       sortObj = sortMapping[req.query.sort] || sortObj;
     }
-    
+
     const products = await Product.find(filter)
       .populate('category', 'name slug')
       .sort(sortObj)
@@ -486,99 +732,6 @@ export const getRelatedProducts = async (req, res) => {
       .limit(Number(req.query.limit) || 4);
 
     res.status(200).json({ success: true, products });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-export const updateProduct = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
-    }
-
-    const {
-      name, description, category, country, year, condition,
-      denomination, material, weight, dimensions, rarity,
-      additionalInfo, price, comparePrice, stock, isFeatured, isActive, isNew, tags,
-      seoMetaTitle, seoMetaDescription, seoMetaKeywords,
-      seoOgTitle, seoOgDescription, seoCanonicalUrl,
-      removeImages
-    } = req.body;
-
-    // Update basic fields
-    if (name) product.name = name;
-    if (description) product.description = description;
-    if (category) product.category = category;
-    if (country !== undefined) product.country = country;
-    if (year !== undefined) product.year = year;
-    if (condition) product.condition = condition;
-    if (denomination !== undefined) product.denomination = denomination;
-    if (material !== undefined) product.material = material;
-    if (weight !== undefined) product.weight = weight;
-    if (dimensions !== undefined) product.dimensions = dimensions;
-    if (rarity) product.rarity = rarity;
-    if (additionalInfo !== undefined) product.additionalInfo = additionalInfo;
-    if (price !== undefined) product.price = price;
-    if (comparePrice !== undefined) product.comparePrice = comparePrice;
-    if (stock !== undefined) {
-      product.stock = stock;
-      product.stockStatus = stock > 0 ? 'In Stock' : 'Out of Stock';
-    }
-    if (isFeatured !== undefined) product.isFeatured = isFeatured === 'true' || isFeatured === true;
-    if (isActive !== undefined) product.isActive = isActive === 'true' || isActive === true;
-    if (isNew !== undefined) product.isNew = isNew === 'true' || isNew === true;
-    if (tags) product.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags;
-
-    // Update SEO fields
-    if (seoMetaTitle !== undefined) product.seo.metaTitle = seoMetaTitle;
-    if (seoMetaDescription !== undefined) product.seo.metaDescription = seoMetaDescription;
-    if (seoMetaKeywords !== undefined) {
-      product.seo.metaKeywords = typeof seoMetaKeywords === 'string'
-        ? seoMetaKeywords.split(',').map(k => k.trim())
-        : seoMetaKeywords;
-    }
-    if (seoOgTitle !== undefined) product.seo.ogTitle = seoOgTitle;
-    if (seoOgDescription !== undefined) product.seo.ogDescription = seoOgDescription;
-    if (seoCanonicalUrl !== undefined) product.seo.canonicalUrl = seoCanonicalUrl;
-
-    // Handle image removal
-    if (removeImages) {
-      const imagesToRemove = typeof removeImages === 'string' ? JSON.parse(removeImages) : removeImages;
-      for (const publicId of imagesToRemove) {
-        await cloudinary.uploader.destroy(publicId);
-        product.images = product.images.filter(img => img.public_id !== publicId);
-      }
-    }
-
-    // Add new images
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const b64 = Buffer.from(file.buffer).toString('base64');
-        const dataURI = `data:${file.mimetype};base64,${b64}`;
-        const result = await cloudinary.uploader.upload(dataURI, {
-          folder: 'currency-corner/products',
-          width: 1200,
-          height: 1200,
-          crop: 'limit'
-        });
-        product.images.push({ public_id: result.public_id, url: result.secure_url });
-      }
-
-      // Update OG image if no custom OG image is set
-      if (!seoOgTitle && !seoOgDescription && product.images.length > 0) {
-        product.seo.ogImage = product.images[0].url;
-      }
-    }
-
-    // Update schema markup
-    product.seo.schemaMarkup = product.generateSchemaMarkup();
-
-    await product.save();
-    await product.populate('category', 'name slug');
-
-    res.status(200).json({ success: true, product, message: 'Product updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

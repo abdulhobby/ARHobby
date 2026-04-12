@@ -9,6 +9,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/', icon: <FiHome />, label: 'Dashboard' },
     { path: '/products', icon: <FiPackage />, label: 'Products' },
     { path: '/categories', icon: <FiGrid />, label: 'Categories' },
+    { path: '/subcategories', icon: <FiGrid />, label: 'SubCategories' },
     { path: '/carts', icon: <FiGrid />, label: 'Carts' },
     { path: '/orders', icon: <FiShoppingBag />, label: 'Orders' },
     { path: '/coupons', icon: <FiTag />, label: 'Coupons' },

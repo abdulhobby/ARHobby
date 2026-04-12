@@ -24,6 +24,8 @@ import AdminCreateCampaignPage from './pages/AdminCreateCampaignPage';
 import AdminCampaignDetailPage from './pages/AdminCampaignDetailPage';
 import AdminSubscribersPage from './pages/AdminSubscribersPage';
 import Carts from './pages/Carts';
+import SubCategoryList from './pages/SubCategoryList';
+import SubCategoryForm from './pages/SubCategoryForm';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -93,6 +95,10 @@ function App() {
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="categories/add" element={<AddCategoryPage />} />
         <Route path="categories/edit/:id" element={<EditCategoryPage />} />
+
+        <Route path="subcategories" element={<SubCategoryList />} />
+        <Route path="subcategories/new" element={<SubCategoryForm />} />
+        <Route path="subcategories/edit/:id" element={<SubCategoryForm />} />
 
         <Route path="carts" element={<Carts />} />
         

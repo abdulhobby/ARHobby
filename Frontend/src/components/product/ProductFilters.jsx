@@ -1,12 +1,15 @@
+// frontend/src/components/product/ProductFilters.jsx
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategories } from '../../features/category/categorySlice';
+import { fetchSubCategories } from '../../features/subCategory/subCategorySlice';
 import {
   SORT_OPTIONS,
   STOCK_OPTIONS,
   PRODUCT_CONDITIONS,
 } from '../../utils/constants';
 import { FiFilter, FiX, FiSearch, FiChevronDown } from 'react-icons/fi';
+import API from '../../services/api'; // Import your API instance
 
 const ProductFilters = ({
   filters,
@@ -15,22 +18,45 @@ const ProductFilters = ({
 }) => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { categories } = useSelector((state) => state.category);
+  const { subCategories } = useSelector((state) => state.subCategory);
+  const [countries, setCountries] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (categories.length === 0) {
       dispatch(fetchCategories());
     }
-  }, [dispatch, categories.length]);
+    if (subCategories.length === 0) {
+      dispatch(fetchSubCategories());
+    }
+    fetchFilterOptions();
+  }, [dispatch, categories.length, subCategories.length]);
+
+  const fetchFilterOptions = async () => {
+    setLoadingOptions(true);
+    try {
+      // Use the API instance instead of raw fetch
+      const response = await API.get('/products/filter-options');
+      console.log('Filter options response:', response.data);
+      
+      if (response.data.success) {
+        setCountries(response.data.countries || []);
+        setMaterials(response.data.materials || []);
+      }
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+      // Fallback to empty arrays
+      setCountries([]);
+      setMaterials([]);
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
 
   const handleChange = (key, value) => {
-    // Create updated filters object
-    const updatedFilters = { 
-      ...filters, 
-      [key]: value, 
-      page: 1 
-    };
-    // Call the parent's onChange handler
+    const updatedFilters = { ...filters, [key]: value, page: 1 };
     onFilterChange(updatedFilters);
   };
 
@@ -38,6 +64,9 @@ const ProductFilters = ({
     const clearedFilters = {
       keyword: '',
       category: '',
+      subCategory: '',
+      country: '',
+      material: '',
       stockStatus: '',
       condition: '',
       sort: 'new-to-old',
@@ -48,16 +77,17 @@ const ProductFilters = ({
     onFilterChange(clearedFilters);
   };
 
-  const hasActiveFilters =
-    filters.category ||
-    filters.stockStatus ||
-    filters.condition ||
-    filters.minPrice ||
-    filters.maxPrice ||
-    filters.keyword;
+  const hasActiveFilters = () => {
+    return filters.category || filters.subCategory || filters.country || 
+           filters.material || filters.stockStatus || filters.condition || 
+           filters.minPrice || filters.maxPrice || filters.keyword;
+  };
 
   const activeFilterCount = [
     filters.category,
+    filters.subCategory,
+    filters.country,
+    filters.material,
     filters.stockStatus,
     filters.condition,
     filters.minPrice || filters.maxPrice,
@@ -69,8 +99,7 @@ const ProductFilters = ({
                          focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
                          transition-all duration-300`;
 
-  const labelClasses =
-    'text-sm font-semibold text-text-primary mb-2 block tracking-wide';
+  const labelClasses = 'text-sm font-semibold text-text-primary mb-2 block tracking-wide';
 
   return (
     <div>
@@ -86,10 +115,8 @@ const ProductFilters = ({
           <FiFilter className="text-base" />
           Filters
           {activeFilterCount > 0 && (
-            <span
-              className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-text-white 
-                         text-[10px] font-bold rounded-full flex items-center justify-center shadow-md"
-            >
+            <span className="absolute -top-2 -right-2 w-5 h-5 bg-primary text-text-white 
+                         text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
               {activeFilterCount}
             </span>
           )}
@@ -118,15 +145,10 @@ const ProductFilters = ({
             className="absolute inset-0 bg-secondary/50 backdrop-blur-sm"
             onClick={() => setShowMobileFilters(false)}
           />
-          <div
-            className="absolute right-0 top-0 h-full w-full max-w-sm bg-bg-primary shadow-2xl 
-                       overflow-y-auto animate-[slideInRight_0.3s_ease-out]"
-          >
-            {/* Mobile Filter Header */}
-            <div
-              className="sticky top-0 z-10 bg-bg-primary border-b border-border-light 
-                         px-5 py-4 flex items-center justify-between"
-            >
+          <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-bg-primary shadow-2xl 
+                       overflow-y-auto animate-[slideInRight_0.3s_ease-out]">
+            <div className="sticky top-0 z-10 bg-bg-primary border-b border-border-light 
+                         px-5 py-4 flex items-center justify-between">
               <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
                 <FiFilter className="text-primary" />
                 Filters
@@ -140,18 +162,20 @@ const ProductFilters = ({
               </button>
             </div>
 
-            {/* Mobile Filter Content */}
             <div className="p-5 space-y-6">
               <FilterContent 
                 filters={filters}
                 handleChange={handleChange}
                 categories={categories}
+                subCategories={subCategories}
+                countries={countries}
+                materials={materials}
+                loadingOptions={loadingOptions}
                 showCategoryFilter={showCategoryFilter}
                 labelClasses={labelClasses}
                 selectClasses={selectClasses}
               />
 
-              {/* Apply Button */}
               <button
                 onClick={() => setShowMobileFilters(false)}
                 className="w-full py-3 bg-primary hover:bg-primary-dark text-text-white 
@@ -167,11 +191,8 @@ const ProductFilters = ({
 
       {/* Desktop Sidebar Filters */}
       <div className="hidden lg:block">
-        <div
-          className="bg-bg-primary rounded-2xl border-2 border-border-light shadow-sm 
-                     p-6 sticky top-24"
-        >
-          {/* Header */}
+        <div className="bg-bg-primary rounded-2xl border-2 border-border-light shadow-sm 
+                     p-6 sticky top-24">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-border-light">
             <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
@@ -179,7 +200,7 @@ const ProductFilters = ({
               </div>
               Filters
             </h3>
-            {hasActiveFilters && (
+            {hasActiveFilters() && (
               <button
                 onClick={handleClearFilters}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-error 
@@ -197,6 +218,10 @@ const ProductFilters = ({
               filters={filters}
               handleChange={handleChange}
               categories={categories}
+              subCategories={subCategories}
+              countries={countries}
+              materials={materials}
+              loadingOptions={loadingOptions}
               showCategoryFilter={showCategoryFilter}
               labelClasses={labelClasses}
               selectClasses={selectClasses}
@@ -208,8 +233,16 @@ const ProductFilters = ({
   );
 };
 
-// Separate component for filter content to avoid code duplication
-const FilterContent = ({ filters, handleChange, categories, showCategoryFilter, labelClasses, selectClasses }) => {
+const FilterContent = ({ 
+  filters, handleChange, categories, subCategories, 
+  countries, materials, loadingOptions, showCategoryFilter, 
+  labelClasses, selectClasses 
+}) => {
+  // Filter sub-categories based on selected category
+  const filteredSubCategories = filters.category
+    ? subCategories.filter(sc => sc.category === filters.category)
+    : subCategories;
+
   return (
     <>
       {/* Search */}
@@ -237,7 +270,10 @@ const FilterContent = ({ filters, handleChange, categories, showCategoryFilter, 
           <div className="relative">
             <select
               value={filters.category || ''}
-              onChange={(e) => handleChange('category', e.target.value)}
+              onChange={(e) => {
+                handleChange('category', e.target.value);
+                handleChange('subCategory', '');
+              }}
               className={selectClasses}
             >
               <option value="">All Categories</option>
@@ -252,11 +288,81 @@ const FilterContent = ({ filters, handleChange, categories, showCategoryFilter, 
         </div>
       )}
 
+      {/* Sub-Category */}
+      {filteredSubCategories.length > 0 && (
+        <div>
+          <h4 className={labelClasses}>Filter by Banknotes, Coins....</h4>
+          <div className="relative">
+            <select
+              value={filters.subCategory || ''}
+              onChange={(e) => handleChange('subCategory', e.target.value)}
+              className={selectClasses}
+            >
+              <option value="">All</option>
+              {filteredSubCategories.map((sub) => (
+                <option key={sub._id} value={sub._id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
+          </div>
+        </div>
+      )}
+
+      {/* Country Filter */}
+      <div>
+        <h4 className={labelClasses}>Country</h4>
+        <div className="relative">
+          <select
+            value={filters.country || ''}
+            onChange={(e) => handleChange('country', e.target.value)}
+            className={selectClasses}
+            disabled={loadingOptions}
+          >
+            <option value="">All Countries</option>
+            {!loadingOptions && countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
+        </div>
+        {loadingOptions && (
+          <p className="text-xs text-text-light mt-1">Loading countries...</p>
+        )}
+      </div>
+
+      {/* Material Filter */}
+      <div>
+        <h4 className={labelClasses}>Material</h4>
+        <div className="relative">
+          <select
+            value={filters.material || ''}
+            onChange={(e) => handleChange('material', e.target.value)}
+            className={selectClasses}
+            disabled={loadingOptions}
+          >
+            <option value="">All Materials</option>
+            {!loadingOptions && materials.map((material) => (
+              <option key={material} value={material}>
+                {material}
+              </option>
+            ))}
+          </select>
+          <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
+        </div>
+        {loadingOptions && (
+          <p className="text-xs text-text-light mt-1">Loading materials...</p>
+        )}
+      </div>
+
       {/* Availability */}
       <div>
         <h4 className={labelClasses}>Availability</h4>
         <div className="space-y-2">
-          {STOCK_OPTIONS.map((opt) => (
+          {STOCK_OPTIONS.filter(opt => opt.value !== '').map((opt) => (
             <label
               key={opt.value}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer 
@@ -321,9 +427,7 @@ const FilterContent = ({ filters, handleChange, categories, showCategoryFilter, 
                        transition-all duration-300"
             />
           </div>
-          <span className="text-text-light text-xs font-semibold flex-shrink-0 px-1">
-            to
-          </span>
+          <span className="text-text-light text-xs font-semibold flex-shrink-0 px-1">to</span>
           <div className="relative flex-1">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light text-xs font-medium">
               ₹

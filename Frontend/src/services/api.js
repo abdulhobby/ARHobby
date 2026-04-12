@@ -65,6 +65,13 @@ export const categoryAPI = {
   getBySlug: (slug) => API.get(`/categories/slug/${slug}`)
 };
 
+// ✅ NEW: SubCategory APIs for Frontend
+export const subCategoryAPI = {
+  getAll: (params) => API.get('/subcategories', { params }),
+  getBySlug: (slug) => API.get(`/subcategories/slug/${slug}`),
+  getByCategory: (categoryId) => API.get(`/subcategories/by-category/${categoryId}`)
+};
+
 export const cartAPI = {
   get: () => API.get('/cart'),
   add: (data) => API.post('/cart/add', data),

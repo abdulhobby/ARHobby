@@ -30,6 +30,9 @@ const ShopPage = () => {
   const [filters, setFilters] = useState({
     keyword: searchParams.get('keyword') || '',
     category: searchParams.get('category') || '',
+    subCategory: searchParams.get('subCategory') || '', // ✅ Added subCategory
+    country: searchParams.get('country') || '', // ✅ Added country
+    material: searchParams.get('material') || '', // ✅ Added material
     stockStatus: searchParams.get('stockStatus') || '',
     condition: searchParams.get('condition') || '',
     sort: searchParams.get('sort') || 'new-to-old',
@@ -49,6 +52,9 @@ const ShopPage = () => {
     
     if (filters.keyword) queryParams.keyword = filters.keyword;
     if (filters.category) queryParams.category = filters.category;
+    if (filters.subCategory) queryParams.subCategory = filters.subCategory; // ✅ Added
+    if (filters.country) queryParams.country = filters.country; // ✅ Added
+    if (filters.material) queryParams.material = filters.material; // ✅ Added
     if (filters.stockStatus) queryParams.stockStatus = filters.stockStatus;
     if (filters.condition) queryParams.condition = filters.condition;
     if (filters.sort) queryParams.sort = filters.sort;
@@ -102,6 +108,9 @@ const ShopPage = () => {
     setFilters({
       keyword: '',
       category: '',
+      subCategory: '', // ✅ Added
+      country: '', // ✅ Added
+      material: '', // ✅ Added
       stockStatus: '',
       condition: '',
       sort: 'new-to-old',
@@ -123,6 +132,9 @@ const ShopPage = () => {
   const activeFiltersCount = [
     filters.keyword,
     filters.category,
+    filters.subCategory, // ✅ Added
+    filters.country, // ✅ Added
+    filters.material, // ✅ Added
     filters.stockStatus,
     filters.condition,
     filters.minPrice,
@@ -302,7 +314,7 @@ const ShopPage = () => {
             </div>
           </div>
 
-          {/* Active Filters Tags */}
+          {/* Active Filters Tags - Updated to show new filters */}
           {activeFiltersCount > 0 && (
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-sm text-text-secondary">Active filters:</span>
@@ -323,9 +335,48 @@ const ShopPage = () => {
               {filters.category && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
                                text-primary text-sm font-medium rounded-lg">
-                  Category: {filters.category}
+                  Category ID: {filters.category.substring(0, 8)}...
                   <button
-                    onClick={() => handleFilterChange({ ...filters, category: '' })}
+                    onClick={() => handleFilterChange({ ...filters, category: '', subCategory: '' })}
+                    className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
+                  >
+                    <FiX className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {filters.subCategory && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
+                               text-primary text-sm font-medium rounded-lg">
+                  Sub-Category Selected
+                  <button
+                    onClick={() => handleFilterChange({ ...filters, subCategory: '' })}
+                    className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
+                  >
+                    <FiX className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {filters.country && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
+                               text-primary text-sm font-medium rounded-lg">
+                  Country: {filters.country}
+                  <button
+                    onClick={() => handleFilterChange({ ...filters, country: '' })}
+                    className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
+                  >
+                    <FiX className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {filters.material && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
+                               text-primary text-sm font-medium rounded-lg">
+                  Material: {filters.material}
+                  <button
+                    onClick={() => handleFilterChange({ ...filters, material: '' })}
                     className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
                   >
                     <FiX className="w-3.5 h-3.5" />

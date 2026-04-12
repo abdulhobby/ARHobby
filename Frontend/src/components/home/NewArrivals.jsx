@@ -14,7 +14,7 @@ const NewArrivals = () => {
 
   useEffect(() => {
     console.log('Fetching new products...');
-    dispatch(fetchNewProducts({ limit: 8 }))
+    dispatch(fetchNewProducts({ limit: 20 }))
       .unwrap()
       .then((result) => {
         console.log('New products fetched:', result);
@@ -99,7 +99,7 @@ const NewArrivals = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {newProducts.slice(0, 8).map((product) => (
+          {newProducts.slice(0, 20).map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

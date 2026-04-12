@@ -3,6 +3,7 @@ import adminAuthReducer from '../features/auth/adminAuthSlice';
 import dashboardReducer from '../features/dashboard/dashboardSlice';
 import adminProductReducer from '../features/products/adminProductSlice';
 import adminCategoryReducer from '../features/categories/adminCategorySlice';
+import adminSubCategoryReducer from '../features/subCategory/adminSubCategorySlice';
 import adminOrderReducer from '../features/orders/adminOrderSlice';
 import adminCouponReducer from '../features/coupons/adminCouponSlice';
 import adminUserReducer from '../features/users/adminUserSlice';
@@ -15,10 +16,12 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     adminProduct: adminProductReducer,
     adminCategory: adminCategoryReducer,
+    adminSubCategory: adminSubCategoryReducer,
     adminOrder: adminOrderReducer,
     adminCoupon: adminCouponReducer,
     adminUser: adminUserReducer,
     adminContact: adminContactReducer,
     adminCart: adminCartReducer
+    
   }
 });

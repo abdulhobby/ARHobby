@@ -30,6 +30,9 @@ const CategoryPage = () => {
 
   const [filters, setFilters] = useState({
     keyword: searchParams.get('keyword') || '',
+    subCategory: searchParams.get('subCategory') || '', // ✅ Added subCategory
+    country: searchParams.get('country') || '', // ✅ Added country
+    material: searchParams.get('material') || '', // ✅ Added material
     stockStatus: searchParams.get('stockStatus') || '',
     condition: searchParams.get('condition') || '',
     sort: searchParams.get('sort') || 'new-to-old',
@@ -43,6 +46,9 @@ const CategoryPage = () => {
     const queryParams = {};
     
     if (filters.keyword) queryParams.keyword = filters.keyword;
+    if (filters.subCategory) queryParams.subCategory = filters.subCategory; // ✅ Added
+    if (filters.country) queryParams.country = filters.country; // ✅ Added
+    if (filters.material) queryParams.material = filters.material; // ✅ Added
     if (filters.stockStatus) queryParams.stockStatus = filters.stockStatus;
     if (filters.condition) queryParams.condition = filters.condition;
     if (filters.sort) queryParams.sort = filters.sort;
@@ -61,6 +67,9 @@ const CategoryPage = () => {
   useEffect(() => {
     setFilters({
       keyword: '',
+      subCategory: '', // ✅ Added
+      country: '', // ✅ Added
+      material: '', // ✅ Added
       stockStatus: '',
       condition: '',
       sort: 'new-to-old',
@@ -87,6 +96,9 @@ const CategoryPage = () => {
   const clearAllFilters = () => {
     setFilters({
       keyword: '',
+      subCategory: '', // ✅ Added
+      country: '', // ✅ Added
+      material: '', // ✅ Added
       stockStatus: '',
       condition: '',
       sort: 'new-to-old',
@@ -98,6 +110,9 @@ const CategoryPage = () => {
 
   const activeFiltersCount = [
     filters.keyword,
+    filters.subCategory, // ✅ Added
+    filters.country, // ✅ Added
+    filters.material, // ✅ Added
     filters.stockStatus,
     filters.condition,
     filters.minPrice,
@@ -227,7 +242,7 @@ const CategoryPage = () => {
           </div>
         </div>
 
-        {/* Active Filters Tags */}
+        {/* Active Filters Tags - Updated to show new filters */}
         {activeFiltersCount > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="text-sm text-text-secondary">Active filters:</span>
@@ -236,6 +251,33 @@ const CategoryPage = () => {
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
                 Search: "{filters.keyword}"
                 <button onClick={() => handleFilterChange({ ...filters, keyword: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+            
+            {filters.subCategory && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Sub-Category Selected
+                <button onClick={() => handleFilterChange({ ...filters, subCategory: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {filters.country && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Country: {filters.country}
+                <button onClick={() => handleFilterChange({ ...filters, country: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {filters.material && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Material: {filters.material}
+                <button onClick={() => handleFilterChange({ ...filters, material: '' })}>
                   <FiX className="w-3.5 h-3.5" />
                 </button>
               </span>

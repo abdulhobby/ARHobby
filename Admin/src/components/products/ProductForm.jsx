@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories } from '../../features/categories/adminCategorySlice';
+import { fetchSubCategories } from '../../features/subCategory/adminSubCategorySlice';
 import { PRODUCT_CONDITIONS, PRODUCT_RARITIES } from '../../utils/helpers';
-import { FiUpload, FiX, FiImage, FiAlertCircle, FiSearch, FiFileText } from 'react-icons/fi';
+import { FiUpload, FiX, FiImage, FiAlertCircle, FiSearch, FiFileText, FiCheck } from 'react-icons/fi';
 
 const ProductForm = ({ initialData, onSubmit, loading }) => {
   const dispatch = useDispatch();
   const { categories } = useSelector((state) => state.adminCategory);
+  const { subCategories } = useSelector((state) => state.adminSubCategory);
 
   const [formData, setFormData] = useState({
     name: '', description: '', category: '', country: '', year: '',
@@ -18,6 +20,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
     seoMetaTitle: '', seoMetaDescription: '', seoMetaKeywords: '',
     seoOgTitle: '', seoOgDescription: '', seoCanonicalUrl: ''
   });
+
   const [images, setImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [removeImages, setRemoveImages] = useState([]);
@@ -25,8 +28,20 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
   const [activeTab, setActiveTab] = useState('basic');
   const [seoPreview, setSeoPreview] = useState({ title: '', description: '', url: '' });
 
+  // ✅ NEW: Sub-categories state
+  const [selectedSubCategories, setSelectedSubCategories] = useState([]);
+  const [availableSubCategories, setAvailableSubCategories] = useState([]);
+
   useEffect(() => {
     dispatch(fetchCategories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchSubCategories()) // ✅ NEW ACTION
+      .unwrap()
+      .then((res) => {
+        setAvailableSubCategories(res.subCategories || []);
+      });
   }, [dispatch]);
 
   useEffect(() => {
@@ -60,6 +75,12 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
         seoCanonicalUrl: initialData.seo?.canonicalUrl || ''
       });
       setExistingImages(initialData.images || []);
+
+      // ✅ Set selected sub-categories
+      if (initialData.subCategories && initialData.subCategories.length > 0) {
+        const subCatIds = initialData.subCategories.map(sc => sc._id || sc);
+        setSelectedSubCategories(subCatIds);
+      }
     }
   }, [initialData]);
 
@@ -68,7 +89,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
     const metaTitle = formData.seoMetaTitle || formData.name;
     const metaDescription = formData.seoMetaDescription || formData.description?.substring(0, 160);
     const slug = initialData?.slug || formData.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    
+
     setSeoPreview({
       title: metaTitle,
       description: metaDescription,
@@ -79,6 +100,17 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  // ✅ Handle sub-category selection
+  const handleSubCategoryToggle = (subCategoryId) => {
+    setSelectedSubCategories(prev => {
+      if (prev.includes(subCategoryId)) {
+        return prev.filter(id => id !== subCategoryId);
+      } else {
+        return [...prev, subCategoryId];
+      }
+    });
   };
 
   const handleImageChange = (e) => {
@@ -113,6 +145,11 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
       }
     });
 
+    // ✅ Add sub-categories to form data
+    if (selectedSubCategories.length > 0) {
+      submitData.append('subCategories', JSON.stringify(selectedSubCategories));
+    }
+
     images.forEach(image => {
       submitData.append('images', image);
     });
@@ -126,6 +163,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
 
   const tabs = [
     { id: 'basic', label: 'Basic Info', icon: <FiFileText className="w-4 h-4" /> },
+    { id: 'subcategories', label: 'Sub-Categories', icon: <FiCheck className="w-4 h-4" /> },
     { id: 'details', label: 'Collectible Details', icon: <FiImage className="w-4 h-4" /> },
     { id: 'pricing', label: 'Pricing & Stock', icon: <FiImage className="w-4 h-4" /> },
     { id: 'seo', label: 'SEO & Metadata', icon: <FiSearch className="w-4 h-4" /> },
@@ -142,11 +180,10 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all duration-200 ${
-                activeTab === tab.id
+              className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-all duration-200 ${activeTab === tab.id
                   ? 'bg-black text-white'
                   : 'text-gray-600 hover:text-black hover:bg-gray-50'
-              }`}
+                }`}
             >
               {tab.icon}
               {tab.label}
@@ -162,7 +199,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
             <FiFileText className="w-5 h-5" />
             Basic Information
           </h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -304,11 +341,46 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
         </div>
       )}
 
+      {/* ✅ NEW: Sub-Categories Tab */}
+      {activeTab === 'subcategories' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <FiCheck className="w-5 h-5" />
+            Sub-Categories
+          </h3>
+
+          {availableSubCategories.length === 0 ? (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+              <p className="text-gray-600">No sub-categories available</p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm text-gray-600 mb-4">
+                Select sub-categories:
+              </p>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {availableSubCategories.map(sub => (
+                  <label key={sub._id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <input
+                      type="checkbox"
+                      checked={selectedSubCategories.includes(sub._id)}
+                      onChange={() => handleSubCategoryToggle(sub._id)}
+                    />
+                    <span>{sub.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Collectible Details Tab */}
       {activeTab === 'details' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Collectible Details</h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
@@ -423,7 +495,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
       {activeTab === 'pricing' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Pricing & Stock</h3>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
@@ -503,7 +575,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
               <FiSearch className="w-5 h-5" />
               Google Search Preview
             </h3>
-            
+
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <div className="text-blue-600 text-lg font-medium hover:underline cursor-pointer">
                 {seoPreview.title || 'Product Title'}
@@ -520,7 +592,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
           {/* SEO Fields */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Meta Tags & SEO Settings</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -588,7 +660,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
 
               <div className="border-t border-gray-200 pt-4">
                 <h4 className="font-medium text-gray-900 mb-3">Open Graph (Social Media) Settings</h4>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

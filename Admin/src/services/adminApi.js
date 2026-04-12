@@ -54,6 +54,19 @@ export const categoryAPI = {
   delete: (id) => API.delete(`/categories/${id}`)
 };
 
+// ✅ NEW: SubCategory APIs for Admin
+export const subCategoryAPI = {
+  getAll: (params) => API.get('/subcategories', { params }),
+  getById: (id) => API.get(`/subcategories/${id}`),
+  create: (formData) => API.post('/subcategories', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  update: (id, formData) => API.put(`/subcategories/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  delete: (id) => API.delete(`/subcategories/${id}`)
+};
+
 export const cartAPI = {
   getAll: (params) => API.get('/admin/carts', { params }),
   getAnalytics: () => API.get('/admin/carts/analytics'),

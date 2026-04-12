@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchProducts, deleteProduct } from '../features/products/adminProductSlice';
+import { fetchCategories } from '../features/categories/adminCategorySlice';
+import { fetchSubCategories } from '../features/subCategory/adminSubCategorySlice';
 import Pagination from '../components/common/Pagination';
 import ConfirmModal from '../components/common/ConfirmModal';
 import Loader from '../components/common/Loader';
@@ -17,7 +19,10 @@ import {
   FiX,
   FiChevronDown,
   FiGrid,
-  FiList
+  FiList,
+  FiMapPin,
+  FiBox,
+  FiLayers
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -26,6 +31,8 @@ const ProductsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { products, totalProducts, page, pages, loading } = useSelector((state) => state.adminProduct);
+  const { categories } = useSelector((state) => state.adminCategory);
+  const { subCategories } = useSelector((state) => state.adminSubCategory);
   
   // Filter states
   const [search, setSearch] = useState('');
@@ -35,6 +42,9 @@ const ProductsPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     category: '',
+    subCategory: '',
+    country: '',
+    material: '',
     stockStatus: '',
     isFeatured: '',
     sortBy: '-createdAt',
@@ -45,15 +55,32 @@ const ProductsPage = () => {
   });
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
   
+  // Get unique countries and materials from products
+  const [availableCountries, setAvailableCountries] = useState([]);
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  
+  // Fetch categories and sub-categories on mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchSubCategories());
+  }, [dispatch]);
+  
   // Get query params from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const pageParam = params.get('page');
     const searchParam = params.get('search');
     const categoryParam = params.get('category');
+    const subCategoryParam = params.get('subCategory');
+    const countryParam = params.get('country');
+    const materialParam = params.get('material');
     const stockStatusParam = params.get('stockStatus');
     const featuredParam = params.get('featured');
     const sortParam = params.get('sort');
+    const conditionParam = params.get('condition');
+    const rarityParam = params.get('rarity');
+    const minPriceParam = params.get('minPrice');
+    const maxPriceParam = params.get('maxPrice');
     
     if (pageParam) setCurrentPage(parseInt(pageParam));
     if (searchParam) {
@@ -61,9 +88,16 @@ const ProductsPage = () => {
       setSearchInput(searchParam);
     }
     if (categoryParam) setFilters(prev => ({ ...prev, category: categoryParam }));
+    if (subCategoryParam) setFilters(prev => ({ ...prev, subCategory: subCategoryParam }));
+    if (countryParam) setFilters(prev => ({ ...prev, country: countryParam }));
+    if (materialParam) setFilters(prev => ({ ...prev, material: materialParam }));
     if (stockStatusParam) setFilters(prev => ({ ...prev, stockStatus: stockStatusParam }));
     if (featuredParam) setFilters(prev => ({ ...prev, isFeatured: featuredParam }));
     if (sortParam) setFilters(prev => ({ ...prev, sortBy: sortParam }));
+    if (conditionParam) setFilters(prev => ({ ...prev, condition: conditionParam }));
+    if (rarityParam) setFilters(prev => ({ ...prev, rarity: rarityParam }));
+    if (minPriceParam) setFilters(prev => ({ ...prev, minPrice: minPriceParam }));
+    if (maxPriceParam) setFilters(prev => ({ ...prev, maxPrice: maxPriceParam }));
   }, [location.search]);
 
   // Fetch products when filters or page changes
@@ -75,6 +109,9 @@ const ProductsPage = () => {
     
     if (search) params.keyword = search;
     if (filters.category) params.category = filters.category;
+    if (filters.subCategory) params.subCategory = filters.subCategory;
+    if (filters.country) params.country = filters.country;
+    if (filters.material) params.material = filters.material;
     if (filters.stockStatus) params.stockStatus = filters.stockStatus;
     if (filters.isFeatured) params.isFeatured = filters.isFeatured;
     if (filters.sortBy) params.sort = filters.sortBy;
@@ -89,14 +126,31 @@ const ProductsPage = () => {
     updateUrlParams(params);
   }, [dispatch, currentPage, search, filters]);
 
+  // Extract unique countries and materials from products
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const countries = [...new Set(products.map(p => p.country).filter(c => c && c.trim()))];
+      const materials = [...new Set(products.map(p => p.material).filter(m => m && m.trim()))];
+      setAvailableCountries(countries.sort());
+      setAvailableMaterials(materials.sort());
+    }
+  }, [products]);
+
   const updateUrlParams = (params) => {
     const urlParams = new URLSearchParams();
     if (params.page && params.page !== 1) urlParams.set('page', params.page);
     if (params.keyword) urlParams.set('search', params.keyword);
     if (params.category) urlParams.set('category', params.category);
+    if (params.subCategory) urlParams.set('subCategory', params.subCategory);
+    if (params.country) urlParams.set('country', params.country);
+    if (params.material) urlParams.set('material', params.material);
     if (params.stockStatus) urlParams.set('stockStatus', params.stockStatus);
     if (params.isFeatured) urlParams.set('featured', params.isFeatured);
     if (params.sort && params.sort !== '-createdAt') urlParams.set('sort', params.sort);
+    if (params.condition) urlParams.set('condition', params.condition);
+    if (params.rarity) urlParams.set('rarity', params.rarity);
+    if (params.minPrice) urlParams.set('minPrice', params.minPrice);
+    if (params.maxPrice) urlParams.set('maxPrice', params.maxPrice);
     
     const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
     window.history.replaceState({}, '', newUrl);
@@ -107,7 +161,6 @@ const ProductsPage = () => {
       .unwrap()
       .then(() => {
         toast.success('Product deleted successfully');
-        // Refresh the product list
         dispatch(fetchProducts({ page: currentPage }));
       })
       .catch((err) => toast.error(err));
@@ -134,6 +187,9 @@ const ProductsPage = () => {
   const handleClearFilters = () => {
     setFilters({
       category: '',
+      subCategory: '',
+      country: '',
+      material: '',
       stockStatus: '',
       isFeatured: '',
       sortBy: '-createdAt',
@@ -194,10 +250,15 @@ const ProductsPage = () => {
   ];
 
   const hasActiveFilters = () => {
-    return filters.category || filters.stockStatus || filters.isFeatured || 
-           filters.minPrice || filters.maxPrice || filters.condition || filters.rarity ||
-           filters.sortBy !== '-createdAt' || search;
+    return filters.category || filters.subCategory || filters.country || filters.material ||
+           filters.stockStatus || filters.isFeatured || filters.minPrice || filters.maxPrice || 
+           filters.condition || filters.rarity || filters.sortBy !== '-createdAt' || search;
   };
+
+  // Filter sub-categories based on selected category
+  const filteredSubCategories = filters.category
+    ? subCategories.filter(sc => sc.category === filters.category)
+    : subCategories;
 
   if (loading) return <Loader />;
 
@@ -313,6 +374,82 @@ const ProductsPage = () => {
                 </select>
               </div>
 
+              {/* Category Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  value={filters.category}
+                  onChange={(e) => {
+                    handleFilterChange('category', e.target.value);
+                    handleFilterChange('subCategory', ''); // Reset sub-category when category changes
+                  }}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(cat => (
+                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sub-Category Filter */}
+              {filteredSubCategories.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                    <FiLayers className="w-4 h-4" />
+                    Sub-Category
+                  </label>
+                  <select
+                    value={filters.subCategory}
+                    onChange={(e) => handleFilterChange('subCategory', e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                  >
+                    <option value="">All Sub-Categories</option>
+                    {filteredSubCategories.map(sub => (
+                      <option key={sub._id} value={sub._id}>{sub.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Country Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                  <FiMapPin className="w-4 h-4" />
+                  Country
+                </label>
+                <select
+                  value={filters.country}
+                  onChange={(e) => handleFilterChange('country', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                >
+                  <option value="">All Countries</option>
+                  {availableCountries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Material Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+                  <FiBox className="w-4 h-4" />
+                  Material
+                </label>
+                <select
+                  value={filters.material}
+                  onChange={(e) => handleFilterChange('material', e.target.value)}
+                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                >
+                  <option value="">All Materials</option>
+                  {availableMaterials.map(material => (
+                    <option key={material} value={material}>{material}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Stock Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -383,7 +520,7 @@ const ProductsPage = () => {
                 </select>
               </div>
 
-              {/* Price Range */}
+              {/* Price Range - Min */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Min Price (₹)
@@ -397,6 +534,7 @@ const ProductsPage = () => {
                 />
               </div>
 
+              {/* Price Range - Max */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Max Price (₹)
@@ -422,45 +560,77 @@ const ProductsPage = () => {
                     </button>
                   </span>
                 )}
-                {filters.stockStatus && (
+                {filters.category && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                    Category: {categories.find(c => c._id === filters.category)?.name || filters.category}
+                    <button onClick={() => handleFilterChange('category', '')} className="ml-1 hover:text-purple-900">
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {filters.subCategory && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm">
+                    Sub-Category: {subCategories.find(s => s._id === filters.subCategory)?.name || filters.subCategory}
+                    <button onClick={() => handleFilterChange('subCategory', '')} className="ml-1 hover:text-indigo-900">
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {filters.country && (
                   <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+                    Country: {filters.country}
+                    <button onClick={() => handleFilterChange('country', '')} className="ml-1 hover:text-green-900">
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {filters.material && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                    Material: {filters.material}
+                    <button onClick={() => handleFilterChange('material', '')} className="ml-1 hover:text-yellow-900">
+                      <FiX className="w-3 h-3" />
+                    </button>
+                  </span>
+                )}
+                {filters.stockStatus && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">
                     Stock: {filters.stockStatus}
-                    <button onClick={() => handleFilterChange('stockStatus', '')} className="ml-1 hover:text-green-900">
+                    <button onClick={() => handleFilterChange('stockStatus', '')} className="ml-1 hover:text-orange-900">
                       <FiX className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {filters.isFeatured && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm">
                     {filters.isFeatured === 'true' ? 'Featured' : 'Non-Featured'}
-                    <button onClick={() => handleFilterChange('isFeatured', '')} className="ml-1 hover:text-purple-900">
+                    <button onClick={() => handleFilterChange('isFeatured', '')} className="ml-1 hover:text-pink-900">
                       <FiX className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {filters.condition && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">
                     Condition: {filters.condition}
-                    <button onClick={() => handleFilterChange('condition', '')} className="ml-1 hover:text-yellow-900">
+                    <button onClick={() => handleFilterChange('condition', '')} className="ml-1 hover:text-teal-900">
                       <FiX className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {filters.rarity && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-sm">
                     Rarity: {filters.rarity}
-                    <button onClick={() => handleFilterChange('rarity', '')} className="ml-1 hover:text-indigo-900">
+                    <button onClick={() => handleFilterChange('rarity', '')} className="ml-1 hover:text-cyan-900">
                       <FiX className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {(filters.minPrice || filters.maxPrice) && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">
-                    Price: {filters.minPrice || '0'} - {filters.maxPrice || '∞'}
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                    Price: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
                     <button onClick={() => {
                       handleFilterChange('minPrice', '');
                       handleFilterChange('maxPrice', '');
-                    }} className="ml-1 hover:text-orange-900">
+                    }} className="ml-1 hover:text-gray-900">
                       <FiX className="w-3 h-3" />
                     </button>
                   </span>
@@ -494,7 +664,10 @@ const ProductsPage = () => {
                     Name
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Category
+                    Category/Sub
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Country
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Price
@@ -516,7 +689,7 @@ const ProductsPage = () => {
               <tbody className="divide-y divide-gray-200">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="px-6 py-16 text-center">
+                    <td colSpan="9" className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center">
                         <div className="p-4 bg-gray-100 rounded-full mb-4">
                           <FiPackage className="w-8 h-8 text-gray-400" />
@@ -560,9 +733,17 @@ const ProductsPage = () => {
                           ID: {product._id.slice(-8)}
                         </p>
                       </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-gray-700">{product.category?.name || 'N/A'}</p>
+                        {product.subCategories && product.subCategories.length > 0 && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {product.subCategories.map(s => s.name).join(', ')}
+                          </p>
+                        )}
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-700">
-                          {product.category?.name || 'N/A'}
+                          {product.country || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -666,9 +847,19 @@ const ProductsPage = () => {
                   <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
                     {product.name}
                   </h3>
-                  <p className="text-sm text-gray-500 mb-2">
+                  <p className="text-sm text-gray-500 mb-1">
                     {product.category?.name || 'Uncategorized'}
                   </p>
+                  {product.country && (
+                    <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
+                      <FiMapPin className="w-3 h-3" /> {product.country}
+                    </p>
+                  )}
+                  {product.material && (
+                    <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                      <FiBox className="w-3 h-3" /> {product.material}
+                    </p>
+                  )}
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-lg font-bold text-black">
                       {formatCurrency(product.price)}
