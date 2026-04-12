@@ -1,3 +1,4 @@
+// frontend/src/pages/ShopPage.jsx
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +9,6 @@ import Pagination from '../components/common/Pagination';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
 import SEO from '../components/common/SEO';
-import { buildQueryString } from '../utils/helpers';
 import { 
   FiGrid, 
   FiList, 
@@ -42,15 +42,41 @@ const ShopPage = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
+  // Fetch products whenever filters change
   useEffect(() => {
-    const queryParams = buildQueryString(filters);
-    setSearchParams(queryParams);
+    // Build query params for API - Remove empty values
+    const queryParams = {};
+    
+    if (filters.keyword) queryParams.keyword = filters.keyword;
+    if (filters.category) queryParams.category = filters.category;
+    if (filters.stockStatus) queryParams.stockStatus = filters.stockStatus;
+    if (filters.condition) queryParams.condition = filters.condition;
+    if (filters.sort) queryParams.sort = filters.sort;
+    if (filters.minPrice) queryParams.minPrice = filters.minPrice;
+    if (filters.maxPrice) queryParams.maxPrice = filters.maxPrice;
+    if (filters.page) queryParams.page = filters.page;
+    
+    // Update URL params
+    const urlParams = new URLSearchParams();
+    Object.keys(queryParams).forEach(key => {
+      if (queryParams[key]) {
+        urlParams.set(key, queryParams[key]);
+      }
+    });
+    setSearchParams(urlParams);
+    
+    // Fetch products with all filters
     dispatch(fetchProducts(queryParams));
+    console.log('Fetching with filters:', queryParams);
   }, [filters, dispatch, setSearchParams]);
 
   useEffect(() => {
     // Close sort dropdown when clicking outside
-    const handleClickOutside = () => setShowSortDropdown(false);
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.sort-dropdown')) {
+        setShowSortDropdown(false);
+      }
+    };
     if (showSortDropdown) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
@@ -58,6 +84,7 @@ const ShopPage = () => {
   }, [showSortDropdown]);
 
   const handleFilterChange = (newFilters) => {
+    console.log('Filter changed:', newFilters);
     setFilters({ ...newFilters, page: 1 });
   };
 
@@ -87,10 +114,10 @@ const ShopPage = () => {
   const sortOptions = [
     { value: 'new-to-old', label: 'Newest First' },
     { value: 'old-to-new', label: 'Oldest First' },
-    { value: 'price-low-to-high', label: 'Price: Low to High' },
-    { value: 'price-high-to-low', label: 'Price: High to Low' },
-    { value: 'name-a-to-z', label: 'Name: A to Z' },
-    { value: 'name-z-to-a', label: 'Name: Z to A' },
+    { value: 'price-low-high', label: 'Price: Low to High' },
+    { value: 'price-high-low', label: 'Price: High to Low' },
+    { value: 'a-z', label: 'Name: A to Z' },
+    { value: 'z-a', label: 'Name: Z to A' },
   ];
 
   const activeFiltersCount = [
@@ -102,7 +129,7 @@ const ShopPage = () => {
     filters.maxPrice
   ].filter(Boolean).length;
 
-  const currentSortLabel = sortOptions.find(opt => opt.value === filters.sort)?.label || 'Sort';
+  const currentSortLabel = sortOptions.find(opt => opt.value === filters.sort)?.label || 'Sort By';
 
   return (
     <div className="min-h-screen bg-bg-secondary">
@@ -150,7 +177,7 @@ const ShopPage = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white border-b border-border sticky top-0 z-30">
+      <div className="bg-white border-b border-border sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Left - Filter Toggle & Results Count */}
@@ -185,7 +212,7 @@ const ShopPage = () => {
             {/* Right - Sort & View Toggle */}
             <div className="flex items-center gap-3">
               {/* Sort Dropdown */}
-              <div className="relative">
+              <div className="relative sort-dropdown">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -204,7 +231,7 @@ const ShopPage = () => {
                 {/* Dropdown Menu */}
                 {showSortDropdown && (
                   <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl 
-                                border border-border py-2 z-50 animate-slide-down">
+                                border border-border py-2 z-50">
                     {sortOptions.map((option) => (
                       <button
                         key={option.value}
@@ -319,6 +346,19 @@ const ShopPage = () => {
                 </span>
               )}
 
+              {filters.stockStatus && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
+                               text-primary text-sm font-medium rounded-lg">
+                  Stock: {filters.stockStatus}
+                  <button
+                    onClick={() => handleFilterChange({ ...filters, stockStatus: '' })}
+                    className="hover:bg-primary/20 rounded-full p-0.5 cursor-pointer"
+                  >
+                    <FiX className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
               {(filters.minPrice || filters.maxPrice) && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
                                text-primary text-sm font-medium rounded-lg">
@@ -371,20 +411,24 @@ const ShopPage = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  <ProductFilters filters={filters} onFilterChange={handleFilterChange} />
+                  <ProductFilters 
+                    filters={filters} 
+                    onFilterChange={handleFilterChange}
+                    showCategoryFilter={true}
+                  />
                 </div>
               </div>
             </div>
           </aside>
 
-          {/* Products Grid */}
+          {/* Products Section */}
           <main className="flex-1 min-w-0">
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Loader />
               </div>
             ) : products.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm border border-border">
+              <div className="bg-white rounded-2xl shadow-sm border border-border p-12">
                 <EmptyState
                   icon={
                     <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-primary-200 
@@ -438,16 +482,13 @@ const ShopPage = () => {
       {/* Mobile Filter Drawer */}
       {showFilters && (
         <>
-          {/* Overlay */}
           <div 
             className="fixed inset-0 bg-secondary/50 z-40 lg:hidden"
             onClick={() => setShowFilters(false)}
           />
           
-          {/* Drawer */}
           <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-50 lg:hidden 
-                        shadow-2xl animate-slide-in-left overflow-hidden flex flex-col">
-            {/* Header */}
+                        shadow-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-secondary/50">
               <h3 className="font-bold text-text-primary flex items-center gap-2">
                 <FiFilter className="w-5 h-5 text-primary" />
@@ -468,12 +509,14 @@ const ShopPage = () => {
               </button>
             </div>
 
-            {/* Filters Content */}
             <div className="flex-1 overflow-y-auto p-6">
-              <ProductFilters filters={filters} onFilterChange={handleFilterChange} />
+              <ProductFilters 
+                filters={filters} 
+                onFilterChange={handleFilterChange}
+                showCategoryFilter={true}
+              />
             </div>
 
-            {/* Footer Actions */}
             <div className="p-6 border-t border-border bg-white">
               <div className="flex gap-3">
                 <button

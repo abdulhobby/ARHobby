@@ -1,4 +1,4 @@
-// CategoryPage.jsx
+// frontend/src/pages/CategoryPage.jsx
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +8,6 @@ import ProductFilters from '../components/product/ProductFilters';
 import Pagination from '../components/common/Pagination';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
-import { buildQueryString } from '../utils/helpers';
 import { 
   FiGrid, 
   FiList, 
@@ -40,11 +39,25 @@ const CategoryPage = () => {
   });
 
   useEffect(() => {
-    const queryParams = buildQueryString(filters);
+    // Build query params for API
+    const queryParams = {};
+    
+    if (filters.keyword) queryParams.keyword = filters.keyword;
+    if (filters.stockStatus) queryParams.stockStatus = filters.stockStatus;
+    if (filters.condition) queryParams.condition = filters.condition;
+    if (filters.sort) queryParams.sort = filters.sort;
+    if (filters.minPrice) queryParams.minPrice = filters.minPrice;
+    if (filters.maxPrice) queryParams.maxPrice = filters.maxPrice;
+    if (filters.page) queryParams.page = filters.page;
+    
+    // Update URL params
     setSearchParams(queryParams);
+    
+    // Fetch products
     dispatch(fetchProductsByCategory({ slug, params: queryParams }));
   }, [filters, slug, dispatch, setSearchParams]);
 
+  // Reset filters when category changes
   useEffect(() => {
     setFilters({
       keyword: '',
@@ -58,13 +71,29 @@ const CategoryPage = () => {
   }, [slug]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({ ...newFilters, page: 1 });
     setShowMobileFilters(false);
   };
 
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSortChange = (sortValue) => {
+    setFilters((prev) => ({ ...prev, sort: sortValue, page: 1 }));
+  };
+
+  const clearAllFilters = () => {
+    setFilters({
+      keyword: '',
+      stockStatus: '',
+      condition: '',
+      sort: 'new-to-old',
+      minPrice: '',
+      maxPrice: '',
+      page: 1
+    });
   };
 
   const activeFiltersCount = [
@@ -75,6 +104,15 @@ const CategoryPage = () => {
     filters.maxPrice
   ].filter(Boolean).length;
 
+  const sortOptions = [
+    { value: 'new-to-old', label: 'Newest First' },
+    { value: 'old-to-new', label: 'Oldest First' },
+    { value: 'price-low-high', label: 'Price: Low to High' },
+    { value: 'price-high-low', label: 'Price: High to Low' },
+    { value: 'a-z', label: 'Name: A to Z' },
+    { value: 'z-a', label: 'Name: Z to A' },
+  ];
+
   return (
     <div className="min-h-screen bg-bg-secondary">
       <SEO
@@ -84,7 +122,6 @@ const CategoryPage = () => {
 
       {/* Hero Banner */}
       <div className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 overflow-hidden">
-        {/* Background Image */}
         {category?.image?.url && (
           <div className="absolute inset-0">
             <img 
@@ -96,38 +133,30 @@ const CategoryPage = () => {
           </div>
         )}
 
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-40 h-40 border-4 border-white rounded-full"></div>
-          <div className="absolute bottom-10 left-20 w-24 h-24 border-4 border-white rounded-full"></div>
-        </div>
-
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-          {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm text-primary-200 mb-6">
-            <Link to="/" className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+            <Link to="/" className="flex items-center gap-1 hover:text-white transition-colors">
               <FiHome className="w-4 h-4" />
               <span>Home</span>
             </Link>
             <FiChevronRight className="w-4 h-4" />
-            <Link to="/shop" className="hover:text-white transition-colors cursor-pointer">
+            <Link to="/shop" className="hover:text-white transition-colors">
               Shop
             </Link>
             <FiChevronRight className="w-4 h-4" />
             <span className="text-white font-medium">{category?.name}</span>
           </nav>
 
-          {/* Category Info */}
           <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 animate-fade-in">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
               {category?.name}
             </h1>
             {category?.description && (
-              <p className="text-lg text-primary-100 mb-6 leading-relaxed animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <p className="text-lg text-primary-100 mb-6 leading-relaxed">
                 {category.description}
               </p>
             )}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
               <FiPackage className="w-5 h-5 text-primary-300" />
               <span className="text-white font-medium">
                 {totalProducts} {totalProducts === 1 ? 'product' : 'products'} found
@@ -136,7 +165,6 @@ const CategoryPage = () => {
           </div>
         </div>
 
-        {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-8 sm:h-12">
             <path d="M0 60L60 55C120 50 240 40 360 35C480 30 600 30 720 32.5C840 35 960 40 1080 42.5C1200 45 1320 45 1380 45L1440 45V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" fill="#f0fdf4"/>
@@ -148,10 +176,9 @@ const CategoryPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          {/* Mobile Filter Button */}
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-white border border-border rounded-xl font-medium text-text-primary cursor-pointer transition-all duration-300 hover:border-primary hover:text-primary active:scale-95"
+            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-white border border-border rounded-xl font-medium text-text-primary cursor-pointer transition-all duration-300 hover:border-primary hover:text-primary"
           >
             <FiFilter className="w-5 h-5" />
             <span>Filters</span>
@@ -162,23 +189,19 @@ const CategoryPage = () => {
             )}
           </button>
 
-          {/* Sort and View Options */}
           <div className="flex items-center gap-3 ml-auto">
-            {/* Sort Dropdown */}
             <select
               value={filters.sort}
-              onChange={(e) => handleFilterChange({ ...filters, sort: e.target.value, page: 1 })}
-              className="px-4 py-2.5 bg-white border border-border rounded-xl text-sm font-medium text-text-primary cursor-pointer transition-all duration-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+              onChange={(e) => handleSortChange(e.target.value)}
+              className="px-4 py-2.5 bg-white border border-border rounded-xl text-sm font-medium text-text-primary cursor-pointer focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="new-to-old">Newest First</option>
-              <option value="old-to-new">Oldest First</option>
-              <option value="price-low-to-high">Price: Low to High</option>
-              <option value="price-high-to-low">Price: High to Low</option>
-              <option value="name-a-z">Name: A to Z</option>
-              <option value="name-z-a">Name: Z to A</option>
+              {sortOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
 
-            {/* View Toggle */}
             <div className="hidden sm:flex items-center bg-white border border-border rounded-xl p-1">
               <button
                 onClick={() => setViewMode('grid')}
@@ -203,6 +226,56 @@ const CategoryPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Active Filters Tags */}
+        {activeFiltersCount > 0 && (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-text-secondary">Active filters:</span>
+            
+            {filters.keyword && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Search: "{filters.keyword}"
+                <button onClick={() => handleFilterChange({ ...filters, keyword: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+            
+            {filters.condition && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Condition: {filters.condition}
+                <button onClick={() => handleFilterChange({ ...filters, condition: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {filters.stockStatus && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Stock: {filters.stockStatus}
+                <button onClick={() => handleFilterChange({ ...filters, stockStatus: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            {(filters.minPrice || filters.maxPrice) && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
+                Price: ₹{filters.minPrice || '0'} - ₹{filters.maxPrice || '∞'}
+                <button onClick={() => handleFilterChange({ ...filters, minPrice: '', maxPrice: '' })}>
+                  <FiX className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            )}
+
+            <button
+              onClick={clearAllFilters}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-error text-sm font-medium hover:bg-error/10 rounded-lg transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
 
         <div className="flex gap-6 lg:gap-8">
           {/* Desktop Filters Sidebar */}
@@ -236,7 +309,7 @@ const CategoryPage = () => {
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={() => setShowMobileFilters(false)}
               ></div>
-              <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-2xl animate-slide-in-right overflow-y-auto">
+              <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-2xl overflow-y-auto">
                 <div className="sticky top-0 flex items-center justify-between p-4 bg-white border-b border-border-light z-10">
                   <div className="flex items-center gap-2">
                     <FiSliders className="w-5 h-5 text-primary" />
@@ -244,7 +317,7 @@ const CategoryPage = () => {
                   </div>
                   <button
                     onClick={() => setShowMobileFilters(false)}
-                    className="p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <FiX className="w-6 h-6" />
                   </button>
@@ -290,15 +363,7 @@ const CategoryPage = () => {
                   We couldn't find any products matching your criteria. Try adjusting your filters.
                 </p>
                 <button
-                  onClick={() => handleFilterChange({
-                    keyword: '',
-                    stockStatus: '',
-                    condition: '',
-                    sort: 'new-to-old',
-                    minPrice: '',
-                    maxPrice: '',
-                    page: 1
-                  })}
+                  onClick={clearAllFilters}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark active:scale-95"
                 >
                   Clear All Filters

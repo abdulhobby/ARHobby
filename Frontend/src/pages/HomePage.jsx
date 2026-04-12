@@ -23,7 +23,6 @@ const HomePage = () => {
         <CategorySection />
       </section>
 
-      {/* New Arrivals Section */}
       <NewArrivals />
       
       {/* Promotional Banner with Premium Design */}

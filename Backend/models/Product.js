@@ -139,6 +139,11 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  // ✅ NEW: Track when product was marked as new
+  newMarkedAt: {
+    type: Date,
+    default: null
+  },
   tags: [String],
   views: {
     type: Number,
@@ -148,8 +153,46 @@ const productSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// ✅ Virtual property to check if product is still new (within 48 hours)
+productSchema.virtual('isNewValid').get(function() {
+  if (!this.isNew) return false;
+  if (!this.newMarkedAt) return false;
+  
+  const now = new Date();
+  const hoursSinceMarked = (now - this.newMarkedAt) / (1000 * 60 * 60);
+  return hoursSinceMarked <= 48; // 48 hours expiration
+});
+
+// ✅ Virtual property to get remaining new time in hours
+productSchema.virtual('newRemainingHours').get(function() {
+  if (!this.isNew || !this.newMarkedAt) return 0;
+  
+  const now = new Date();
+  const hoursSinceMarked = (now - this.newMarkedAt) / (1000 * 60 * 60);
+  const remaining = 48 - hoursSinceMarked;
+  return remaining > 0 ? Math.floor(remaining) : 0;
+});
+
+// ✅ Virtual property to get formatted remaining time
+productSchema.virtual('newRemainingTime').get(function() {
+  const hours = this.newRemainingHours;
+  if (hours <= 0) return 'Expired';
+  
+  if (hours < 24) {
+    return `${hours} hour${hours !== 1 ? 's' : ''} remaining`;
+  }
+  
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+  if (remainingHours === 0) {
+    return `${days} day${days !== 1 ? 's' : ''} remaining`;
+  }
+  return `${days} day${days !== 1 ? 's' : ''} ${remainingHours} hour${remainingHours !== 1 ? 's' : ''} remaining`;
+});
+
 // Pre-save middleware
 productSchema.pre('save', function() {
+  // Generate slug
   if (this.isNew || this.isModified('name')) {
     this.slug = this.name
       .toLowerCase()
@@ -157,8 +200,19 @@ productSchema.pre('save', function() {
       .replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
   }
 
+  // Update stock status
   if (this.isModified('stock') || this.isNew) {
     this.stockStatus = this.stock <= 0 ? 'Out of Stock' : 'In Stock';
+  }
+
+  // ✅ NEW: When isNew changes from false to true, set newMarkedAt
+  if (this.isModified('isNew') && this.isNew === true) {
+    this.newMarkedAt = new Date();
+  }
+  
+  // ✅ NEW: When isNew is set to false, clear newMarkedAt
+  if (this.isModified('isNew') && this.isNew === false) {
+    this.newMarkedAt = null;
   }
 
   // Auto-generate SEO metadata if not provided
@@ -182,6 +236,21 @@ productSchema.pre('save', function() {
     this.seo.ogImage = this.images[0].url;
   }
 });
+
+// ✅ NEW: Auto-expire old new products (run this as a scheduled job)
+productSchema.statics.autoExpireNewProducts = async function() {
+  const expiryDate = new Date(Date.now() - 48 * 60 * 60 * 1000);
+  const result = await this.updateMany(
+    {
+      isNew: true,
+      newMarkedAt: { $lt: expiryDate }
+    },
+    {
+      $set: { isNew: false }
+    }
+  );
+  return result.modifiedCount;
+};
 
 // Generate Product Schema Markup
 productSchema.methods.generateSchemaMarkup = function() {
@@ -220,17 +289,19 @@ productSchema.methods.generateSchemaMarkup = function() {
   };
 };
 
-// ✅ IMPORTANT: Indexes for performance and proper sorting
+// Indexes for performance
 productSchema.index({ name: 'text', description: 'text', tags: 'text' });
 productSchema.index({ category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ slug: 1 });
 productSchema.index({ 'seo.metaTitle': 'text', 'seo.metaKeywords': 'text' });
-
-// ✅ CRITICAL FIX: Compound index for default sorting (newest first)
 productSchema.index({ createdAt: -1, _id: -1 });
-productSchema.index({ isActive: 1, createdAt: -1, _id: -1 }); // For active products
-productSchema.index({ isFeatured: -1, createdAt: -1, _id: -1 }); // For featured products
-productSchema.index({ category: 1, isActive: 1, createdAt: -1, _id: -1 }); // For category filtering
+productSchema.index({ isActive: 1, createdAt: -1, _id: -1 });
+productSchema.index({ isFeatured: -1, createdAt: -1, _id: -1 });
+productSchema.index({ category: 1, isActive: 1, createdAt: -1, _id: -1 });
+
+// ✅ NEW: Index for efficient new product queries
+productSchema.index({ isNew: 1, newMarkedAt: -1 });
+productSchema.index({ isActive: 1, isNew: 1, newMarkedAt: -1 });
 
 export default mongoose.model('Product', productSchema);

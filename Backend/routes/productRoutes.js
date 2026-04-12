@@ -12,7 +12,9 @@ import {
   getRelatedProducts,
   updateProduct,
   deleteProduct,
-  getNewProducts
+  getNewProducts,
+  expireNewProduct,
+  autoExpireNewProducts
 } from '../controllers/productController.js';
 
 import { protectAdmin } from '../middleware/auth.js';
@@ -22,6 +24,8 @@ const router = express.Router();
 
 // ==================== ADMIN ROUTES ====================
 router.get('/admin', protectAdmin, getAllProductsAdmin);
+router.put('/admin/expire-new/:id', protectAdmin, expireNewProduct);
+router.post('/admin/auto-expire', protectAdmin, autoExpireNewProducts);
 
 // ==================== PUBLIC ROUTES ====================
 router.get('/', getAllProducts);

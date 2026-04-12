@@ -40,11 +40,12 @@ export const fetchFeaturedProducts = createAsyncThunk('product/fetchFeatured', a
 
 export const fetchNewProducts = createAsyncThunk('product/fetchNew', async (params, { rejectWithValue }) => {
   try {
+    console.log('Fetching new products with params:', params);
     const response = await productAPI.getNew(params);
-    console.log('New Products API Response:', response.data); // Debug log
+    console.log('New products API response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('New Products API Error:', error);
+    console.error('Error in fetchNewProducts:', error);
     return rejectWithValue(error.response?.data?.message || 'Failed to fetch new products');
   }
 });
@@ -127,41 +128,42 @@ const productSlice = createSlice({
       .addCase(fetchFeaturedProducts.pending, (state) => { state.loading = true; })
       .addCase(fetchFeaturedProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.featuredProducts = action.payload.products || action.payload;
+        state.featuredProducts = action.payload.products;
       })
-      .addCase(fetchFeaturedProducts.rejected, (state) => {
+      .addCase(fetchFeaturedProducts.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
       })
-      .addCase(fetchNewProducts.pending, (state) => { 
-        state.loading = true; 
-        state.error = null;
-      })
+      .addCase(fetchNewProducts.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(fetchNewProducts.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle different response structures
-        const products = action.payload.products || action.payload;
-        state.newProducts = Array.isArray(products) ? products : [];
-        state.totalProducts = action.payload.totalProducts || state.newProducts.length;
-        state.page = action.payload.page || 1;
-        state.pages = action.payload.pages || 1;
-        console.log('New products loaded:', state.newProducts.length); // Debug log
+        state.newProducts = action.payload.products;
+        state.totalProducts = action.payload.totalProducts;
+        state.page = action.payload.page;
+        state.pages = action.payload.pages;
       })
       .addCase(fetchNewProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        state.newProducts = [];
-        console.error('Failed to load new products:', action.payload);
+        state.newProducts = []; // Reset on error
       })
       .addCase(fetchLatestProducts.pending, (state) => { state.loading = true; })
       .addCase(fetchLatestProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.latestProducts = action.payload.products || action.payload;
+        state.latestProducts = action.payload.products;
       })
-      .addCase(fetchLatestProducts.rejected, (state) => {
+      .addCase(fetchLatestProducts.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
       })
+      .addCase(fetchRelatedProducts.pending, (state) => { state.loading = true; })
       .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
-        state.relatedProducts = action.payload.products || action.payload;
+        state.loading = false;
+        state.relatedProducts = action.payload.products;
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });

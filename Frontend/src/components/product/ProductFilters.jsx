@@ -24,11 +24,18 @@ const ProductFilters = ({
   }, [dispatch, categories.length]);
 
   const handleChange = (key, value) => {
-    onFilterChange({ ...filters, [key]: value, page: 1 });
+    // Create updated filters object
+    const updatedFilters = { 
+      ...filters, 
+      [key]: value, 
+      page: 1 
+    };
+    // Call the parent's onChange handler
+    onFilterChange(updatedFilters);
   };
 
   const handleClearFilters = () => {
-    onFilterChange({
+    const clearedFilters = {
       keyword: '',
       category: '',
       stockStatus: '',
@@ -37,7 +44,8 @@ const ProductFilters = ({
       minPrice: '',
       maxPrice: '',
       page: 1,
-    });
+    };
+    onFilterChange(clearedFilters);
   };
 
   const hasActiveFilters =
@@ -105,14 +113,14 @@ const ProductFilters = ({
 
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
-        <div
-          className="lg:hidden fixed inset-0 bg-secondary/50 backdrop-blur-sm z-50"
-          onClick={() => setShowMobileFilters(false)}
-        >
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-secondary/50 backdrop-blur-sm"
+            onClick={() => setShowMobileFilters(false)}
+          />
           <div
             className="absolute right-0 top-0 h-full w-full max-w-sm bg-bg-primary shadow-2xl 
                        overflow-y-auto animate-[slideInRight_0.3s_ease-out]"
-            onClick={(e) => e.stopPropagation()}
           >
             {/* Mobile Filter Header */}
             <div
@@ -134,7 +142,14 @@ const ProductFilters = ({
 
             {/* Mobile Filter Content */}
             <div className="p-5 space-y-6">
-              {renderFilterContent()}
+              <FilterContent 
+                filters={filters}
+                handleChange={handleChange}
+                categories={categories}
+                showCategoryFilter={showCategoryFilter}
+                labelClasses={labelClasses}
+                selectClasses={selectClasses}
+              />
 
               {/* Apply Button */}
               <button
@@ -177,166 +192,176 @@ const ProductFilters = ({
             )}
           </div>
 
-          <div className="space-y-6">{renderFilterContent()}</div>
+          <div className="space-y-6">
+            <FilterContent 
+              filters={filters}
+              handleChange={handleChange}
+              categories={categories}
+              showCategoryFilter={showCategoryFilter}
+              labelClasses={labelClasses}
+              selectClasses={selectClasses}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
+};
 
-  function renderFilterContent() {
-    return (
-      <>
-        {/* Search */}
+// Separate component for filter content to avoid code duplication
+const FilterContent = ({ filters, handleChange, categories, showCategoryFilter, labelClasses, selectClasses }) => {
+  return (
+    <>
+      {/* Search */}
+      <div>
+        <h4 className={labelClasses}>Search</h4>
+        <div className="relative">
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-light text-sm" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={filters.keyword || ''}
+            onChange={(e) => handleChange('keyword', e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
+                     text-text-primary text-sm placeholder:text-text-light
+                     focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
+                     focus:bg-bg-primary transition-all duration-300"
+          />
+        </div>
+      </div>
+
+      {/* Category */}
+      {showCategoryFilter && (
         <div>
-          <h4 className={labelClasses}>Search</h4>
+          <h4 className={labelClasses}>Category</h4>
           <div className="relative">
-            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-light text-sm" />
+            <select
+              value={filters.category || ''}
+              onChange={(e) => handleChange('category', e.target.value)}
+              className={selectClasses}
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
+          </div>
+        </div>
+      )}
+
+      {/* Availability */}
+      <div>
+        <h4 className={labelClasses}>Availability</h4>
+        <div className="space-y-2">
+          {STOCK_OPTIONS.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer 
+                        transition-all duration-200 border-2
+                        ${
+                          filters.stockStatus === opt.value
+                            ? 'border-primary bg-primary-50 text-primary'
+                            : 'border-transparent hover:bg-bg-secondary text-text-secondary'
+                        }`}
+            >
+              <input
+                type="radio"
+                name="stockStatus"
+                value={opt.value}
+                checked={filters.stockStatus === opt.value}
+                onChange={(e) => handleChange('stockStatus', e.target.value)}
+                className="w-4 h-4 text-primary border-border focus:ring-primary cursor-pointer
+                         accent-primary"
+              />
+              <span className="text-sm font-medium">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Condition */}
+      <div>
+        <h4 className={labelClasses}>Condition</h4>
+        <div className="relative">
+          <select
+            value={filters.condition || ''}
+            onChange={(e) => handleChange('condition', e.target.value)}
+            className={selectClasses}
+          >
+            <option value="">All Conditions</option>
+            {PRODUCT_CONDITIONS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h4 className={labelClasses}>Price Range</h4>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light text-xs font-medium">
+              ₹
+            </span>
             <input
-              type="text"
-              placeholder="Search products..."
-              value={filters.keyword || ''}
-              onChange={(e) => handleChange('keyword', e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
+              type="number"
+              placeholder="Min"
+              value={filters.minPrice || ''}
+              onChange={(e) => handleChange('minPrice', e.target.value)}
+              className="w-full pl-7 pr-2 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
                        text-text-primary text-sm placeholder:text-text-light
                        focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
-                       focus:bg-bg-primary transition-all duration-300"
+                       transition-all duration-300"
+            />
+          </div>
+          <span className="text-text-light text-xs font-semibold flex-shrink-0 px-1">
+            to
+          </span>
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light text-xs font-medium">
+              ₹
+            </span>
+            <input
+              type="number"
+              placeholder="Max"
+              value={filters.maxPrice || ''}
+              onChange={(e) => handleChange('maxPrice', e.target.value)}
+              className="w-full pl-7 pr-2 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
+                       text-text-primary text-sm placeholder:text-text-light
+                       focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
+                       transition-all duration-300"
             />
           </div>
         </div>
+      </div>
 
-        {/* Category */}
-        {showCategoryFilter && (
-          <div>
-            <h4 className={labelClasses}>Category</h4>
-            <div className="relative">
-              <select
-                value={filters.category || ''}
-                onChange={(e) => handleChange('category', e.target.value)}
-                className={selectClasses}
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name} ({cat.productCount})
-                  </option>
-                ))}
-              </select>
-              <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-            </div>
-          </div>
-        )}
-
-        {/* Availability */}
-        <div>
-          <h4 className={labelClasses}>Availability</h4>
-          <div className="space-y-2">
-            {STOCK_OPTIONS.map((opt) => (
-              <label
-                key={opt.value}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer 
-                          transition-all duration-200 border-2
-                          ${
-                            filters.stockStatus === opt.value
-                              ? 'border-primary bg-primary-50 text-primary'
-                              : 'border-transparent hover:bg-bg-secondary text-text-secondary'
-                          }`}
-              >
-                <input
-                  type="radio"
-                  name="stockStatus"
-                  value={opt.value}
-                  checked={filters.stockStatus === opt.value}
-                  onChange={(e) => handleChange('stockStatus', e.target.value)}
-                  className="w-4 h-4 text-primary border-border focus:ring-primary cursor-pointer
-                           accent-primary"
-                />
-                <span className="text-sm font-medium">{opt.label}</span>
-              </label>
+      {/* Sort (Desktop) */}
+      <div className="hidden lg:block">
+        <h4 className={labelClasses}>Sort By</h4>
+        <div className="relative">
+          <select
+            value={filters.sort || 'new-to-old'}
+            onChange={(e) => handleChange('sort', e.target.value)}
+            className={selectClasses}
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
             ))}
-          </div>
+          </select>
+          <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
         </div>
-
-        {/* Condition */}
-        <div>
-          <h4 className={labelClasses}>Condition</h4>
-          <div className="relative">
-            <select
-              value={filters.condition || ''}
-              onChange={(e) => handleChange('condition', e.target.value)}
-              className={selectClasses}
-            >
-              <option value="">All Conditions</option>
-              {PRODUCT_CONDITIONS.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <h4 className={labelClasses}>Price Range</h4>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light text-xs font-medium">
-                ₹
-              </span>
-              <input
-                type="number"
-                placeholder="Min"
-                value={filters.minPrice || ''}
-                onChange={(e) => handleChange('minPrice', e.target.value)}
-                className="w-full pl-7 pr-2 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
-                         text-text-primary text-sm placeholder:text-text-light
-                         focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
-                         transition-all duration-300"
-              />
-            </div>
-            <span className="text-text-light text-xs font-semibold flex-shrink-0 px-1">
-              to
-            </span>
-            <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light text-xs font-medium">
-                ₹
-              </span>
-              <input
-                type="number"
-                placeholder="Max"
-                value={filters.maxPrice || ''}
-                onChange={(e) => handleChange('maxPrice', e.target.value)}
-                className="w-full pl-7 pr-2 py-2.5 rounded-xl border-2 border-border-light bg-bg-secondary 
-                         text-text-primary text-sm placeholder:text-text-light
-                         focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-200 
-                         transition-all duration-300"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Sort (Desktop) */}
-        <div className="hidden lg:block">
-          <h4 className={labelClasses}>Sort By</h4>
-          <div className="relative">
-            <select
-              value={filters.sort || 'new-to-old'}
-              onChange={(e) => handleChange('sort', e.target.value)}
-              className={selectClasses}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light pointer-events-none" />
-          </div>
-        </div>
-      </>
-    );
-  }
+      </div>
+    </>
+  );
 };
 
 export default ProductFilters;

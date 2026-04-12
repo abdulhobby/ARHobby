@@ -1,3 +1,4 @@
+// utils/apiFeatures.js
 class ApiFeatures {
   constructor(query, queryStr) {
     this.query = query;
@@ -20,76 +21,90 @@ class ApiFeatures {
   }
 
   filter() {
+    // Create a copy of query string
     const queryCopy = { ...this.queryStr };
-
-    const removeFields = ['keyword', 'page', 'limit', 'sort', 'fields'];
+    
+    // Remove fields that are not for filtering
+    const removeFields = ['keyword', 'page', 'limit', 'sort', 'fields', 'search'];
     removeFields.forEach((key) => delete queryCopy[key]);
-
-    if (queryCopy.category) {
-      this.query = this.query.find({ category: queryCopy.category });
-      delete queryCopy.category;
+    
+    // Handle price range
+    let queryStr = JSON.stringify(queryCopy);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    let parsedQuery = JSON.parse(queryStr);
+    
+    // Handle special filters
+    if (parsedQuery.category) {
+      this.query = this.query.find({ category: parsedQuery.category });
+      delete parsedQuery.category;
     }
-
-    if (queryCopy.stockStatus) {
-      this.query = this.query.find({ stockStatus: queryCopy.stockStatus });
-      delete queryCopy.stockStatus;
+    
+    if (parsedQuery.stockStatus) {
+      this.query = this.query.find({ stockStatus: parsedQuery.stockStatus });
+      delete parsedQuery.stockStatus;
     }
-
-    if (queryCopy.condition) {
-      this.query = this.query.find({ condition: queryCopy.condition });
-      delete queryCopy.condition;
+    
+    if (parsedQuery.condition) {
+      this.query = this.query.find({ condition: parsedQuery.condition });
+      delete parsedQuery.condition;
     }
-
-    if (queryCopy.country) {
-      this.query = this.query.find({ country: { $regex: queryCopy.country, $options: 'i' } });
-      delete queryCopy.country;
+    
+    if (parsedQuery.rarity) {
+      this.query = this.query.find({ rarity: parsedQuery.rarity });
+      delete parsedQuery.rarity;
     }
-
-    if (queryCopy.rarity) {
-      this.query = this.query.find({ rarity: queryCopy.rarity });
-      delete queryCopy.rarity;
+    
+    if (parsedQuery.country) {
+      this.query = this.query.find({ country: { $regex: parsedQuery.country, $options: 'i' } });
+      delete parsedQuery.country;
     }
-
-    if (queryCopy.minPrice || queryCopy.maxPrice) {
+    
+    if (parsedQuery.minPrice || parsedQuery.maxPrice) {
       const priceFilter = {};
-      if (queryCopy.minPrice) priceFilter.$gte = Number(queryCopy.minPrice);
-      if (queryCopy.maxPrice) priceFilter.$lte = Number(queryCopy.maxPrice);
+      if (parsedQuery.minPrice) priceFilter.$gte = Number(parsedQuery.minPrice);
+      if (parsedQuery.maxPrice) priceFilter.$lte = Number(parsedQuery.maxPrice);
       this.query = this.query.find({ price: priceFilter });
-      delete queryCopy.minPrice;
-      delete queryCopy.maxPrice;
+      delete parsedQuery.minPrice;
+      delete parsedQuery.maxPrice;
     }
-
-    if (queryCopy.isFeatured) {
-      this.query = this.query.find({ isFeatured: queryCopy.isFeatured === 'true' });
-      delete queryCopy.isFeatured;
+    
+    if (parsedQuery.isFeatured) {
+      this.query = this.query.find({ isFeatured: parsedQuery.isFeatured === 'true' });
+      delete parsedQuery.isFeatured;
     }
-
+    
+    if (parsedQuery.isNew) {
+      this.query = this.query.find({ isNew: parsedQuery.isNew === 'true' });
+      delete parsedQuery.isNew;
+    }
+    
+    // Apply remaining filters
+    if (Object.keys(parsedQuery).length > 0) {
+      this.query = this.query.find(parsedQuery);
+    }
+    
     return this;
   }
 
   sort() {
-  if (this.queryStr.sort) {
-    const sortMapping = {
-      'price-low-high': { price: 1 },
-      'price-high-low': { price: -1 },
-      'new-to-old': { createdAt: -1, _id: -1 }, // ✅ FIX
-      'old-to-new': { createdAt: 1, _id: 1 },
-      'a-z': { name: 1 },
-      'z-a': { name: -1 },
-      'featured': { isFeatured: -1, createdAt: -1, _id: -1 }
-    };
+    if (this.queryStr.sort) {
+      const sortMapping = {
+        'price-low-high': { price: 1, _id: 1 },
+        'price-high-low': { price: -1, _id: -1 },
+        'new-to-old': { createdAt: -1, _id: -1 },
+        'old-to-new': { createdAt: 1, _id: 1 },
+        'a-z': { name: 1, _id: 1 },
+        'z-a': { name: -1, _id: -1 },
+        'featured': { isFeatured: -1, createdAt: -1, _id: -1 }
+      };
 
-    const sortOption = sortMapping[this.queryStr.sort] || { createdAt: -1, _id: -1 };
-
-    this.query = this.query.sort(sortOption);
-
-  } else {
-    // ✅ DEFAULT FIX
-    this.query = this.query.sort({ createdAt: -1, _id: -1 });
+      const sortOption = sortMapping[this.queryStr.sort] || { createdAt: -1, _id: -1 };
+      this.query = this.query.sort(sortOption);
+    } else {
+      this.query = this.query.sort({ createdAt: -1, _id: -1 });
+    }
+    return this;
   }
-
-  return this;
-}
 
   paginate(resultPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;
