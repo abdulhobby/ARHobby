@@ -1,14 +1,25 @@
 // CartSummary.jsx
+import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../utils/helpers';
-import { FiTruck, FiShield, FiGift, FiClock, FiCheckCircle } from 'react-icons/fi';
+import { 
+  FiTruck, 
+  FiShield, 
+  FiGift, 
+  FiClock, 
+  FiCheckCircle,
+  FiLock,
+  FiArrowRight,
+  FiPackage,
+  FiTrash2
+} from 'react-icons/fi';
 
-const CartSummary = ({ subtotal, totalItems, shipping, total }) => {
+const CartSummary = ({ subtotal, totalItems, shipping, total, onCheckout, onClearCart }) => {
   const freeShippingRemaining = Math.max(0, 1000 - subtotal);
   const freeShippingProgress = Math.min((subtotal / 1000) * 100, 100);
   const isFreeShipping = subtotal >= 1000;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden sticky top-24">
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary-dark p-5 sm:p-6 relative overflow-hidden">
         <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -117,32 +128,32 @@ const CartSummary = ({ subtotal, totalItems, shipping, total }) => {
           Inclusive of all taxes and GST
         </p>
 
-        {/* Trust Badges */}
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-            <FiShield className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
-              Secure Payment
-            </span>
-          </div>
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-            <FiTruck className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
-              Fast Delivery
-            </span>
-          </div>
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-            <FiClock className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
-              7-Day Returns
-            </span>
-          </div>
-          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
-            <FiGift className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
-              Gift Ready
-            </span>
-          </div>
+        {/* Action Buttons */}
+        <div className="space-y-3 pt-2">
+          <button
+            onClick={onCheckout}
+            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] group text-lg"
+          >
+            <FiLock className="w-5 h-5" />
+            Proceed to Checkout
+            <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+          
+          <button
+            onClick={onClearCart}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-600 font-semibold rounded-xl border-2 border-red-200 cursor-pointer transition-all duration-300 hover:bg-red-50 hover:border-red-300 active:scale-[0.98]"
+          >
+            <FiTrash2 className="w-5 h-5" />
+            Clear Cart
+          </button>
+          
+          <Link 
+            to="/shop"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 font-semibold rounded-xl border border-gray-200 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 active:scale-[0.98]"
+          >
+            <FiPackage className="w-5 h-5" />
+            Continue Shopping
+          </Link>
         </div>
       </div>
     </div>

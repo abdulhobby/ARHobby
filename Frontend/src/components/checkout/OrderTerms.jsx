@@ -29,10 +29,6 @@ const OrderTerms = ({ accepted, onAcceptChange }) => {
       text: "Once an item has been shipped, returns will not be accepted. Please contact us immediately if there are any issues with your order. We will do our best to resolve any problems, but we cannot accept returns or cancellations after shipping."
     },
     {
-      icon: FiCreditCard,
-      text: "Shipping charges are non-refundable."
-    },
-    {
       icon: FiGift,
       text: "Free shipping on orders above ₹1000."
     }

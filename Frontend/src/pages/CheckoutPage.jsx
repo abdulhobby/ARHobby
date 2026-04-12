@@ -72,6 +72,12 @@ const CheckoutPage = () => {
       return;
     }
 
+    // Calculate order totals
+    const subtotal = cart?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
+    const discount = appliedCoupon?.discount || 0;
+    const shipping = subtotal >= 1000 ? 0 : 80;
+    const total = subtotal - discount + shipping;
+
     const orderData = {
       shippingAddress: {
         fullName: selectedAddress.fullName,
@@ -81,11 +87,22 @@ const CheckoutPage = () => {
         city: selectedAddress.city,
         state: selectedAddress.state,
         pincode: selectedAddress.pincode,
-        country: selectedAddress.country
+        country: selectedAddress.country || 'India'
       },
       couponCode: appliedCoupon?.code || '',
       notes,
-      termsAccepted
+      termsAccepted,
+      items: cart.items.map(item => ({
+        product: item.product?._id || item.productId,
+        name: item.product?.name,
+        quantity: item.quantity,
+        price: item.price,
+        image: item.product?.images?.[0]?.url
+      })),
+      subtotal,
+      discount,
+      shippingCharge: shipping,
+      totalAmount: total
     };
 
     dispatch(createOrder(orderData))
@@ -94,7 +111,9 @@ const CheckoutPage = () => {
         dispatch(removeCoupon());
         toast.success('Order placed successfully!');
       })
-      .catch(() => {});
+      .catch((err) => {
+        toast.error(err || 'Failed to place order');
+      });
   };
 
   if (cartLoading) return <Loader />;
@@ -104,7 +123,12 @@ const CheckoutPage = () => {
     return null;
   }
 
+  // Calculate totals for display
+  const subtotal = cart.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
+  const totalItems = cart.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const discount = appliedCoupon?.discount || 0;
+  const shipping = subtotal >= 1000 ? 0 : 80;
+  const total = subtotal - discount + shipping;
 
   const steps = [
     { id: 1, name: 'Address', icon: FiTruck },
@@ -115,13 +139,12 @@ const CheckoutPage = () => {
   const canPlaceOrder = selectedAddress && termsAccepted;
 
   return (
-    <div className="min-h-screen bg-bg-secondary">
+    <div className="bg-bg-secondary py-5">
       <SEO title="Checkout" />
 
       {/* Header */}
       <div className="bg-white border-b border-border-light sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-sm py-3 border-b border-border-light">
             <Link to="/" className="flex items-center gap-1 text-text-light hover:text-primary transition-colors cursor-pointer">
               <FiHome className="w-4 h-4" />
@@ -134,7 +157,6 @@ const CheckoutPage = () => {
             <span className="text-text-primary font-medium">Checkout</span>
           </nav>
 
-          {/* Title and Steps */}
           <div className="py-4 sm:py-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -147,7 +169,6 @@ const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* Progress Steps */}
               <div className="hidden md:flex items-center gap-2">
                 {steps.map((step, index) => {
                   const StepIcon = step.icon;
@@ -196,7 +217,6 @@ const CheckoutPage = () => {
           
           {/* Left Column - Forms */}
           <div className="flex-1 space-y-6">
-            {/* Back Link */}
             <Link 
               to="/cart"
               className="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors cursor-pointer group"
@@ -205,7 +225,6 @@ const CheckoutPage = () => {
               Back to Cart
             </Link>
 
-            {/* Address Selection */}
             <div className="animate-fade-in">
               <AddressSelector 
                 selectedAddress={selectedAddress} 
@@ -228,7 +247,7 @@ const CheckoutPage = () => {
               <div className="divide-y divide-border-light">
                 {cart.items.map((item, index) => (
                   <div 
-                    key={item._id}
+                    key={item._id || index}
                     className="flex items-center gap-4 p-4 hover:bg-bg-secondary transition-colors"
                   >
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-bg-secondary border border-border-light flex-shrink-0">
@@ -256,6 +275,34 @@ const CheckoutPage = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+              
+              {/* Order Summary inside items */}
+              <div className="p-4 bg-gray-50 border-t border-border-light">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-secondary">Subtotal</span>
+                    <span className="font-medium text-text-primary">{formatCurrency(subtotal)}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-green-600">Discount</span>
+                      <span className="font-medium text-green-600">-{formatCurrency(discount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-secondary">Shipping</span>
+                    <span className={`font-medium ${shipping === 0 ? 'text-green-600' : 'text-text-primary'}`}>
+                      {shipping === 0 ? 'Free' : formatCurrency(shipping)}
+                    </span>
+                  </div>
+                  <div className="border-t border-border-light pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span className="font-bold text-text-primary">Total</span>
+                      <span className="font-bold text-primary text-lg">{formatCurrency(total)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -293,19 +340,19 @@ const CheckoutPage = () => {
           {/* Right Column - Summary */}
           <div className="lg:w-96 flex-shrink-0">
             <div className="lg:sticky lg:top-40 space-y-6">
-              {/* Coupon Input */}
-              <div className="animate-fade-in">
-                <CouponInput orderAmount={cart.totalPrice} />
-              </div>
+              <CouponInput orderAmount={subtotal} />
 
-              {/* Cart Summary */}
-              <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-                <CartSummary cart={cart} discount={discount} />
-              </div>
+              {/* Cart Summary with calculated values */}
+              <CartSummary 
+                subtotal={subtotal}
+                totalItems={totalItems}
+                shipping={shipping}
+                total={total}
+                discount={discount}
+              />
 
               {/* Place Order Button */}
               <div className="bg-white rounded-2xl border border-border-light shadow-sm p-4 sm:p-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                {/* Validation Messages */}
                 {!selectedAddress && (
                   <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/20 rounded-xl mb-4">
                     <FiAlertCircle className="w-5 h-5 text-warning flex-shrink-0" />
@@ -336,12 +383,11 @@ const CheckoutPage = () => {
                   ) : (
                     <>
                       <FiLock className="w-5 h-5" />
-                      <span>Place Order</span>
+                      <span>Place Order ₹{formatCurrency(total)}</span>
                     </>
                   )}
                 </button>
 
-                {/* Security Badge */}
                 <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-border-light">
                   <FiShield className="w-4 h-4 text-primary" />
                   <span className="text-sm text-text-light">Secure & Encrypted</span>
@@ -369,9 +415,7 @@ const CheckoutPage = () => {
         <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
           <div>
             <p className="text-xs text-text-light">Total Amount</p>
-            <p className="text-xl font-bold text-primary">
-              {formatCurrency((cart.totalPrice || 0) - discount)}
-            </p>
+            <p className="text-xl font-bold text-primary">{formatCurrency(total)}</p>
           </div>
           <button 
             onClick={handlePlaceOrder} 
@@ -394,7 +438,6 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      {/* Spacer for mobile bottom bar */}
       <div className="h-24 lg:hidden"></div>
     </div>
   );

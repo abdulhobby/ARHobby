@@ -1,29 +1,29 @@
 // CartPage.jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchCart, clearCart } from '../features/cart/cartSlice';
 import CartItem from '../components/cart/CartItem';
 import CartSummary from '../components/cart/CartSummary';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
 import SEO from '../components/common/SEO';
-import {
-  FiShoppingCart,
-  FiArrowRight,
-  FiArrowLeft,
-  FiShield,
-  FiTruck,
+import { 
+  FiShoppingCart, 
+  FiArrowRight, 
+  FiArrowLeft, 
+  FiShield, 
+  FiTruck, 
   FiRefreshCw,
   FiLock,
   FiPackage,
-  FiTrash2,
-  FiAlertCircle
+  FiTrash2
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { cart, loading } = useSelector((state) => state.cart);
 
   useEffect(() => {
@@ -36,6 +36,22 @@ const CartPage = () => {
         .unwrap()
         .then(() => toast.success('Cart cleared successfully'))
         .catch((err) => toast.error(err || 'Failed to clear cart'));
+    }
+  };
+
+  const handleProceedToCheckout = () => {
+    // Store cart data in sessionStorage before navigating
+    if (cart && cart.items && cart.items.length > 0) {
+      const checkoutData = {
+        items: cart.items,
+        subtotal: cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        totalItems: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+        timestamp: Date.now()
+      };
+      sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+      navigate('/checkout');
+    } else {
+      toast.error('Your cart is empty');
     }
   };
 
@@ -74,9 +90,9 @@ const CartPage = () => {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-white pb-24 lg:pb-8 py-5">
       <SEO title="Shopping Cart" />
-
+      
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm py-5">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -90,7 +106,7 @@ const CartPage = () => {
                 </p>
               </div>
             </div>
-
+            
             {/* Clear Cart Button */}
             <button
               onClick={handleClearCart}
@@ -109,7 +125,7 @@ const CartPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-
+          
           {/* Cart Items Section */}
           <div className="flex-1 min-w-0">
             {/* Items Header */}
@@ -125,7 +141,7 @@ const CartPage = () => {
             {/* Cart Items */}
             <div className="bg-white rounded-2xl md:rounded-t-none border border-gray-200 md:border-t-0 shadow-sm divide-y divide-gray-100">
               {cart.items.map((item, index) => (
-                <div
+                <div 
                   key={item.product?._id || index}
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.05}s` }}
@@ -137,7 +153,7 @@ const CartPage = () => {
 
             {/* Continue Shopping Link */}
             <div className="mt-6">
-              <Link
+              <Link 
                 to="/shop"
                 className="inline-flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-all duration-300 cursor-pointer group"
               >
@@ -161,53 +177,16 @@ const CartPage = () => {
           </div>
 
           {/* Cart Summary Section */}
-          <div className="lg:w-96 flex-shrink-0 ">
-            <div className="lg:sticky lg:top-24 space-y-4 sm:space-y-6">
-
-              {/* Action Buttons */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6 space-y-3">
-                <Link
-                  to="/checkout"
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] group text-lg"
-                >
-                  <FiLock className="w-5 h-5" />
-                  Proceed to Checkout
-                  <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link
-                  to="/shop"
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 font-semibold rounded-xl border border-gray-200 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 active:scale-[0.98]"
-                >
-                  <FiPackage className="w-5 h-5" />
-                  Continue Shopping
-                </Link>
-              </div>
-
-              <CartSummary
-                subtotal={subtotal}
+          <div className="lg:w-96 flex-shrink-0">
+            <div className="space-y-4 sm:space-y-6">
+              <CartSummary 
+                subtotal={subtotal} 
                 totalItems={totalItems}
                 shipping={shipping}
                 total={total}
+                onCheckout={handleProceedToCheckout}
+                onClearCart={handleClearCart}
               />
-
-              {/* Security Note */}
-              <div className="flex items-start gap-3 p-4 bg-primary-50 rounded-xl border border-primary-100">
-                <FiShield className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Secure Checkout</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Your payment information is processed securely. We do not store credit card details.
-                  </p>
-                </div>
-              </div>
-
-              {/* Help Section */}
-              <div className="text-center">
-                <p className="text-sm text-gray-500">
-                  Need help? <Link to="/contact" className="text-primary font-medium hover:underline cursor-pointer">Contact us</Link>
-                </p>
-              </div>
             </div>
           </div>
         </div>
@@ -222,13 +201,13 @@ const CartPage = () => {
               ₹{total.toLocaleString()}
             </p>
           </div>
-          <Link
-            to="/checkout"
+          <button
+            onClick={handleProceedToCheckout}
             className="flex-1 max-w-[200px] flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg active:scale-95"
           >
             Checkout
             <FiArrowRight className="w-4 h-4" />
-          </Link>
+          </button>
         </div>
       </div>
 

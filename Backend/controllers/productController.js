@@ -659,7 +659,7 @@ export const getFeaturedProducts = async (req, res) => {
 
 export const getNewProducts = async (req, res) => {
   try {
-    const resultPerPage = Number(req.query.limit) || 12;
+    const resultPerPage = Number(req.query.limit) || 20;
     const page = Number(req.query.page) || 1;
 
     // ✅ Only get products that are marked as new AND have a marking date
