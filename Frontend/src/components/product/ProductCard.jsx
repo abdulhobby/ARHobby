@@ -124,10 +124,6 @@ const ProductCard = ({ product }) => {
 
         {/* Content */}
         <div className="p-4">
-          {/* Category */}
-          {product.category && (
-            <p className="text-xs text-gray-500 mb-1">{product.category.name}</p>
-          )}
           
           {/* Product Name */}
           <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 
@@ -147,14 +143,6 @@ const ProductCard = ({ product }) => {
               </span>
             )}
           </div>
-          
-          {/* ✅ Show remaining time if available and product is new */}
-          {showNewBadge && remainingTime && (
-            <div className="mt-2 flex items-center gap-1 text-xs text-green-600">
-              <FiClock className="w-3 h-3" />
-              <span className="font-medium">{remainingTime}</span>
-            </div>
-          )}
         </div>
       </Link>
 

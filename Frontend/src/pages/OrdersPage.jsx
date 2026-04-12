@@ -35,7 +35,7 @@ const OrdersPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-bg-secondary">
+    <div className="bg-bg-secondary py-5">
       <SEO title="My Orders" />
       
       {/* Page Header */}

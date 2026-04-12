@@ -1,30 +1,20 @@
 // CartSummary.jsx
 import { formatCurrency } from '../../utils/helpers';
-import { FiTruck, FiShield, FiGift } from 'react-icons/fi';
+import { FiTruck, FiShield, FiGift, FiClock, FiCheckCircle } from 'react-icons/fi';
 
-const CartSummary = ({ cart, discount, shippingCharge }) => {
-  const subtotal = cart?.totalPrice || 0;
-  const shipping =
-    shippingCharge !== undefined
-      ? shippingCharge
-      : subtotal >= 1000
-        ? 0
-        : 80;
-  const total = subtotal - (discount || 0) + shipping;
-  const freeShippingRemaining = 1000 - subtotal;
+const CartSummary = ({ subtotal, totalItems, shipping, total }) => {
+  const freeShippingRemaining = Math.max(0, 1000 - subtotal);
   const freeShippingProgress = Math.min((subtotal / 1000) * 100, 100);
+  const isFreeShipping = subtotal >= 1000;
 
   return (
-    <div
-      className="bg-bg-primary rounded-2xl border-2 border-border-light shadow-sm overflow-hidden"
-    >
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden sticky top-24">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-primary-dark p-5 sm:p-6 relative overflow-hidden">
-        {/* Decorative Circles */}
         <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full"></div>
         <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/5 rounded-full"></div>
 
-        <h3 className="text-lg sm:text-xl font-bold text-text-white relative z-10 flex items-center gap-2">
+        <h3 className="text-lg sm:text-xl font-bold text-white relative z-10 flex items-center gap-2">
           <FiShield className="text-white/80" />
           Order Summary
         </h3>
@@ -32,49 +22,37 @@ const CartSummary = ({ cart, discount, shippingCharge }) => {
 
       {/* Content */}
       <div className="p-5 sm:p-6 space-y-4">
+        {/* Items Count */}
+        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          <span className="text-sm text-gray-600 font-medium">
+            Total Items
+          </span>
+          <span className="text-sm font-bold text-gray-900">
+            {totalItems} item{totalItems !== 1 ? 's' : ''}
+          </span>
+        </div>
+
         {/* Subtotal */}
         <div className="flex items-center justify-between py-2">
-          <span className="text-sm text-text-secondary font-medium">
-            Subtotal{' '}
-            <span className="text-text-light">({cart?.totalItems || 0} items)</span>
+          <span className="text-sm text-gray-600 font-medium">
+            Subtotal
           </span>
-          <span className="text-sm font-bold text-text-primary">
+          <span className="text-sm font-bold text-gray-900">
             {formatCurrency(subtotal)}
           </span>
         </div>
 
-        {/* Discount */}
-        {discount > 0 && (
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm text-primary font-medium flex items-center gap-1.5">
-              <FiGift className="text-xs" />
-              Discount
-            </span>
-            <span className="text-sm font-bold text-primary">
-              -{formatCurrency(discount)}
-            </span>
-          </div>
-        )}
-
         {/* Shipping */}
         <div className="flex items-center justify-between py-2">
-          <span className="text-sm text-text-secondary font-medium flex items-center gap-1.5">
-            <FiTruck className="text-xs text-text-light" />
+          <span className="text-sm text-gray-600 font-medium flex items-center gap-1.5">
+            <FiTruck className="text-sm text-gray-400" />
             Shipping
           </span>
-          <span
-            className={`text-sm font-bold ${
-              shipping === 0 ? 'text-primary' : 'text-text-primary'
-            }`}
-          >
+          <span className={`text-sm font-bold ${shipping === 0 ? 'text-green-600' : 'text-gray-900'}`}>
             {shipping === 0 ? (
               <span className="inline-flex items-center gap-1">
-                <span
-                  className="px-2 py-0.5 bg-primary-100 text-primary text-[10px] font-bold 
-                             rounded-full uppercase tracking-wider"
-                >
-                  Free
-                </span>
+                <FiCheckCircle className="w-4 h-4" />
+                Free
               </span>
             ) : (
               formatCurrency(shipping)
@@ -83,83 +61,86 @@ const CartSummary = ({ cart, discount, shippingCharge }) => {
         </div>
 
         {/* Free Shipping Progress */}
-        {subtotal < 1000 && subtotal > 0 && (
-          <div className="bg-bg-secondary rounded-xl p-3.5 border border-border-light">
+        {!isFreeShipping && subtotal > 0 && (
+          <div className="bg-amber-50 rounded-xl p-3.5 border border-amber-200 mt-2">
             <div className="flex items-center gap-2 mb-2">
-              <FiTruck className="text-primary text-sm flex-shrink-0" />
-              <p className="text-xs text-text-secondary leading-relaxed">
+              <FiTruck className="text-amber-600 text-sm flex-shrink-0" />
+              <p className="text-xs text-amber-800 leading-relaxed">
                 Add{' '}
-                <span className="font-bold text-primary">
+                <span className="font-bold text-amber-900">
                   {formatCurrency(freeShippingRemaining)}
                 </span>{' '}
                 more for{' '}
-                <span className="font-bold text-primary">free shipping!</span>
+                <span className="font-bold text-amber-900">FREE shipping!</span>
               </p>
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-amber-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full 
+                className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full 
                          transition-all duration-700 ease-out relative"
                 style={{ width: `${freeShippingProgress}%` }}
               >
-                {/* Shimmer Effect */}
-                <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent 
-                             animate-[shimmer_2s_infinite]"
-                ></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent 
+                              animate-[shimmer_2s_infinite]"></div>
               </div>
             </div>
           </div>
         )}
 
         {/* Free shipping achieved message */}
-        {subtotal >= 1000 && (
-          <div className="bg-primary-50 rounded-xl p-3 border border-primary-200 flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
+        {isFreeShipping && (
+          <div className="bg-green-50 rounded-xl p-3 border border-green-200 flex items-center gap-2">
+            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiCheckCircle className="w-3.5 h-3.5 text-white" />
             </div>
-            <p className="text-xs font-semibold text-primary-dark">
-              You've unlocked free shipping!
+            <p className="text-xs font-semibold text-green-800">
+              Congratulations! You've unlocked free shipping!
             </p>
           </div>
         )}
 
         {/* Divider */}
-        <div className="border-t-2 border-dashed border-border-light my-1"></div>
+        <div className="border-t-2 border-dashed border-gray-200 my-2"></div>
 
         {/* Total */}
-        <div
-          className="flex items-center justify-between py-3 bg-bg-secondary rounded-xl px-4 
-                     border border-border-light"
-        >
-          <span className="text-base font-bold text-text-primary">Total</span>
+        <div className="flex items-center justify-between py-3 bg-gradient-to-r from-gray-50 to-white rounded-xl px-4 border border-gray-200">
+          <span className="text-base font-bold text-gray-900">Total Amount</span>
           <span className="text-xl sm:text-2xl font-extrabold text-primary">
             {formatCurrency(total)}
           </span>
         </div>
 
+        {/* Tax Note */}
+        <p className="text-xs text-gray-400 text-center">
+          Inclusive of all taxes and GST
+        </p>
+
         {/* Trust Badges */}
         <div className="grid grid-cols-2 gap-2 pt-2">
-          <div
-            className="flex items-center gap-2 bg-bg-secondary rounded-lg p-2.5 
-                       border border-border-light"
-          >
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
             <FiShield className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-text-light font-medium leading-tight">
+            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
               Secure Payment
             </span>
           </div>
-          <div
-            className="flex items-center gap-2 bg-bg-secondary rounded-lg p-2.5 
-                       border border-border-light"
-          >
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
             <FiTruck className="text-primary text-sm flex-shrink-0" />
-            <span className="text-[10px] sm:text-xs text-text-light font-medium leading-tight">
+            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
               Fast Delivery
+            </span>
+          </div>
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+            <FiClock className="text-primary text-sm flex-shrink-0" />
+            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
+              7-Day Returns
+            </span>
+          </div>
+          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+            <FiGift className="text-primary text-sm flex-shrink-0" />
+            <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">
+              Gift Ready
             </span>
           </div>
         </div>
