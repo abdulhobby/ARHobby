@@ -174,6 +174,18 @@ const CartPage = () => {
                 );
               })}
             </div>
+
+            {/* Proceed to Checkout Button - Desktop */}
+            <div className="hidden lg:block mt-8">
+              <button
+                onClick={handleProceedToCheckout}
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] group text-lg"
+              >
+                <FiLock className="w-5 h-5" />
+                Proceed to Checkout
+                <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </div>
 
           {/* Cart Summary Section */}
@@ -184,7 +196,6 @@ const CartPage = () => {
                 totalItems={totalItems}
                 shipping={shipping}
                 total={total}
-                onCheckout={handleProceedToCheckout}
                 onClearCart={handleClearCart}
               />
             </div>

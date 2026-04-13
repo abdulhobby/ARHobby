@@ -13,18 +13,22 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-green-50">
-      <SEO title="Home" description="AR Hobby - Your destination for collectible currencies and coins" />
-      
+      <SEO title="Home"
+        description="Shop the best hobby products at AR Hobby. Discover quality collectibles, rare items, and hobby supplies with fast delivery across India."
+        keywords="hobby store, collectibles India, hobby products online, AR Hobby"
+        url="https://www.arhobby.in"
+        type="website" />
+
       {/* Hero Section */}
       <HeroBanner />
-      
+
       {/* Categories Section */}
       <section className="py-12 sm:py-16 lg:py-20 bg-white">
         <CategorySection />
       </section>
 
       <NewArrivals />
-      
+
       {/* Promotional Banner with Premium Design */}
       <section className="py-16 sm:py-20 lg:py-28 bg-gradient-to-r from-slate-900 via-green-900 to-slate-900 relative overflow-hidden">
         {/* Animated Background */}
@@ -51,7 +55,7 @@ const HomePage = () => {
               <p className="text-lg text-gray-300 mb-8 max-w-xl leading-relaxed">
                 Start building your collection today! Enjoy free delivery on all orders over ₹1000. Premium packaging guaranteed.
               </p>
-              
+
               {/* Feature List */}
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
@@ -69,7 +73,7 @@ const HomePage = () => {
                 ))}
               </div>
 
-              <Link 
+              <Link
                 to="/shop"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold rounded-xl transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/40 active:scale-95 group text-lg"
               >
@@ -83,7 +87,7 @@ const HomePage = () => {
               <div className="relative w-full aspect-square">
                 {/* Coin Cards Stack */}
                 {[0, 1, 2].map((idx) => (
-                  <div 
+                  <div
                     key={idx}
                     className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white to-gray-100 border-2 border-white/20 shadow-2xl transform"
                     style={{
@@ -104,7 +108,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Why Choose Us Section */}
       <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-green-50">
         <WhyChooseUs />

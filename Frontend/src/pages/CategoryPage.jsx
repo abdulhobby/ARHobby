@@ -130,9 +130,13 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-bg-secondary">
-      <SEO
-        title={category?.name || 'Category'}
-        description={category?.description || `Browse ${category?.name} collection`}
+      <SEO 
+        title={`${category.name} - Shop ${category.name} Products`}
+        description={category.description || `Browse our collection of ${category.name} products. Quality hobby items with fast delivery.`}
+        keywords={`${category.name}, hobby products, ${category.name} online, AR Hobby`}
+        url={`https://www.arhobby.in/category/${category.slug}`}
+        type="website"
+        section={category.name}
       />
 
       {/* Hero Banner */}

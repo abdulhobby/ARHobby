@@ -19,6 +19,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import adminCartRoutes from './routes/admin/cartRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import subscriberRoutes from './routes/subscriberRoutes.js';
+import seoRoutes from './routes/seoRoutes.js';
 
 dotenv.config();
 
@@ -48,6 +49,8 @@ app.use(cors({
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'AR Hobby API is running' });
 });
+
+app.use('/', seoRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

@@ -13,7 +13,7 @@ import {
   FiTrash2
 } from 'react-icons/fi';
 
-const CartSummary = ({ subtotal, totalItems, shipping, total, onCheckout, onClearCart }) => {
+const CartSummary = ({ subtotal, totalItems, shipping, total, onClearCart }) => {
   const freeShippingRemaining = Math.max(0, 1000 - subtotal);
   const freeShippingProgress = Math.min((subtotal / 1000) * 100, 100);
   const isFreeShipping = subtotal >= 1000;
@@ -130,15 +130,6 @@ const CartSummary = ({ subtotal, totalItems, shipping, total, onCheckout, onClea
 
         {/* Action Buttons */}
         <div className="space-y-3 pt-2">
-          <button
-            onClick={onCheckout}
-            className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] group text-lg"
-          >
-            <FiLock className="w-5 h-5" />
-            Proceed to Checkout
-            <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-          
           <button
             onClick={onClearCart}
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-red-600 font-semibold rounded-xl border-2 border-red-200 cursor-pointer transition-all duration-300 hover:bg-red-50 hover:border-red-300 active:scale-[0.98]"

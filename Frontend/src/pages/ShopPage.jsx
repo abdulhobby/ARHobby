@@ -145,7 +145,13 @@ const ShopPage = () => {
 
   return (
     <div className="bg-bg-secondary py-5">
-      <SEO title="Shop" description="Browse our collection of collectible currencies and coins" />
+      <SEO 
+        title="Shop All Products - AR Hobby"
+        description="Browse our complete collection of hobby products. Find collectibles, rare items, and quality hobby supplies with fast shipping across India."
+        keywords="shop hobby products, buy collectibles online, hobby store India"
+        url="https://www.arhobby.in/shop"
+        type="website"
+      />
       
       {/* Page Header */}
       <div className="bg-white border-b border-border">
