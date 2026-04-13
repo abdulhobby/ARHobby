@@ -10,7 +10,7 @@ export const register = createAsyncThunk('auth/register', async (data, { rejectW
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Registration failed'
     );
   }
@@ -25,7 +25,7 @@ export const login = createAsyncThunk('auth/login', async (data, { rejectWithVal
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Login failed'
     );
   }
@@ -63,7 +63,7 @@ export const forgotPassword = createAsyncThunk('auth/forgotPassword', async (dat
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Failed to send reset email'
     );
   }
@@ -71,12 +71,12 @@ export const forgotPassword = createAsyncThunk('auth/forgotPassword', async (dat
 
 // ✅ FIXED: Include confirmPassword in the request
 export const resetPassword = createAsyncThunk(
-  'auth/resetPassword', 
+  'auth/resetPassword',
   async ({ token, password, confirmPassword }, { rejectWithValue }) => {
     try {
-      const response = await authAPI.resetPassword(token, { 
+      const response = await authAPI.resetPassword(token, {
         password,
-        confirmPassword 
+        confirmPassword
       });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -84,7 +84,7 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.errors?.[0]?.message ||
-        error.response?.data?.message || 
+        error.response?.data?.message ||
         'Password reset failed'
       );
     }
@@ -100,7 +100,7 @@ export const changePassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.errors?.[0]?.message ||
-        error.response?.data?.message || 
+        error.response?.data?.message ||
         'Password change failed'
       );
     }
@@ -115,7 +115,7 @@ export const updateProfile = createAsyncThunk('auth/updateProfile', async (data,
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Update failed'
     );
   }
@@ -128,7 +128,7 @@ export const updatePassword = createAsyncThunk('auth/updatePassword', async (dat
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Password update failed'
     );
   }
@@ -142,7 +142,7 @@ export const updateAvatar = createAsyncThunk('auth/updateAvatar', async (formDat
   } catch (error) {
     return rejectWithValue(
       error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message || 
+      error.response?.data?.message ||
       'Avatar update failed'
     );
   }
@@ -162,7 +162,7 @@ const authSlice = createSlice({
     errors: []
   },
   reducers: {
-    clearError: (state) => { 
+    clearError: (state) => {
       state.error = null;
       state.errors = [];
     },
@@ -171,9 +171,9 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Register
-      .addCase(register.pending, (state) => { 
-        state.loading = true; 
-        state.error = null; 
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
@@ -185,11 +185,11 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Login
-      .addCase(login.pending, (state) => { 
-        state.loading = true; 
-        state.error = null; 
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
@@ -201,7 +201,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
@@ -209,7 +209,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
       })
-      
+
       // Load User
       .addCase(loadUser.pending, (state) => {
         state.loading = true;
@@ -225,10 +225,10 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.loading = false;
       })
-      
+
       // Forgot Password
-      .addCase(forgotPassword.pending, (state) => { 
-        state.loading = true; 
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(forgotPassword.fulfilled, (state, action) => {
@@ -239,10 +239,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Reset Password
-      .addCase(resetPassword.pending, (state) => { 
-        state.loading = true; 
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(resetPassword.fulfilled, (state, action) => {
@@ -257,10 +257,10 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.isAuthenticated = false;
       })
-      
+
       // Change Password
-      .addCase(changePassword.pending, (state) => { 
-        state.loading = true; 
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(changePassword.fulfilled, (state, action) => {
@@ -271,10 +271,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update Profile
-      .addCase(updateProfile.pending, (state) => { 
-        state.loading = true; 
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(updateProfile.fulfilled, (state, action) => {
@@ -286,10 +286,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update Password
-      .addCase(updatePassword.pending, (state) => { 
-        state.loading = true; 
+      .addCase(updatePassword.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(updatePassword.fulfilled, (state, action) => {
@@ -300,10 +300,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Update Avatar
-      .addCase(updateAvatar.pending, (state) => { 
-        state.loading = true; 
+      .addCase(updateAvatar.pending, (state) => {
+        state.loading = true;
         state.error = null;
       })
       .addCase(updateAvatar.fulfilled, (state, action) => {

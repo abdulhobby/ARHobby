@@ -8,11 +8,11 @@ import ProductFilters from '../components/product/ProductFilters';
 import Pagination from '../components/common/Pagination';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
-import { 
-  FiGrid, 
-  FiList, 
-  FiFilter, 
-  FiX, 
+import {
+  FiGrid,
+  FiList,
+  FiFilter,
+  FiX,
   FiPackage,
   FiChevronRight,
   FiHome,
@@ -44,7 +44,7 @@ const CategoryPage = () => {
   useEffect(() => {
     // Build query params for API
     const queryParams = {};
-    
+
     if (filters.keyword) queryParams.keyword = filters.keyword;
     if (filters.subCategory) queryParams.subCategory = filters.subCategory; // ✅ Added
     if (filters.country) queryParams.country = filters.country; // ✅ Added
@@ -55,10 +55,10 @@ const CategoryPage = () => {
     if (filters.minPrice) queryParams.minPrice = filters.minPrice;
     if (filters.maxPrice) queryParams.maxPrice = filters.maxPrice;
     if (filters.page) queryParams.page = filters.page;
-    
+
     // Update URL params
     setSearchParams(queryParams);
-    
+
     // Fetch products
     dispatch(fetchProductsByCategory({ slug, params: queryParams }));
   }, [filters, slug, dispatch, setSearchParams]);
@@ -130,7 +130,7 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-bg-secondary">
-      <SEO 
+      <SEO
         title={`${category.name} - Shop ${category.name} Products`}
         description={category.description || `Browse our collection of ${category.name} products. Quality hobby items with fast delivery.`}
         keywords={`${category.name}, hobby products, ${category.name} online, AR Hobby`}
@@ -143,8 +143,8 @@ const CategoryPage = () => {
       <div className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 overflow-hidden">
         {category?.image?.url && (
           <div className="absolute inset-0">
-            <img 
-              src={category.image.url} 
+            <img
+              src={category.image.url}
               alt={category?.name}
               className="w-full h-full object-cover opacity-20"
             />
@@ -186,7 +186,7 @@ const CategoryPage = () => {
 
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-8 sm:h-12">
-            <path d="M0 60L60 55C120 50 240 40 360 35C480 30 600 30 720 32.5C840 35 960 40 1080 42.5C1200 45 1320 45 1380 45L1440 45V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" fill="#f0fdf4"/>
+            <path d="M0 60L60 55C120 50 240 40 360 35C480 30 600 30 720 32.5C840 35 960 40 1080 42.5C1200 45 1320 45 1380 45L1440 45V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" fill="#f0fdf4" />
           </svg>
         </div>
       </div>
@@ -224,21 +224,19 @@ const CategoryPage = () => {
             <div className="hidden sm:flex items-center bg-white border border-border rounded-xl p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                  viewMode === 'grid' 
-                    ? 'bg-primary text-white' 
+                className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${viewMode === 'grid'
+                    ? 'bg-primary text-white'
                     : 'text-text-light hover:text-primary'
-                }`}
+                  }`}
               >
                 <FiGrid className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                  viewMode === 'list' 
-                    ? 'bg-primary text-white' 
+                className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${viewMode === 'list'
+                    ? 'bg-primary text-white'
                     : 'text-text-light hover:text-primary'
-                }`}
+                  }`}
               >
                 <FiList className="w-5 h-5" />
               </button>
@@ -250,7 +248,7 @@ const CategoryPage = () => {
         {activeFiltersCount > 0 && (
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="text-sm text-text-secondary">Active filters:</span>
-            
+
             {filters.keyword && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
                 Search: "{filters.keyword}"
@@ -259,7 +257,7 @@ const CategoryPage = () => {
                 </button>
               </span>
             )}
-            
+
             {filters.subCategory && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
                 Sub-Category Selected
@@ -286,7 +284,7 @@ const CategoryPage = () => {
                 </button>
               </span>
             )}
-            
+
             {filters.condition && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-lg">
                 Condition: {filters.condition}
@@ -338,10 +336,10 @@ const CategoryPage = () => {
                   )}
                 </div>
                 <div className="p-4">
-                  <ProductFilters 
-                    filters={filters} 
-                    onFilterChange={handleFilterChange} 
-                    showCategoryFilter={false} 
+                  <ProductFilters
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    showCategoryFilter={false}
                   />
                 </div>
               </div>
@@ -351,7 +349,7 @@ const CategoryPage = () => {
           {/* Mobile Filters Drawer */}
           {showMobileFilters && (
             <div className="fixed inset-0 z-50 lg:hidden">
-              <div 
+              <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={() => setShowMobileFilters(false)}
               ></div>
@@ -369,10 +367,10 @@ const CategoryPage = () => {
                   </button>
                 </div>
                 <div className="p-4">
-                  <ProductFilters 
-                    filters={filters} 
-                    onFilterChange={handleFilterChange} 
-                    showCategoryFilter={false} 
+                  <ProductFilters
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    showCategoryFilter={false}
                   />
                 </div>
               </div>
@@ -388,13 +386,13 @@ const CategoryPage = () => {
             ) : categoryProducts.length > 0 ? (
               <>
                 <ProductGrid products={categoryProducts} viewMode={viewMode} />
-                
+
                 {pages > 1 && (
                   <div className="mt-8">
-                    <Pagination 
-                      page={page} 
-                      pages={pages} 
-                      onPageChange={handlePageChange} 
+                    <Pagination
+                      page={page}
+                      pages={pages}
+                      onPageChange={handlePageChange}
                     />
                   </div>
                 )}

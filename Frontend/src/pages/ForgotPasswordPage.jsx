@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { forgotPassword, clearError, clearMessage } from '../features/auth/authSlice';
 import SEO from '../components/common/SEO';
 import toast from 'react-hot-toast';
-import { 
-  FiMail, 
-  FiArrowLeft, 
-  FiSend, 
+import {
+  FiMail,
+  FiArrowLeft,
+  FiSend,
   FiCheckCircle,
   FiLock,
   FiShield
@@ -23,9 +23,9 @@ const ForgotPasswordPage = () => {
 
   useEffect(() => {
     if (error) { toast.error(error); dispatch(clearError()); }
-    if (message) { 
-      toast.success(message); 
-      dispatch(clearMessage()); 
+    if (message) {
+      toast.success(message);
+      dispatch(clearMessage());
       setSubmitted(true);
     }
   }, [error, message, dispatch]);
@@ -38,7 +38,7 @@ const ForgotPasswordPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <SEO title="Forgot Password" />
-      
+
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary-200 rounded-full blur-3xl opacity-30"></div>
@@ -48,7 +48,7 @@ const ForgotPasswordPage = () => {
 
       <div className="relative w-full max-w-md">
         {/* Back to Login Link */}
-        <Link 
+        <Link
           to="/login"
           className="inline-flex items-center gap-2 text-text-secondary hover:text-primary mb-6 transition-colors cursor-pointer group"
         >
@@ -102,10 +102,10 @@ const ForgotPasswordPage = () => {
                     Email Address
                   </label>
                   <div className="relative">
-                    <input 
-                      type="email" 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)} 
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                       placeholder="Enter your email address"
                       className="w-full px-4 py-3.5 pl-12 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 group-hover:border-primary-300"
@@ -114,8 +114,8 @@ const ForgotPasswordPage = () => {
                   </div>
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -150,7 +150,7 @@ const ForgotPasswordPage = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <Link 
+          <Link
             to="/"
             className="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors cursor-pointer"
           >

@@ -22,12 +22,12 @@ const Footer = () => {
                 </h2>
               </div>
             </div>
-            
+
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xs">
               Your trusted destination for collectible currencies, coins, and numismatic
               treasures from around the world.
             </p>
-            
+
             {/* Shipping Badge */}
             <div className="mt-6 p-3 bg-primary/10 rounded-lg border border-primary/20">
               <div className="flex items-center gap-2 mb-2">
@@ -134,24 +134,24 @@ const Footer = () => {
                 <FiMapPin className="text-primary-light text-lg mt-0.5 flex-shrink-0" />
                 <span>Prayagraj, Uttar Pradesh, India</span>
               </p>
-              <a 
-                href="tel:+917081434589" 
+              <a
+                href="tel:+917081434589"
                 className="flex items-center gap-3 text-gray-400 hover:text-primary-light text-sm sm:text-base transition-colors duration-300"
               >
                 <FiPhone className="text-primary-light text-lg flex-shrink-0" />
                 <span>+91-7081434589</span>
               </a>
-              <a 
-                href="https://wa.me/917081434589" 
-                target="_blank" 
+              <a
+                href="https://wa.me/917081434589"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-gray-400 hover:text-green-400 text-sm sm:text-base transition-colors duration-300"
               >
                 <FaWhatsapp className="text-green-500 text-lg flex-shrink-0" />
                 <span>WhatsApp: 7081434589</span>
               </a>
-              <a 
-                href="mailto:arhobby@email.com" 
+              <a
+                href="mailto:arhobby@email.com"
                 className="flex items-center gap-3 text-gray-400 hover:text-primary-light text-sm sm:text-base transition-colors duration-300"
               >
                 <FiMail className="text-primary-light text-lg flex-shrink-0" />

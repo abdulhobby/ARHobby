@@ -63,10 +63,10 @@ function App() {
     <div className="min-h-screen flex flex-col bg-bg-primary">
       {/* Scroll To Top on Route Change */}
       <ScrollToTop />
-      
+
       {/* Header - Hidden on auth pages */}
       {!hideLayout && <Header />}
-      
+
       {/* Main Content Area */}
       <main className={`flex-1 ${!hideLayout ? 'pt-0' : ''}`}>
         <Routes>
@@ -79,84 +79,84 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-          
+
           {/* Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          
+
           {/* Protected Routes - Require Authentication */}
-          <Route 
-            path="/cart" 
+          <Route
+            path="/cart"
             element={
               <ProtectedRoute>
                 <CartPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/checkout" 
+          <Route
+            path="/checkout"
             element={
               <ProtectedRoute>
                 <CheckoutPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/order-success/:id" 
+          <Route
+            path="/order-success/:id"
             element={
               <ProtectedRoute>
                 <OrderSuccessPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/orders" 
+          <Route
+            path="/orders"
             element={
               <ProtectedRoute>
                 <OrdersPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/order/:id" 
+          <Route
+            path="/order/:id"
             element={
               <ProtectedRoute>
                 <OrderDetailPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/track-order/:id" 
+          <Route
+            path="/track-order/:id"
             element={
               <ProtectedRoute>
                 <TrackOrderPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/profile" 
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <ProfilePage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/addresses" 
+          <Route
+            path="/addresses"
             element={
               <ProtectedRoute>
                 <AddressesPage />
               </ProtectedRoute>
-            } 
+            }
           />
-          
+
           {/* 404 Not Found */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
-      
+
       {/* Footer - Hidden on auth pages, minimal on checkout */}
       {!hideLayout && (
         <Footer minimal={showMinimalFooter} />

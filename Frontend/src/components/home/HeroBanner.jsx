@@ -16,7 +16,7 @@ const HeroBanner = () => {
 
   return (
     <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      
+
       {/* Background Currency Images Grid - FIXED */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-black/40 z-10"></div> {/* Optional: overlay for better text readability */}

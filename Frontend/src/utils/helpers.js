@@ -143,9 +143,9 @@ export const calculateDiscount = (originalPrice, salePrice) => {
 // SEO Helpers
 export const generateProductSchema = (product, url) => {
   const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
-  
+
   if (!product) return null;
-  
+
   return {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -195,7 +195,7 @@ export const getConditionSchema = (condition) => {
 
 export const generateBreadcrumbSchema = (items, baseUrl) => {
   if (!items || !Array.isArray(items)) return null;
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -267,7 +267,7 @@ export const getUrlParams = () => {
 
 export const updateUrlParams = (params, replace = false) => {
   const urlParams = new URLSearchParams(window.location.search);
-  
+
   Object.keys(params).forEach(key => {
     if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
       urlParams.set(key, params[key]);
@@ -275,9 +275,9 @@ export const updateUrlParams = (params, replace = false) => {
       urlParams.delete(key);
     }
   });
-  
+
   const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
-  
+
   if (replace) {
     window.history.replaceState({}, '', newUrl);
   } else {
@@ -314,20 +314,20 @@ export const getRarityLevel = (rarity) => {
 // Image Helpers
 export const getImageUrl = (url, width = 800, height = 800) => {
   if (!url) return '/placeholder.png';
-  
+
   // If using Cloudinary, you can add transformations
   if (url.includes('cloudinary.com')) {
     return url.replace('/upload/', `/upload/w_${width},h_${height},c_fill/`);
   }
-  
+
   return url;
 };
 
 export const getOptimizedImageUrl = (url, options = {}) => {
   const { width = 400, height = 400, quality = 80, format = 'auto' } = options;
-  
+
   if (!url) return '/placeholder.png';
-  
+
   if (url.includes('cloudinary.com')) {
     let transformation = `/upload/`;
     if (width || height) transformation += `w_${width},h_${height},c_fill/`;
@@ -335,7 +335,7 @@ export const getOptimizedImageUrl = (url, options = {}) => {
     if (format) transformation += `f_${format}/`;
     return url.replace('/upload/', transformation);
   }
-  
+
   return url;
 };
 
@@ -363,13 +363,13 @@ export const throttle = (func, limit) => {
 // Error Helpers
 export const getErrorMessage = (error) => {
   if (!error) return 'An unknown error occurred';
-  
+
   if (typeof error === 'string') return error;
-  
+
   if (error.response?.data?.message) return error.response.data.message;
-  
+
   if (error.message) return error.message;
-  
+
   return 'Something went wrong. Please try again.';
 };
 

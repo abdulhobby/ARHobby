@@ -15,7 +15,7 @@ const OrderSuccess = ({ order, bankDetails }) => {
   return (
     <div className="min-h-screen bg-bg-secondary py-6 sm:py-8 lg:py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        
+
         {/* Payment Details Card - Only payment info, no duplicate success message */}
         <div className="bg-white rounded-2xl border border-border-light shadow-sm overflow-hidden mb-6 animate-fade-in">
           {/* Card Header */}
@@ -48,13 +48,13 @@ const OrderSuccess = ({ order, bankDetails }) => {
                 </div>
                 <h3 className="font-bold text-text-primary">Scan QR Code to Pay</h3>
               </div>
-              
+
               <div className="flex justify-center mb-4">
                 <div className="p-4 bg-white rounded-2xl shadow-md inline-block">
                   {/* QR Code Image - Replace with your actual QR code image URL */}
-                  <img 
-                    src={QR} 
-                    alt="UPI QR Code" 
+                  <img
+                    src={QR}
+                    alt="UPI QR Code"
                     className="w-48 h-48 sm:w-56 sm:h-56"
                   />
                   {/* Or use a QR code generation library like qrcode.react */}
@@ -71,14 +71,14 @@ const OrderSuccess = ({ order, bankDetails }) => {
                 </div>
                 <h3 className="font-bold text-text-primary">UPI Payment</h3>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-white rounded-lg group">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-text-light">UPI ID</p>
                     <p className="font-semibold text-text-primary font-mono">6388870150@ptyes</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => copyToClipboard('6388870150@ptyes', 'UPI ID')}
                     className="p-2.5 rounded-lg bg-primary-50 text-primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-300"
                   >
@@ -91,7 +91,7 @@ const OrderSuccess = ({ order, bankDetails }) => {
                     <p className="text-xs text-text-light">Mobile Number (Google Pay / PhonePe / Paytm)</p>
                     <p className="font-semibold text-text-primary font-mono text-lg">6388870150</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => copyToClipboard('6388870150', 'Mobile number')}
                     className="p-2.5 rounded-lg bg-primary-50 text-primary hover:bg-primary hover:text-white cursor-pointer transition-all duration-300"
                   >
@@ -102,20 +102,20 @@ const OrderSuccess = ({ order, bankDetails }) => {
 
               {/* Payment Apps Buttons */}
               <div className="mt-4 grid grid-cols-3 gap-2">
-                <a 
-                  href="tez://pay?pa=6388870150@ptyes&pn=Store&am=0" 
+                <a
+                  href="tez://pay?pa=6388870150@ptyes&pn=Store&am=0"
                   className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
                 >
                   <span>📱</span> GPay
                 </a>
-                <a 
-                  href="phonepe://pay?pa=6388870150@ptyes&pn=Store&am=0" 
+                <a
+                  href="phonepe://pay?pa=6388870150@ptyes&pn=Store&am=0"
                   className="flex items-center justify-center gap-2 px-3 py-2 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 transition-colors"
                 >
                   <span>📱</span> PhonePe
                 </a>
-                <a 
-                  href="paytmmp://pay?pa=6388870150@ptyes&pn=Store&am=0" 
+                <a
+                  href="paytmmp://pay?pa=6388870150@ptyes&pn=Store&am=0"
                   className="flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
                   <span>📱</span> Paytm
@@ -133,9 +133,9 @@ const OrderSuccess = ({ order, bankDetails }) => {
                   <p className="text-sm text-text-secondary mb-2">
                     After payment, please send the payment screenshot via WhatsApp to:
                   </p>
-                  <a 
-                    href="https://wa.me/917081434589" 
-                    target="_blank" 
+                  <a
+                    href="https://wa.me/917081434589"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-5 py-3 bg-green-500 text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/30 active:scale-95"
                   >
@@ -151,7 +151,7 @@ const OrderSuccess = ({ order, bankDetails }) => {
 
         {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 animate-fade-in">
-          <Link 
+          <Link
             to={`/order/${order._id}`}
             className="flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95 group"
           >
@@ -159,16 +159,16 @@ const OrderSuccess = ({ order, bankDetails }) => {
             View Order Details
             <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
-          
-          <Link 
+
+          <Link
             to="/orders"
             className="flex items-center justify-center gap-2 px-6 py-4 bg-white text-primary font-semibold rounded-xl border-2 border-primary cursor-pointer transition-all duration-300 hover:bg-primary-50 active:scale-95"
           >
             <FiPackage className="w-5 h-5" />
             My Orders
           </Link>
-          
-          <Link 
+
+          <Link
             to="/shop"
             className="flex items-center justify-center gap-2 px-6 py-4 bg-secondary text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-secondary-light hover:shadow-lg active:scale-95"
           >

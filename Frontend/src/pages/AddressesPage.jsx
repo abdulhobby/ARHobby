@@ -6,13 +6,13 @@ import AddressCard from '../components/profile/AddressCard';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import SEO from '../components/common/SEO';
 import { INDIAN_STATES, ADDRESS_LABELS } from '../utils/constants';
-import { 
-  FiPlus, 
-  FiX, 
-  FiMapPin, 
-  FiUser, 
-  FiPhone, 
-  FiHome, 
+import {
+  FiPlus,
+  FiX,
+  FiMapPin,
+  FiUser,
+  FiPhone,
+  FiHome,
   FiSave,
   FiCheck,
   FiEdit3
@@ -86,7 +86,7 @@ const AddressesPage = () => {
   return (
     <div className="bg-bg-secondary py-5">
       <SEO title="My Addresses" />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Sidebar */}
@@ -107,13 +107,12 @@ const AddressesPage = () => {
                   <p className="text-sm text-text-light">{addresses.length} saved address{addresses.length !== 1 ? 'es' : ''}</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => { resetForm(); setShowForm(!showForm); }}
-                className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 active:scale-95 ${
-                  showForm 
-                    ? 'bg-white text-error border-2 border-error hover:bg-error/5' 
+                className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 active:scale-95 ${showForm
+                    ? 'bg-white text-error border-2 border-error hover:bg-error/5'
                     : 'bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30'
-                }`}
+                  }`}
               >
                 {showForm ? (
                   <>
@@ -153,11 +152,11 @@ const AddressesPage = () => {
                         <FiUser className="w-4 h-4 text-primary" />
                         Full Name <span className="text-error">*</span>
                       </label>
-                      <input 
-                        type="text" 
-                        name="fullName" 
-                        value={formData.fullName} 
-                        onChange={handleChange} 
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
                         required
                         placeholder="Enter your full name"
                         className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
@@ -168,11 +167,11 @@ const AddressesPage = () => {
                         <FiPhone className="w-4 h-4 text-primary" />
                         Phone Number <span className="text-error">*</span>
                       </label>
-                      <input 
-                        type="tel" 
-                        name="phone" 
-                        value={formData.phone} 
-                        onChange={handleChange} 
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
                         required
                         placeholder="Enter 10-digit mobile number"
                         className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
@@ -186,11 +185,11 @@ const AddressesPage = () => {
                       <FiHome className="w-4 h-4 text-primary" />
                       Address Line 1 <span className="text-error">*</span>
                     </label>
-                    <input 
-                      type="text" 
-                      name="addressLine1" 
-                      value={formData.addressLine1} 
-                      onChange={handleChange} 
+                    <input
+                      type="text"
+                      name="addressLine1"
+                      value={formData.addressLine1}
+                      onChange={handleChange}
                       required
                       placeholder="House/Flat No., Building Name, Street"
                       className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
@@ -203,10 +202,10 @@ const AddressesPage = () => {
                       <FiMapPin className="w-4 h-4 text-primary" />
                       Address Line 2 <span className="text-text-light">(Optional)</span>
                     </label>
-                    <input 
-                      type="text" 
-                      name="addressLine2" 
-                      value={formData.addressLine2} 
+                    <input
+                      type="text"
+                      name="addressLine2"
+                      value={formData.addressLine2}
                       onChange={handleChange}
                       placeholder="Landmark, Area, Colony"
                       className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
@@ -219,11 +218,11 @@ const AddressesPage = () => {
                       <label className="block text-sm font-medium text-text-primary mb-2">
                         City <span className="text-error">*</span>
                       </label>
-                      <input 
-                        type="text" 
-                        name="city" 
-                        value={formData.city} 
-                        onChange={handleChange} 
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
                         required
                         placeholder="Enter city"
                         className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
@@ -233,10 +232,10 @@ const AddressesPage = () => {
                       <label className="block text-sm font-medium text-text-primary mb-2">
                         State <span className="text-error">*</span>
                       </label>
-                      <select 
-                        name="state" 
-                        value={formData.state} 
-                        onChange={handleChange} 
+                      <select
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
                         required
                         className="w-full px-4 py-3 rounded-xl border border-border bg-white text-text-primary cursor-pointer transition-all duration-300 focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/20 group-hover:border-primary-300"
                       >
@@ -248,11 +247,11 @@ const AddressesPage = () => {
                       <label className="block text-sm font-medium text-text-primary mb-2">
                         Pincode <span className="text-error">*</span>
                       </label>
-                      <input 
-                        type="text" 
-                        name="pincode" 
-                        value={formData.pincode} 
-                        onChange={handleChange} 
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={formData.pincode}
+                        onChange={handleChange}
                         required
                         placeholder="6-digit pincode"
                         maxLength={6}
@@ -271,24 +270,23 @@ const AddressesPage = () => {
                             key={l}
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, label: l }))}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-300 ${
-                              formData.label === l 
-                                ? 'bg-primary text-white shadow-md shadow-primary/30' 
+                            className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-300 ${formData.label === l
+                                ? 'bg-primary text-white shadow-md shadow-primary/30'
                                 : 'bg-white text-text-secondary border border-border hover:border-primary hover:text-primary'
-                            }`}
+                              }`}
                           >
                             {l}
                           </button>
                         ))}
                       </div>
                     </div>
-                    
+
                     <label className="flex items-center gap-3 cursor-pointer group p-3 bg-white rounded-xl border border-border hover:border-primary transition-all duration-300">
                       <div className="relative">
-                        <input 
-                          type="checkbox" 
-                          name="isDefault" 
-                          checked={formData.isDefault} 
+                        <input
+                          type="checkbox"
+                          name="isDefault"
+                          checked={formData.isDefault}
                           onChange={handleChange}
                           className="sr-only peer"
                         />
@@ -304,15 +302,15 @@ const AddressesPage = () => {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-border-light">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={resetForm}
                       className="flex-1 sm:flex-none px-6 py-3 rounded-xl border-2 border-border text-text-secondary font-semibold cursor-pointer transition-all duration-300 hover:border-error hover:text-error hover:bg-error/5 active:scale-95 flex items-center justify-center gap-2"
                     >
                       <FiX className="w-5 h-5" />
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
                       disabled={loading}
                       className="flex-1 sm:flex-none px-8 py-3 rounded-xl bg-primary text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -338,7 +336,7 @@ const AddressesPage = () => {
             {addresses.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {addresses.map((address, index) => (
-                  <div 
+                  <div
                     key={address._id}
                     className="animate-fade-in"
                     style={{ animationDelay: `${index * 0.05}s` }}
@@ -359,7 +357,7 @@ const AddressesPage = () => {
                 <p className="text-text-light mb-6 max-w-sm mx-auto">
                   Add your first delivery address to start shopping
                 </p>
-                <button 
+                <button
                   onClick={() => setShowForm(true)}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95"
                 >

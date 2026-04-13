@@ -44,7 +44,7 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
   };
 
   return (
-    <form 
+    <form
       onSubmit={handleSubmit}
       className="bg-white rounded-2xl border border-border-light p-4 sm:p-6 lg:p-8 shadow-sm animate-fade-in"
     >
@@ -68,11 +68,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
             <FiUser className="w-4 h-4 text-primary" />
             Full Name <span className="text-error">*</span>
           </label>
-          <input 
-            type="text" 
-            name="fullName" 
-            value={formData.fullName} 
-            onChange={handleChange} 
+          <input
+            type="text"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
             required
             placeholder="Enter your full name"
             className="input-field group-hover:border-primary-300"
@@ -83,11 +83,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
             <FiPhone className="w-4 h-4 text-primary" />
             Phone Number <span className="text-error">*</span>
           </label>
-          <input 
-            type="tel" 
-            name="phone" 
-            value={formData.phone} 
-            onChange={handleChange} 
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
             required
             placeholder="Enter 10-digit mobile number"
             className="input-field group-hover:border-primary-300"
@@ -101,11 +101,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
           <FiHome className="w-4 h-4 text-primary" />
           Address Line 1 <span className="text-error">*</span>
         </label>
-        <input 
-          type="text" 
-          name="addressLine1" 
-          value={formData.addressLine1} 
-          onChange={handleChange} 
+        <input
+          type="text"
+          name="addressLine1"
+          value={formData.addressLine1}
+          onChange={handleChange}
           required
           placeholder="House/Flat No., Building Name, Street"
           className="input-field group-hover:border-primary-300"
@@ -118,10 +118,10 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
           <FiMapPin className="w-4 h-4 text-primary" />
           Address Line 2 <span className="text-text-light">(Optional)</span>
         </label>
-        <input 
-          type="text" 
-          name="addressLine2" 
-          value={formData.addressLine2} 
+        <input
+          type="text"
+          name="addressLine2"
+          value={formData.addressLine2}
           onChange={handleChange}
           placeholder="Landmark, Area, Colony"
           className="input-field group-hover:border-primary-300"
@@ -134,11 +134,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
           <label className="label-text">
             City <span className="text-error">*</span>
           </label>
-          <input 
-            type="text" 
-            name="city" 
-            value={formData.city} 
-            onChange={handleChange} 
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
             required
             placeholder="Enter city"
             className="input-field group-hover:border-primary-300"
@@ -148,10 +148,10 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
           <label className="label-text">
             State <span className="text-error">*</span>
           </label>
-          <select 
-            name="state" 
-            value={formData.state} 
-            onChange={handleChange} 
+          <select
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
             required
             className="select-field group-hover:border-primary-300"
           >
@@ -165,11 +165,11 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
           <label className="label-text">
             Pincode <span className="text-error">*</span>
           </label>
-          <input 
-            type="text" 
-            name="pincode" 
-            value={formData.pincode} 
-            onChange={handleChange} 
+          <input
+            type="text"
+            name="pincode"
+            value={formData.pincode}
+            onChange={handleChange}
             required
             placeholder="6-digit pincode"
             maxLength={6}
@@ -188,24 +188,23 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
                 key={l}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, label: l }))}
-                className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-300 ${
-                  formData.label === l 
-                    ? 'bg-primary text-white shadow-md shadow-primary/30' 
+                className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-all duration-300 ${formData.label === l
+                    ? 'bg-primary text-white shadow-md shadow-primary/30'
                     : 'bg-white text-text-secondary border border-border hover:border-primary hover:text-primary'
-                }`}
+                  }`}
               >
                 {l}
               </button>
             ))}
           </div>
         </div>
-        
+
         <label className="flex items-center gap-3 cursor-pointer group p-3 bg-white rounded-xl border border-border hover:border-primary transition-all duration-300">
           <div className="relative">
-            <input 
-              type="checkbox" 
-              name="isDefault" 
-              checked={formData.isDefault} 
+            <input
+              type="checkbox"
+              name="isDefault"
+              checked={formData.isDefault}
               onChange={handleChange}
               className="sr-only peer"
             />
@@ -222,8 +221,8 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
       {/* Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-border-light">
         {onCancel && (
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={onCancel}
             className="flex-1 sm:flex-none px-6 py-3 rounded-xl border-2 border-border text-text-secondary font-semibold cursor-pointer transition-all duration-300 hover:border-error hover:text-error hover:bg-error/5 active:scale-95 flex items-center justify-center gap-2"
           >
@@ -231,7 +230,7 @@ const AddressForm = ({ onSuccess, onCancel, initialData }) => {
             Cancel
           </button>
         )}
-        <button 
+        <button
           type="submit"
           disabled={loading}
           className="flex-1 sm:flex-none px-8 py-3 rounded-xl bg-primary text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

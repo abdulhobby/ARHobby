@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateProfile, updatePassword, updateAvatar, clearError, clearMessage } from '../features/auth/authSlice';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import SEO from '../components/common/SEO';
-import { 
-  FiCamera, 
-  FiUser, 
-  FiMail, 
-  FiPhone, 
-  FiLock, 
-  FiEye, 
+import {
+  FiCamera,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiLock,
+  FiEye,
   FiEyeOff,
   FiShield,
   FiCheck,
@@ -23,10 +23,10 @@ const ProfilePage = () => {
   const { user, loading, error, message } = useSelector((state) => state.auth);
 
   const [profileData, setProfileData] = useState({ name: '', phone: '' });
-  const [passwordData, setPasswordData] = useState({ 
-    currentPassword: '', 
-    newPassword: '', 
-    confirmPassword: '' 
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -43,12 +43,12 @@ const ProfilePage = () => {
   }, [user]);
 
   useEffect(() => {
-    if (error) { 
-      toast.error(error); 
-      dispatch(clearError()); 
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
     }
-    if (message) { 
-      toast.success(message); 
+    if (message) {
+      toast.success(message);
       dispatch(clearMessage());
       setIsEditingProfile(false);
     }
@@ -83,7 +83,7 @@ const ProfilePage = () => {
         toast.error('Image size should be less than 5MB');
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result);
@@ -111,7 +111,7 @@ const ProfilePage = () => {
 
     const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
     const colors = ['', 'bg-error', 'bg-warning', 'bg-warning', 'bg-success', 'bg-success'];
-    
+
     return { strength, label: labels[strength], color: colors[strength] };
   };
 
@@ -140,7 +140,7 @@ const ProfilePage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="lg:sticky lg:top-24">
@@ -150,7 +150,7 @@ const ProfilePage = () => {
 
           {/* Profile Content */}
           <main className="flex-1 min-w-0 space-y-8">
-            
+
             {/* Avatar Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <div className="px-6 py-4 border-b border-border bg-bg-secondary/50">
@@ -163,8 +163,8 @@ const ProfilePage = () => {
                     <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-primary-100 
                                   to-primary-200 border-4 border-white shadow-xl">
                       {avatarPreview || user?.avatar?.url ? (
-                        <img 
-                          src={avatarPreview || user.avatar.url} 
+                        <img
+                          src={avatarPreview || user.avatar.url}
                           alt={user?.name}
                           className="w-full h-full object-cover"
                         />
@@ -176,7 +176,7 @@ const ProfilePage = () => {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Upload Button Overlay */}
                     <label className="absolute inset-0 flex items-center justify-center rounded-2xl
                                     bg-secondary/60 opacity-0 group-hover:opacity-100 
@@ -185,10 +185,10 @@ const ProfilePage = () => {
                         <FiCamera className="w-6 h-6 mb-1" />
                         <span className="text-xs font-medium">Change</span>
                       </div>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleAvatarChange} 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
                         className="hidden"
                       />
                     </label>
@@ -206,10 +206,10 @@ const ProfilePage = () => {
                                     hover:bg-primary/20 transition-colors duration-300">
                       <FiCamera className="w-4 h-4" />
                       Upload New Photo
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleAvatarChange} 
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
                         className="hidden"
                       />
                     </label>
@@ -236,7 +236,7 @@ const ProfilePage = () => {
                   </button>
                 )}
               </div>
-              
+
               <form onSubmit={handleProfileUpdate} className="p-6 space-y-6">
                 {/* Name Field */}
                 <div>
@@ -251,10 +251,10 @@ const ProfilePage = () => {
                       onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
                       disabled={!isEditingProfile}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl border transition-all duration-300
-                               ${isEditingProfile 
-                                 ? 'border-border bg-white focus:border-primary focus:ring-3 focus:ring-primary/20' 
-                                 : 'border-transparent bg-bg-secondary text-text-primary cursor-not-allowed'
-                               }
+                               ${isEditingProfile
+                          ? 'border-border bg-white focus:border-primary focus:ring-3 focus:ring-primary/20'
+                          : 'border-transparent bg-bg-secondary text-text-primary cursor-not-allowed'
+                        }
                                focus:outline-none`}
                       placeholder="Enter your full name"
                     />
@@ -298,10 +298,10 @@ const ProfilePage = () => {
                       onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
                       disabled={!isEditingProfile}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl border transition-all duration-300
-                               ${isEditingProfile 
-                                 ? 'border-border bg-white focus:border-primary focus:ring-3 focus:ring-primary/20' 
-                                 : 'border-transparent bg-bg-secondary text-text-primary cursor-not-allowed'
-                               }
+                               ${isEditingProfile
+                          ? 'border-border bg-white focus:border-primary focus:ring-3 focus:ring-primary/20'
+                          : 'border-transparent bg-bg-secondary text-text-primary cursor-not-allowed'
+                        }
                                focus:outline-none`}
                       placeholder="Enter your phone number"
                     />
@@ -358,7 +358,7 @@ const ProfilePage = () => {
                   Ensure your account is using a strong password
                 </p>
               </div>
-              
+
               <form onSubmit={handlePasswordUpdate} className="p-6 space-y-6">
                 {/* Current Password */}
                 <div>
@@ -415,26 +415,24 @@ const ProfilePage = () => {
                       {showPasswords.new ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                     </button>
                   </div>
-                  
+
                   {/* Password Strength Indicator */}
                   {passwordData.newPassword && (
                     <div className="mt-3">
                       <div className="flex items-center justify-between text-sm mb-1.5">
                         <span className="text-text-secondary">Password strength</span>
-                        <span className={`font-medium ${
-                          passwordStrength.strength >= 4 ? 'text-success' : 
-                          passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
-                        }`}>
+                        <span className={`font-medium ${passwordStrength.strength >= 4 ? 'text-success' :
+                            passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
+                          }`}>
                           {passwordStrength.label}
                         </span>
                       </div>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((level) => (
-                          <div 
+                          <div
                             key={level}
-                            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                              level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
-                            }`}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
+                              }`}
                           />
                         ))}
                       </div>
@@ -457,9 +455,9 @@ const ProfilePage = () => {
                                text-text-primary placeholder:text-text-light transition-all duration-300
                                focus:outline-none focus:ring-3
                                ${passwordData.confirmPassword && passwordData.confirmPassword !== passwordData.newPassword
-                                 ? 'border-error focus:border-error focus:ring-error/20'
-                                 : 'border-border focus:border-primary focus:ring-primary/20'
-                               }`}
+                          ? 'border-error focus:border-error focus:ring-error/20'
+                          : 'border-border focus:border-primary focus:ring-primary/20'
+                        }`}
                       placeholder="Confirm new password"
                       required
                     />
@@ -481,8 +479,8 @@ const ProfilePage = () => {
                 <div className="pt-4">
                   <button
                     type="submit"
-                    disabled={loading || !passwordData.currentPassword || !passwordData.newPassword || 
-                             passwordData.newPassword !== passwordData.confirmPassword}
+                    disabled={loading || !passwordData.currentPassword || !passwordData.newPassword ||
+                      passwordData.newPassword !== passwordData.confirmPassword}
                     className="w-full sm:w-auto flex items-center justify-center gap-2 py-3.5 px-8
                              bg-secondary hover:bg-secondary-light text-white rounded-xl font-semibold
                              transition-all duration-300 cursor-pointer shadow-lg shadow-secondary/20

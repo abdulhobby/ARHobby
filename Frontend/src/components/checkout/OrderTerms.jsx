@@ -56,7 +56,7 @@ const OrderTerms = ({ accepted, onAcceptChange }) => {
           {terms.map((term, index) => {
             const IconComponent = term.icon;
             return (
-              <div 
+              <div
                 key={index}
                 className="flex items-start gap-3 p-3 sm:p-4 bg-bg-secondary rounded-xl border border-border-light hover:border-primary-200 transition-colors group"
               >
@@ -77,12 +77,11 @@ const OrderTerms = ({ accepted, onAcceptChange }) => {
         </div>
 
         {/* Acceptance Checkbox */}
-        <div 
-          className={`p-4 sm:p-5 rounded-xl border-2 transition-all duration-300 ${
-            accepted 
-              ? 'bg-primary-50 border-primary' 
+        <div
+          className={`p-4 sm:p-5 rounded-xl border-2 transition-all duration-300 ${accepted
+              ? 'bg-primary-50 border-primary'
               : 'bg-bg-secondary border-border-light hover:border-primary-300'
-          }`}
+            }`}
         >
           <label className="flex items-start gap-3 cursor-pointer">
             <input
@@ -92,9 +91,8 @@ const OrderTerms = ({ accepted, onAcceptChange }) => {
               className="w-6 h-6 mt-0.5 cursor-pointer accent-primary rounded transition-all duration-300 hover:accent-primary-dark"
               aria-label="Accept terms and conditions"
             />
-            <span className={`text-sm sm:text-base font-medium transition-colors select-none ${
-              accepted ? 'text-primary-dark' : 'text-text-secondary'
-            }`}>
+            <span className={`text-sm sm:text-base font-medium transition-colors select-none ${accepted ? 'text-primary-dark' : 'text-text-secondary'
+              }`}>
               I have read and agree to the terms and conditions
             </span>
           </label>

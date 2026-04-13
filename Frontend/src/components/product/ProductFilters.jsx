@@ -40,7 +40,7 @@ const ProductFilters = ({
       // Use the API instance instead of raw fetch
       const response = await API.get('/products/filter-options');
       console.log('Filter options response:', response.data);
-      
+
       if (response.data.success) {
         setCountries(response.data.countries || []);
         setMaterials(response.data.materials || []);
@@ -78,9 +78,9 @@ const ProductFilters = ({
   };
 
   const hasActiveFilters = () => {
-    return filters.category || filters.subCategory || filters.country || 
-           filters.material || filters.stockStatus || filters.condition || 
-           filters.minPrice || filters.maxPrice || filters.keyword;
+    return filters.category || filters.subCategory || filters.country ||
+      filters.material || filters.stockStatus || filters.condition ||
+      filters.minPrice || filters.maxPrice || filters.keyword;
   };
 
   const activeFilterCount = [
@@ -163,7 +163,7 @@ const ProductFilters = ({
             </div>
 
             <div className="p-5 space-y-6">
-              <FilterContent 
+              <FilterContent
                 filters={filters}
                 handleChange={handleChange}
                 categories={categories}
@@ -214,7 +214,7 @@ const ProductFilters = ({
           </div>
 
           <div className="space-y-6">
-            <FilterContent 
+            <FilterContent
               filters={filters}
               handleChange={handleChange}
               categories={categories}
@@ -233,10 +233,10 @@ const ProductFilters = ({
   );
 };
 
-const FilterContent = ({ 
-  filters, handleChange, categories, subCategories, 
-  countries, materials, loadingOptions, showCategoryFilter, 
-  labelClasses, selectClasses 
+const FilterContent = ({
+  filters, handleChange, categories, subCategories,
+  countries, materials, loadingOptions, showCategoryFilter,
+  labelClasses, selectClasses
 }) => {
   // Filter sub-categories based on selected category
   const filteredSubCategories = filters.category
@@ -367,11 +367,10 @@ const FilterContent = ({
               key={opt.value}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer 
                         transition-all duration-200 border-2
-                        ${
-                          filters.stockStatus === opt.value
-                            ? 'border-primary bg-primary-50 text-primary'
-                            : 'border-transparent hover:bg-bg-secondary text-text-secondary'
-                        }`}
+                        ${filters.stockStatus === opt.value
+                  ? 'border-primary bg-primary-50 text-primary'
+                  : 'border-transparent hover:bg-bg-secondary text-text-secondary'
+                }`}
             >
               <input
                 type="radio"

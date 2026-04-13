@@ -27,7 +27,7 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
   };
 
   const getLabelIcon = (label) => {
-    switch(label?.toLowerCase()) {
+    switch (label?.toLowerCase()) {
       case 'home': return <FiHome className="w-4 h-4" />;
       case 'work': case 'office': return <FiBriefcase className="w-4 h-4" />;
       default: return <FiMapPin className="w-4 h-4" />;
@@ -47,7 +47,7 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
             <p className="text-sm text-text-light">Select or add a delivery address</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95"
         >
@@ -59,9 +59,9 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
       {/* Add Form */}
       {showAddForm && (
         <div className="p-4 sm:p-6 border-b border-border-light bg-bg-secondary animate-slide-down">
-          <AddressForm 
-            onSuccess={handleAddressAdded} 
-            onCancel={() => setShowAddForm(false)} 
+          <AddressForm
+            onSuccess={handleAddressAdded}
+            onCancel={() => setShowAddForm(false)}
           />
         </div>
       )}
@@ -78,14 +78,13 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
       {!loading && addresses.length > 0 && (
         <div className="p-4 sm:p-6 space-y-3 sm:space-y-4 max-h-[400px] overflow-y-auto">
           {addresses.map((address, index) => (
-            <div 
-              key={address._id} 
+            <div
+              key={address._id}
               onClick={() => onSelectAddress(address)}
-              className={`relative p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 group ${
-                selectedAddress?._id === address._id 
-                  ? 'border-primary bg-primary-50 shadow-md shadow-primary/10' 
+              className={`relative p-4 sm:p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 group ${selectedAddress?._id === address._id
+                  ? 'border-primary bg-primary-50 shadow-md shadow-primary/10'
                   : 'border-border-light bg-white hover:border-primary-300 hover:bg-primary-50/50'
-              }`}
+                }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Radio Button */}
@@ -98,11 +97,10 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
                     onChange={() => onSelectAddress(address)}
                     className="sr-only peer"
                   />
-                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                    selectedAddress?._id === address._id 
-                      ? 'border-primary bg-primary' 
+                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${selectedAddress?._id === address._id
+                      ? 'border-primary bg-primary'
                       : 'border-border group-hover:border-primary-400'
-                  }`}>
+                    }`}>
                     {selectedAddress?._id === address._id && (
                       <FiCheck className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     )}
@@ -172,7 +170,7 @@ const AddressSelector = ({ selectedAddress, onSelectAddress }) => {
           <p className="text-text-light mb-6 max-w-sm">
             Please add a shipping address to continue with your order.
           </p>
-          <button 
+          <button
             onClick={() => setShowAddForm(true)}
             className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95"
           >

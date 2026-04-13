@@ -132,11 +132,10 @@ const ProductImageGallery = ({ images }) => {
               onClick={() => setSelectedImage(index)}
               className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden 
                         cursor-pointer transition-all duration-300 border-2
-                        ${
-                          selectedImage === index
-                            ? 'border-primary shadow-lg shadow-primary/20 scale-105'
-                            : 'border-border-light hover:border-primary-300 opacity-70 hover:opacity-100'
-                        }`}
+                        ${selectedImage === index
+                  ? 'border-primary shadow-lg shadow-primary/20 scale-105'
+                  : 'border-border-light hover:border-primary-300 opacity-70 hover:opacity-100'
+                }`}
             >
               <img
                 src={image.url}
@@ -218,11 +217,10 @@ const ProductImageGallery = ({ images }) => {
                   }}
                   className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden cursor-pointer 
                             transition-all duration-300 border-2
-                            ${
-                              selectedImage === index
-                                ? 'border-primary scale-110 opacity-100'
-                                : 'border-transparent opacity-50 hover:opacity-80'
-                            }`}
+                            ${selectedImage === index
+                      ? 'border-primary scale-110 opacity-100'
+                      : 'border-transparent opacity-50 hover:opacity-80'
+                    }`}
                 >
                   <img
                     src={image.url}

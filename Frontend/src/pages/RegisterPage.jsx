@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { register, clearError } from '../features/auth/authSlice';
 import SEO from '../components/common/SEO';
-import { 
-  FiUser, 
-  FiMail, 
-  FiLock, 
-  FiPhone, 
-  FiEye, 
-  FiEyeOff, 
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiPhone,
+  FiEye,
+  FiEyeOff,
   FiArrowRight,
   FiCheck,
   FiLoader,
@@ -21,17 +21,17 @@ import {
 import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({ 
-    name: '', 
-    email: '', 
-    password: '', 
-    confirmPassword: '', 
-    phone: '' 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
@@ -41,9 +41,9 @@ const RegisterPage = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (error) { 
-      toast.error(error); 
-      dispatch(clearError()); 
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
     }
   }, [error, dispatch]);
 
@@ -53,27 +53,27 @@ const RegisterPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!agreedToTerms) {
       toast.error('Please agree to the Terms & Conditions');
       return;
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    
-    dispatch(register({ 
-      name: formData.name, 
-      email: formData.email, 
-      password: formData.password, 
-      phone: formData.phone 
+
+    dispatch(register({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone
     }));
   };
 
@@ -88,7 +88,7 @@ const RegisterPage = () => {
 
     const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
     const colors = ['', 'bg-error', 'bg-warning', 'bg-warning', 'bg-success', 'bg-success'];
-    
+
     return { strength, label: labels[strength], color: colors[strength] };
   };
 
@@ -105,7 +105,7 @@ const RegisterPage = () => {
   return (
     <div className="min-h-screen bg-bg-secondary flex">
       <SEO title="Create Account" />
-      
+
       {/* Left Side - Benefits (Hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-primary-dark relative overflow-hidden">
         {/* Background Pattern */}
@@ -113,24 +113,24 @@ const RegisterPage = () => {
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full translate-x-1/2 translate-y-1/2"></div>
         </div>
-        
+
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-16 text-white">
           {/* Logo */}
           <Link to="/" className="mb-12">
             <h2 className="text-3xl font-bold">AR Hobby</h2>
           </Link>
-          
+
           {/* Welcome Text */}
           <div className="mb-12">
             <h1 className="text-4xl xl:text-5xl font-bold mb-4">
               Start Your Collection Journey
             </h1>
             <p className="text-lg text-white/80 leading-relaxed">
-              Join thousands of collectors who trust AR Hobby for authentic coins, 
+              Join thousands of collectors who trust AR Hobby for authentic coins,
               notes, and stamps. Create your account today and unlock exclusive benefits.
             </p>
           </div>
-          
+
           {/* Benefits */}
           <div className="space-y-6">
             {benefits.map((benefit, index) => (
@@ -262,26 +262,24 @@ const RegisterPage = () => {
                     {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                   </button>
                 </div>
-                
+
                 {/* Password Strength */}
                 {formData.password && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="text-text-secondary">Password strength</span>
-                      <span className={`font-medium ${
-                        passwordStrength.strength >= 4 ? 'text-success' : 
-                        passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
-                      }`}>
+                      <span className={`font-medium ${passwordStrength.strength >= 4 ? 'text-success' :
+                          passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
+                        }`}>
                         {passwordStrength.label}
                       </span>
                     </div>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((level) => (
-                        <div 
+                        <div
                           key={level}
-                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                            level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
-                          }`}
+                          className={`h-1 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
+                            }`}
                         />
                       ))}
                     </div>
@@ -304,12 +302,12 @@ const RegisterPage = () => {
                     className={`w-full pl-12 pr-12 py-3.5 rounded-xl border bg-white
                              text-text-primary placeholder:text-text-light transition-all duration-300
                              focus:outline-none focus:ring-3
-                             ${formData.confirmPassword 
-                               ? passwordsMatch 
-                                 ? 'border-success focus:border-success focus:ring-success/20'
-                                 : 'border-error focus:border-error focus:ring-error/20'
-                               : 'border-border focus:border-primary focus:ring-primary/20'
-                             }`}
+                             ${formData.confirmPassword
+                        ? passwordsMatch
+                          ? 'border-success focus:border-success focus:ring-success/20'
+                          : 'border-error focus:border-error focus:ring-error/20'
+                        : 'border-border focus:border-primary focus:ring-primary/20'
+                      }`}
                     placeholder="Confirm your password"
                     required
                   />
@@ -321,12 +319,11 @@ const RegisterPage = () => {
                   >
                     {showConfirmPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                   </button>
-                  
+
                   {/* Match Indicator */}
                   {formData.confirmPassword && (
-                    <div className={`absolute right-12 top-1/2 -translate-y-1/2 ${
-                      passwordsMatch ? 'text-success' : 'text-error'
-                    }`}>
+                    <div className={`absolute right-12 top-1/2 -translate-y-1/2 ${passwordsMatch ? 'text-success' : 'text-error'
+                      }`}>
                       {passwordsMatch ? <FiCheck className="w-5 h-5" /> : null}
                     </div>
                   )}
@@ -403,7 +400,7 @@ const RegisterPage = () => {
 
           {/* Footer */}
           <p className="text-center text-sm text-text-light mt-6">
-            By creating an account, you agree to receive updates and promotional 
+            By creating an account, you agree to receive updates and promotional
             emails from AR Hobby.
           </p>
         </div>

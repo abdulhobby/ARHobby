@@ -71,13 +71,13 @@ const OrderCard = ({ order }) => {
       <div className="p-4 sm:p-5">
         <div className="space-y-3">
           {order.items.slice(0, 3).map((item, index) => (
-            <div 
+            <div
               key={index}
               className="flex items-center gap-3 sm:gap-4 p-3 bg-bg-secondary rounded-xl border border-border-light hover:border-primary-200 transition-colors"
             >
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-white border border-border-light flex-shrink-0">
-                <img 
-                  src={item.image || '/placeholder.png'} 
+                <img
+                  src={item.image || '/placeholder.png'}
                   alt={item.name}
                   className="w-full h-full object-cover"
                 />
@@ -104,7 +104,7 @@ const OrderCard = ({ order }) => {
               </div>
             </div>
           ))}
-          
+
           {/* More items indicator */}
           {order.items.length > 3 && (
             <div className="flex items-center justify-center gap-2 py-3 bg-primary-50 rounded-xl border border-primary-100">
@@ -135,7 +135,7 @@ const OrderCard = ({ order }) => {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link 
+            <Link
               to={`/order/${order._id}`}
               className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-primary text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95 text-sm"
             >
@@ -143,9 +143,9 @@ const OrderCard = ({ order }) => {
               <span>View Details</span>
               <FiChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            
+
             {order.trackingNumber && (
-              <Link 
+              <Link
                 to={`/track-order/${order._id}`}
                 className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 bg-white text-primary font-semibold rounded-xl border-2 border-primary cursor-pointer transition-all duration-300 hover:bg-primary-50 active:scale-95 text-sm"
               >

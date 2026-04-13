@@ -5,11 +5,11 @@ import { trackOrder } from '../features/order/orderSlice';
 import OrderTimeline from '../components/order/OrderTimeline';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
-import { 
-  FiCopy, 
-  FiPackage, 
-  FiTruck, 
-  FiMapPin, 
+import {
+  FiCopy,
+  FiPackage,
+  FiTruck,
+  FiMapPin,
   FiExternalLink,
   FiArrowLeft,
   FiClock,
@@ -44,33 +44,33 @@ const TrackOrderPage = () => {
 
   const getStatusConfig = (status) => {
     const configs = {
-      'Pending': { 
-        icon: FiClock, 
-        color: 'text-warning', 
+      'Pending': {
+        icon: FiClock,
+        color: 'text-warning',
         bg: 'bg-warning/10',
         border: 'border-warning/20'
       },
-      'Processing': { 
-        icon: FiBox, 
-        color: 'text-info', 
+      'Processing': {
+        icon: FiBox,
+        color: 'text-info',
         bg: 'bg-info/10',
         border: 'border-info/20'
       },
-      'Shipped': { 
-        icon: FiTruck, 
-        color: 'text-primary', 
+      'Shipped': {
+        icon: FiTruck,
+        color: 'text-primary',
         bg: 'bg-primary/10',
         border: 'border-primary/20'
       },
-      'Delivered': { 
-        icon: FiCheckCircle, 
-        color: 'text-success', 
+      'Delivered': {
+        icon: FiCheckCircle,
+        color: 'text-success',
         bg: 'bg-success/10',
         border: 'border-success/20'
       },
-      'Cancelled': { 
-        icon: FiAlertCircle, 
-        color: 'text-error', 
+      'Cancelled': {
+        icon: FiAlertCircle,
+        color: 'text-error',
         bg: 'bg-error/10',
         border: 'border-error/20'
       },
@@ -102,7 +102,7 @@ const TrackOrderPage = () => {
           <p className="text-text-secondary mb-6">
             We couldn't find the order you're looking for. Please check the order ID and try again.
           </p>
-          <Link 
+          <Link
             to="/orders"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark 
                      text-white rounded-xl font-semibold transition-all duration-300 cursor-pointer
@@ -127,7 +127,7 @@ const TrackOrderPage = () => {
       <div className="bg-white border-b border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Back Button */}
-          <Link 
+          <Link
             to={`/order/${id}`}
             className="inline-flex items-center gap-2 text-text-secondary hover:text-primary 
                      transition-colors duration-300 mb-4 cursor-pointer group"
@@ -218,7 +218,7 @@ const TrackOrderPage = () => {
                 Tracking Information
               </h3>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Carrier Info */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
@@ -268,9 +268,8 @@ const TrackOrderPage = () => {
                     {trackingInfo.updates.map((update, index) => (
                       <div key={index} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                          <div className={`w-3 h-3 rounded-full ${
-                            index === 0 ? 'bg-primary' : 'bg-border'
-                          }`}></div>
+                          <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-primary' : 'bg-border'
+                            }`}></div>
                           {index < trackingInfo.updates.length - 1 && (
                             <div className="w-0.5 h-full bg-border mt-1"></div>
                           )}
@@ -298,7 +297,7 @@ const TrackOrderPage = () => {
                 Tracking Not Yet Available
               </h3>
               <p className="text-text-secondary max-w-md mx-auto mb-6">
-                Tracking information will be available once your order has been shipped. 
+                Tracking information will be available once your order has been shipped.
                 We'll notify you via email when your package is on its way.
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-warning/10 text-warning 
@@ -335,7 +334,7 @@ const TrackOrderPage = () => {
             <FiPackage className="w-5 h-5" />
             View Order Details
           </Link>
-          
+
           <Link
             to="/orders"
             className="flex items-center justify-center gap-2 py-4 px-6

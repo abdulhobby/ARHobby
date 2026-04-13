@@ -31,9 +31,9 @@ const NewArrivalsPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
-      <SEO 
-        title="New Arrivals" 
-        description="Discover our latest collection of rare and authentic currencies" 
+      <SEO
+        title="New Arrivals"
+        description="Discover our latest collection of rare and authentic currencies"
       />
 
       {/* Hero Section */}
@@ -69,7 +69,7 @@ const NewArrivalsPage = () => {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-4">
                 <div className="flex items-center justify-between mb-6 lg:hidden">
                   <h3 className="font-bold text-lg">Filters</h3>
-                  <button 
+                  <button
                     onClick={() => setShowFilters(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
@@ -133,21 +133,19 @@ const NewArrivalsPage = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setViewType('grid')}
-                      className={`flex-1 py-2 rounded-lg border-2 transition ${
-                        viewType === 'grid'
+                      className={`flex-1 py-2 rounded-lg border-2 transition ${viewType === 'grid'
                           ? 'border-green-600 bg-green-50 text-green-600'
                           : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                      }`}
+                        }`}
                     >
                       <FiGrid className="w-4 h-4 mx-auto" />
                     </button>
                     <button
                       onClick={() => setViewType('list')}
-                      className={`flex-1 py-2 rounded-lg border-2 transition ${
-                        viewType === 'list'
+                      className={`flex-1 py-2 rounded-lg border-2 transition ${viewType === 'list'
                           ? 'border-green-600 bg-green-50 text-green-600'
                           : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                      }`}
+                        }`}
                     >
                       <FiList className="w-4 h-4 mx-auto" />
                     </button>
@@ -234,11 +232,10 @@ const NewArrivalsPage = () => {
                       <button
                         key={pageNum}
                         onClick={() => handlePageChange(pageNum)}
-                        className={`px-4 py-2 rounded-lg transition ${
-                          currentPage === pageNum
+                        className={`px-4 py-2 rounded-lg transition ${currentPage === pageNum
                             ? 'bg-green-600 text-white'
                             : 'border border-gray-300 hover:bg-gray-50'
-                        }`}
+                          }`}
                       >
                         {pageNum}
                       </button>
@@ -267,8 +264,8 @@ const ProductListItem = ({ product }) => {
   return (
     <div className="flex gap-4 bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition">
       <div className="w-24 h-24 flex-shrink-0 bg-gray-100 overflow-hidden">
-        <img 
-          src={product.images?.[0]?.url} 
+        <img
+          src={product.images?.[0]?.url}
           alt={product.name}
           className="w-full h-full object-cover"
         />

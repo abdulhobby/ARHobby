@@ -29,15 +29,15 @@ const OrdersPage = () => {
     { value: 'Cancelled', label: 'Cancelled' },
   ];
 
-  const filteredOrders = orders.filter(order => 
-    searchQuery === '' || 
+  const filteredOrders = orders.filter(order =>
+    searchQuery === '' ||
     order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="bg-bg-secondary py-5">
       <SEO title="My Orders" />
-      
+
       {/* Page Header */}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -61,7 +61,7 @@ const OrdersPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="lg:sticky lg:top-24">
@@ -71,11 +71,11 @@ const OrdersPage = () => {
 
           {/* Orders Content */}
           <main className="flex-1 min-w-0">
-            
+
             {/* Filters & Search Bar */}
             <div className="bg-white rounded-2xl shadow-sm border border-border p-4 sm:p-6 mb-6">
               <div className="flex flex-col lg:flex-row gap-4">
-                
+
                 {/* Search */}
                 <div className="flex-1">
                   <div className="relative">
@@ -106,10 +106,10 @@ const OrdersPage = () => {
                         }}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 
                                   cursor-pointer whitespace-nowrap
-                                  ${filterStatus === filter.value 
-                                    ? 'bg-primary text-white shadow-md shadow-primary/30' 
-                                    : 'bg-bg-secondary text-text-secondary hover:bg-primary/10 hover:text-primary'
-                                  }`}
+                                  ${filterStatus === filter.value
+                            ? 'bg-primary text-white shadow-md shadow-primary/30'
+                            : 'bg-bg-secondary text-text-secondary hover:bg-primary/10 hover:text-primary'
+                          }`}
                       >
                         {filter.label}
                       </button>
@@ -135,7 +135,7 @@ const OrdersPage = () => {
                   }
                   title="No Orders Found"
                   message={
-                    searchQuery 
+                    searchQuery
                       ? `No orders match "${searchQuery}"`
                       : filterStatus !== 'all'
                         ? `No ${filterStatus.toLowerCase()} orders found`
@@ -163,7 +163,7 @@ const OrdersPage = () => {
                 {/* Order Cards */}
                 <div className="space-y-4">
                   {filteredOrders.map((order, index) => (
-                    <div 
+                    <div
                       key={order._id}
                       className="animate-fade-in"
                       style={{ animationDelay: `${index * 50}ms` }}
@@ -176,10 +176,10 @@ const OrdersPage = () => {
                 {/* Pagination */}
                 {pages > 1 && (
                   <div className="mt-8 flex justify-center">
-                    <Pagination 
-                      page={page} 
-                      pages={pages} 
-                      onPageChange={setCurrentPage} 
+                    <Pagination
+                      page={page}
+                      pages={pages}
+                      onPageChange={setCurrentPage}
                     />
                   </div>
                 )}

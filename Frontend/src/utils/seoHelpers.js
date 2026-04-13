@@ -2,7 +2,7 @@
 
 export const generateProductSchema = (product, url) => {
   const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
-  
+
   return {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -86,7 +86,7 @@ export const generateOrganizationSchema = () => {
 
 export const generateWebsiteSchema = () => {
   const siteUrl = import.meta.process.env.VITE_SITE_URL || window.location.origin;
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",

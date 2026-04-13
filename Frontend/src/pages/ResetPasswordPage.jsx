@@ -3,12 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetPassword, clearError } from '../features/auth/authSlice';
 import SEO from '../components/common/SEO';
-import { 
-  FiLock, 
-  FiEye, 
-  FiEyeOff, 
-  FiShield, 
-  FiCheck, 
+import {
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiShield,
+  FiCheck,
   FiLoader,
   FiArrowRight,
   FiCheckCircle,
@@ -23,7 +23,7 @@ const ResetPasswordPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
@@ -39,36 +39,36 @@ const ResetPasswordPage = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (error) { 
-      toast.error(error); 
-      dispatch(clearError()); 
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
     }
   }, [error, dispatch]);
 
   // ✅ FIXED: Pass confirmPassword to dispatch
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!password || !confirmPassword) {
       toast.error('Please fill in all fields');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
-    
+
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    
+
     // ✅ Dispatch with confirmPassword
-    dispatch(resetPassword({ 
-      token, 
+    dispatch(resetPassword({
+      token,
       password,
-      confirmPassword 
+      confirmPassword
     }));
   };
 
@@ -83,7 +83,7 @@ const ResetPasswordPage = () => {
 
     const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
     const colors = ['', 'bg-error', 'bg-warning', 'bg-warning', 'bg-success', 'bg-success'];
-    
+
     return { strength, label: labels[strength], color: colors[strength] };
   };
 
@@ -96,7 +96,7 @@ const ResetPasswordPage = () => {
       <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-bg-secondary 
                     flex items-center justify-center p-4">
         <SEO title="Password Reset Successful" />
-        
+
         <div className="w-full max-w-md text-center">
           {/* Success Animation */}
           <div className="relative inline-flex mb-8">
@@ -106,14 +106,14 @@ const ResetPasswordPage = () => {
             </div>
             <div className="absolute inset-0 rounded-full border-4 border-success/20 animate-ping"></div>
           </div>
-          
+
           <h1 className="text-3xl font-bold text-text-primary mb-4">
             Password Reset <span className="text-primary">Successful!</span>
           </h1>
           <p className="text-text-secondary mb-8">
             Your password has been changed. Redirecting you to the homepage...
           </p>
-          
+
           <div className="flex items-center justify-center gap-2 text-primary">
             <FiLoader className="w-5 h-5 animate-spin" />
             <span>Redirecting...</span>
@@ -127,7 +127,7 @@ const ResetPasswordPage = () => {
     <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-bg-secondary 
                   flex items-center justify-center p-4">
       <SEO title="Reset Password" />
-      
+
       {/* Background Decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
@@ -185,26 +185,24 @@ const ResetPasswordPage = () => {
                   {showPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                 </button>
               </div>
-              
+
               {/* Password Strength Indicator */}
               {password && (
                 <div className="mt-3">
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="text-text-secondary">Password strength</span>
-                    <span className={`font-medium ${
-                      passwordStrength.strength >= 4 ? 'text-success' : 
-                      passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
-                    }`}>
+                    <span className={`font-medium ${passwordStrength.strength >= 4 ? 'text-success' :
+                        passwordStrength.strength >= 3 ? 'text-warning' : 'text-error'
+                      }`}>
                       {passwordStrength.label}
                     </span>
                   </div>
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((level) => (
-                      <div 
+                      <div
                         key={level}
-                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                          level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
-                        }`}
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength.strength ? passwordStrength.color : 'bg-border'
+                          }`}
                       />
                     ))}
                   </div>
@@ -226,12 +224,12 @@ const ResetPasswordPage = () => {
                   className={`w-full pl-12 pr-12 py-3.5 rounded-xl border bg-white
                            text-text-primary placeholder:text-text-light transition-all duration-300
                            focus:outline-none focus:ring-3
-                           ${confirmPassword 
-                             ? passwordsMatch 
-                               ? 'border-success focus:border-success focus:ring-success/20'
-                               : 'border-error focus:border-error focus:ring-error/20'
-                             : 'border-border focus:border-primary focus:ring-primary/20'
-                           }`}
+                           ${confirmPassword
+                      ? passwordsMatch
+                        ? 'border-success focus:border-success focus:ring-success/20'
+                        : 'border-error focus:border-error focus:ring-error/20'
+                      : 'border-border focus:border-primary focus:ring-primary/20'
+                    }`}
                   placeholder="Confirm new password"
                   required
                 />
@@ -243,7 +241,7 @@ const ResetPasswordPage = () => {
                 >
                   {showConfirmPassword ? <FiEyeOff className="w-5 h-5" /> : <FiEye className="w-5 h-5" />}
                 </button>
-                
+
                 {/* Match Indicator */}
                 {confirmPassword && passwordsMatch && (
                   <div className="absolute right-12 top-1/2 -translate-y-1/2 text-success">
@@ -309,7 +307,7 @@ const ResetPasswordPage = () => {
 
           {/* Back to Login */}
           <div className="mt-8 text-center">
-            <Link 
+            <Link
               to="/login"
               className="text-text-secondary hover:text-primary font-medium transition-colors duration-300"
             >

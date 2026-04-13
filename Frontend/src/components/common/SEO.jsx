@@ -1,12 +1,12 @@
 // components/common/SEO.jsx
 import { useEffect } from 'react';
 
-const SEO = ({ 
-  title, 
-  description, 
-  keywords, 
-  image, 
-  url, 
+const SEO = ({
+  title,
+  description,
+  keywords,
+  image,
+  url,
   type = 'website',
   publishedTime,
   modifiedTime,
@@ -19,7 +19,7 @@ const SEO = ({
   locale = 'en_IN',
   siteName = 'AR Hobby'
 }) => {
-  
+
   useEffect(() => {
     const siteUrl = import.meta.env.VITE_SITE_URL || 'https://www.arhobby.in';
     const siteTitle = import.meta.env.VITE_SITE_NAME || siteName;
@@ -37,12 +37,12 @@ const SEO = ({
     // Helper function to update or create meta tags
     const updateMetaTag = (identifier, content, useProperty = false) => {
       if (!content) return;
-      
+
       const attribute = useProperty ? 'property' : 'name';
       const selector = `meta[${attribute}="${identifier}"]`;
-      
+
       let meta = document.querySelector(selector);
-      
+
       if (meta) {
         meta.setAttribute('content', content);
       } else {
@@ -55,9 +55,9 @@ const SEO = ({
 
     const updateLinkTag = (rel, href, attributes = {}) => {
       if (!href) return;
-      
+
       let link = document.querySelector(`link[rel="${rel}"]${attributes.hreflang ? `[hreflang="${attributes.hreflang}"]` : ''}`);
-      
+
       if (link) {
         link.setAttribute('href', href);
         Object.entries(attributes).forEach(([key, value]) => {
@@ -105,7 +105,7 @@ const SEO = ({
     updateMetaTag('og:image:alt', title || siteTitle, true);
     updateMetaTag('og:site_name', siteTitle, true);
     updateMetaTag('og:locale', locale, true);
-    
+
     // Twitter Card
     updateMetaTag('twitter:card', 'summary_large_image');
     updateMetaTag('twitter:site', '@arhobby');
@@ -164,8 +164,8 @@ const SEO = ({
     return () => {
       // Optional: Clean up specific meta tags if needed
     };
-  }, [title, description, keywords, image, url, type, publishedTime, modifiedTime, 
-      author, section, tags, productData, noIndex, canonicalUrl, locale, siteName]);
+  }, [title, description, keywords, image, url, type, publishedTime, modifiedTime,
+    author, section, tags, productData, noIndex, canonicalUrl, locale, siteName]);
 
   return null;
 };
@@ -236,11 +236,11 @@ const addSchemaMarkup = (type, data) => {
         "priceCurrency": "INR",
         "price": data.productData.price || data.productData.salePrice || 0,
         "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        "itemCondition": data.productData.condition ? 
-          `https://schema.org/${data.productData.condition.replace(/\s/g, '')}Condition` : 
+        "itemCondition": data.productData.condition ?
+          `https://schema.org/${data.productData.condition.replace(/\s/g, '')}Condition` :
           "https://schema.org/NewCondition",
-        "availability": data.productData.stock > 0 ? 
-          "https://schema.org/InStock" : 
+        "availability": data.productData.stock > 0 ?
+          "https://schema.org/InStock" :
           "https://schema.org/OutOfStock",
         "seller": {
           "@type": "Organization",

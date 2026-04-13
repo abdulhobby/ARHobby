@@ -14,9 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Provider store={store}>
         <BrowserRouter>
           <App />
-          
+
           {/* Toast Notifications with Custom Styling */}
-          <Toaster 
+          <Toaster
             position="top-right"
             toastOptions={{
               // Default options for all toasts
@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 fontSize: '14px',
                 fontWeight: '500',
               },
-              
+
               // Custom success toast
               success: {
                 duration: 3000,
@@ -45,7 +45,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   secondary: '#ffffff',
                 },
               },
-              
+
               // Custom error toast
               error: {
                 duration: 5000,
@@ -59,7 +59,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   secondary: '#ffffff',
                 },
               },
-              
+
               // Custom loading toast
               loading: {
                 style: {

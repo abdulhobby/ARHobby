@@ -66,7 +66,7 @@ const CouponInput = ({ orderAmount }) => {
                   </span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handleRemove}
                 className="p-2.5 rounded-xl text-error hover:bg-error/10 cursor-pointer transition-all duration-300 group"
                 title="Remove coupon"
@@ -74,7 +74,7 @@ const CouponInput = ({ orderAmount }) => {
                 <FiX className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
             </div>
-            
+
             {/* Savings Badge */}
             <div className="mt-3 flex items-center justify-center gap-2 py-2 px-4 bg-primary-100 rounded-lg">
               <FiPercent className="w-4 h-4 text-primary" />
@@ -102,8 +102,8 @@ const CouponInput = ({ orderAmount }) => {
                   className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-border bg-bg-secondary text-text-primary placeholder:text-text-light font-medium tracking-wider uppercase transition-all duration-300 focus:outline-none focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/10"
                 />
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading || !code.trim()}
                 className="px-6 sm:px-8 py-3.5 rounded-xl bg-primary text-white font-semibold cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:shadow-none flex items-center justify-center gap-2 min-w-[120px]"
               >

@@ -8,12 +8,12 @@ import CartSummary from '../components/cart/CartSummary';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
 import SEO from '../components/common/SEO';
-import { 
-  FiShoppingCart, 
-  FiArrowRight, 
-  FiArrowLeft, 
-  FiShield, 
-  FiTruck, 
+import {
+  FiShoppingCart,
+  FiArrowRight,
+  FiArrowLeft,
+  FiShield,
+  FiTruck,
   FiRefreshCw,
   FiLock,
   FiPackage,
@@ -90,7 +90,7 @@ const CartPage = () => {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-white pb-24 lg:pb-8 py-5">
       <SEO title="Shopping Cart" />
-      
+
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -106,7 +106,7 @@ const CartPage = () => {
                 </p>
               </div>
             </div>
-            
+
             {/* Clear Cart Button */}
             <button
               onClick={handleClearCart}
@@ -125,7 +125,7 @@ const CartPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          
+
           {/* Cart Items Section */}
           <div className="flex-1 min-w-0">
             {/* Items Header */}
@@ -141,7 +141,7 @@ const CartPage = () => {
             {/* Cart Items */}
             <div className="bg-white rounded-2xl md:rounded-t-none border border-gray-200 md:border-t-0 shadow-sm divide-y divide-gray-100">
               {cart.items.map((item, index) => (
-                <div 
+                <div
                   key={item.product?._id || index}
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.05}s` }}
@@ -153,7 +153,7 @@ const CartPage = () => {
 
             {/* Continue Shopping Link */}
             <div className="mt-6">
-              <Link 
+              <Link
                 to="/shop"
                 className="inline-flex items-center gap-2 text-primary hover:text-primary-dark font-medium transition-all duration-300 cursor-pointer group"
               >
@@ -191,8 +191,8 @@ const CartPage = () => {
           {/* Cart Summary Section */}
           <div className="lg:w-96 flex-shrink-0">
             <div className="space-y-4 sm:space-y-6">
-              <CartSummary 
-                subtotal={subtotal} 
+              <CartSummary
+                subtotal={subtotal}
                 totalItems={totalItems}
                 shipping={shipping}
                 total={total}

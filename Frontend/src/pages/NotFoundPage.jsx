@@ -8,13 +8,13 @@ const NotFoundPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       <SEO title="Page Not Found" />
-      
+
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-primary-200 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-primary-300 rounded-full blur-3xl opacity-20"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary-100 rounded-full blur-3xl opacity-40"></div>
-        
+
         {/* Floating Coins */}
         <div className="absolute top-1/4 left-1/4 animate-bounce-subtle" style={{ animationDelay: '0s' }}>
           <div className="w-12 h-12 rounded-full bg-primary-200 opacity-50"></div>
@@ -70,14 +70,14 @@ const NotFoundPage = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <Link 
+          <Link
             to="/"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-95 group"
           >
             <FiHome className="w-5 h-5" />
             <span>Back to Home</span>
           </Link>
-          <Link 
+          <Link
             to="/shop"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary font-bold rounded-xl border-2 border-primary cursor-pointer transition-all duration-300 hover:bg-primary-50 active:scale-95 group"
           >
@@ -109,7 +109,7 @@ const NotFoundPage = () => {
 
         {/* Help Link */}
         <div className="mt-12 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <Link 
+          <Link
             to="/contact"
             className="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors cursor-pointer"
           >
@@ -120,7 +120,7 @@ const NotFoundPage = () => {
 
         {/* Back Button */}
         <div className="mt-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="inline-flex items-center gap-2 text-primary font-medium hover:underline cursor-pointer group"
           >

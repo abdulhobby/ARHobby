@@ -32,8 +32,8 @@ const ProductCard = ({ product }) => {
   const discountPercent =
     product.comparePrice && product.comparePrice > product.price
       ? Math.round(
-          ((product.comparePrice - product.price) / product.comparePrice) * 100
-        )
+        ((product.comparePrice - product.price) / product.comparePrice) * 100
+      )
       : 0;
 
   // ✅ Check if product is marked as new and still valid
@@ -124,7 +124,7 @@ const ProductCard = ({ product }) => {
 
         {/* Content */}
         <div className="p-4">
-          
+
           {/* Product Name */}
           <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 
                     group-hover:text-primary transition-colors duration-300 

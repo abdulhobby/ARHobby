@@ -6,12 +6,12 @@ import OrderTimeline from '../components/order/OrderTimeline';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
 import { formatCurrency, formatDate, getStatusColor } from '../utils/helpers';
-import { 
-  FiDownload, 
-  FiMapPin, 
-  FiCopy, 
-  FiPackage, 
-  FiCreditCard, 
+import {
+  FiDownload,
+  FiMapPin,
+  FiCopy,
+  FiPackage,
+  FiCreditCard,
   FiTruck,
   FiArrowLeft,
   FiExternalLink,
@@ -60,20 +60,20 @@ const OrderDetailPage = () => {
   return (
     <div className="min-h-screen bg-bg-secondary">
       <SEO title={`Order ${order.orderNumber}`} />
-      
+
       {/* Header */}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Back Button */}
-          <Link 
-            to="/orders" 
+          <Link
+            to="/orders"
             className="inline-flex items-center gap-2 text-text-secondary hover:text-primary 
                        transition-colors duration-300 mb-4 cursor-pointer group"
           >
             <FiArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
             <span className="text-sm font-medium">Back to Orders</span>
           </Link>
-          
+
           {/* Order Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-start gap-4">
@@ -91,7 +91,7 @@ const OrderDetailPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Status Badges */}
             <div className="flex flex-wrap items-center gap-3">
               <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusBadgeStyles(order.orderStatus)}`}>
@@ -109,10 +109,10 @@ const OrderDetailPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Left Column - Order Items & Summary */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* Order Items Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <div className="px-6 py-4 border-b border-border bg-bg-secondary/50">
@@ -124,19 +124,19 @@ const OrderDetailPage = () => {
                   </span>
                 </h2>
               </div>
-              
+
               <div className="divide-y divide-border">
                 {order.items.map((item, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     className="p-4 sm:p-6 flex gap-4 hover:bg-bg-secondary/30 transition-colors duration-300"
                   >
                     {/* Product Image */}
                     <div className="relative flex-shrink-0">
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-bg-secondary 
                                     border border-border">
-                        <img 
-                          src={item.image || '/placeholder.png'} 
+                        <img
+                          src={item.image || '/placeholder.png'}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
@@ -146,7 +146,7 @@ const OrderDetailPage = () => {
                         {item.quantity}
                       </span>
                     </div>
-                    
+
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-text-primary text-sm sm:text-base line-clamp-2">
@@ -163,7 +163,7 @@ const OrderDetailPage = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Item Total */}
                     <div className="text-right flex-shrink-0">
                       <p className="text-lg font-bold text-primary">
@@ -180,18 +180,18 @@ const OrderDetailPage = () => {
               <div className="px-6 py-4 border-b border-border bg-bg-secondary/50">
                 <h2 className="text-lg font-bold text-text-primary">Order Summary</h2>
               </div>
-              
+
               <div className="p-6 space-y-4">
                 <div className="flex justify-between text-text-secondary">
                   <span>Subtotal</span>
                   <span className="font-medium text-text-primary">{formatCurrency(order.subtotal)}</span>
                 </div>
-                
+
                 {order.discount > 0 && (
                   <div className="flex justify-between text-success">
                     <span className="flex items-center gap-2">
                       <FiCheckCircle className="w-4 h-4" />
-                      Discount 
+                      Discount
                       {order.coupon?.code && (
                         <span className="px-2 py-0.5 bg-success/10 text-success text-xs font-medium rounded">
                           {order.coupon.code}
@@ -201,7 +201,7 @@ const OrderDetailPage = () => {
                     <span className="font-medium">-{formatCurrency(order.discount)}</span>
                   </div>
                 )}
-                
+
                 <div className="flex justify-between text-text-secondary">
                   <span className="flex items-center gap-2">
                     <FiTruck className="w-4 h-4" />
@@ -216,9 +216,9 @@ const OrderDetailPage = () => {
                     ) : formatCurrency(order.shippingCharge)}
                   </span>
                 </div>
-                
+
                 <div className="h-px bg-border my-4"></div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-bold text-text-primary">Total Amount</span>
                   <span className="text-2xl font-bold text-primary">{formatCurrency(order.totalAmount)}</span>
@@ -242,7 +242,7 @@ const OrderDetailPage = () => {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            
+
             {/* Shipping Address Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <div className="px-6 py-4 border-b border-border bg-bg-secondary/50">
@@ -292,7 +292,7 @@ const OrderDetailPage = () => {
                       <code className="flex-1 px-3 py-2 bg-bg-secondary rounded-lg text-sm font-mono text-text-primary">
                         {order.trackingNumber}
                       </code>
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(order.trackingNumber, 'Tracking number copied!')}
                         className="p-2 text-text-light hover:text-primary hover:bg-primary/10 
                                  rounded-lg transition-all duration-300 cursor-pointer"
@@ -302,11 +302,11 @@ const OrderDetailPage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3">
-                    <a 
-                      href="https://www.indiapost.gov.in/_layouts/15/DOP.Portal.Tracking/TrackConsignment.aspx" 
-                      target="_blank" 
+                    <a
+                      href="https://www.indiapost.gov.in/_layouts/15/DOP.Portal.Tracking/TrackConsignment.aspx"
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 w-full py-3 px-4 
                                bg-bg-secondary hover:bg-primary/10 text-text-primary hover:text-primary 
@@ -316,8 +316,8 @@ const OrderDetailPage = () => {
                       <FiExternalLink className="w-4 h-4" />
                       Track on India Post
                     </a>
-                    
-                    <Link 
+
+                    <Link
                       to={`/track-order/${order._id}`}
                       className="flex items-center justify-center gap-2 w-full py-3 px-4 
                                bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold 
@@ -348,7 +348,7 @@ const OrderDetailPage = () => {
                     <label className="text-xs font-medium text-text-light uppercase tracking-wider">Bank Name</label>
                     <p className="mt-1 font-semibold text-text-primary">{bankDetails.bankName}</p>
                   </div>
-                  
+
                   {/* Account Number */}
                   <div>
                     <label className="text-xs font-medium text-text-light uppercase tracking-wider">Account Number</label>
@@ -356,7 +356,7 @@ const OrderDetailPage = () => {
                       <code className="flex-1 px-3 py-2 bg-bg-secondary rounded-lg text-sm font-mono text-text-primary">
                         {bankDetails.accountNumber}
                       </code>
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(bankDetails.accountNumber, 'Account number copied!')}
                         className="p-2 text-text-light hover:text-primary hover:bg-primary/10 
                                  rounded-lg transition-all duration-300 cursor-pointer"
@@ -365,7 +365,7 @@ const OrderDetailPage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* IFSC Code */}
                   <div>
                     <label className="text-xs font-medium text-text-light uppercase tracking-wider">IFSC Code</label>
@@ -373,7 +373,7 @@ const OrderDetailPage = () => {
                       <code className="flex-1 px-3 py-2 bg-bg-secondary rounded-lg text-sm font-mono text-text-primary">
                         {bankDetails.ifsc}
                       </code>
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(bankDetails.ifsc, 'IFSC code copied!')}
                         className="p-2 text-text-light hover:text-primary hover:bg-primary/10 
                                  rounded-lg transition-all duration-300 cursor-pointer"
@@ -382,7 +382,7 @@ const OrderDetailPage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* UPI ID */}
                   <div>
                     <label className="text-xs font-medium text-text-light uppercase tracking-wider">UPI ID</label>
@@ -390,7 +390,7 @@ const OrderDetailPage = () => {
                       <code className="flex-1 px-3 py-2 bg-bg-secondary rounded-lg text-sm font-mono text-text-primary">
                         {bankDetails.upi}
                       </code>
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(bankDetails.upi, 'UPI ID copied!')}
                         className="p-2 text-text-light hover:text-primary hover:bg-primary/10 
                                  rounded-lg transition-all duration-300 cursor-pointer"
@@ -399,17 +399,17 @@ const OrderDetailPage = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Amount to Pay */}
                   <div className="p-4 bg-warning/10 rounded-xl border border-warning/20">
                     <label className="text-xs font-medium text-warning uppercase tracking-wider">Amount to Pay</label>
                     <p className="mt-1 text-2xl font-bold text-text-primary">{formatCurrency(order.totalAmount)}</p>
                   </div>
-                  
+
                   {/* WhatsApp Button */}
-                  <a 
-                    href={`https://wa.me/${bankDetails.whatsapp?.replace('+', '')}?text=Hi, I have made payment for Order %23${order.orderNumber}. Please find the payment screenshot attached.`} 
-                    target="_blank" 
+                  <a
+                    href={`https://wa.me/${bankDetails.whatsapp?.replace('+', '')}?text=Hi, I have made payment for Order %23${order.orderNumber}. Please find the payment screenshot attached.`}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-3.5 px-4 
                              bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-semibold 
@@ -426,7 +426,7 @@ const OrderDetailPage = () => {
             {/* Download Invoice */}
             <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <div className="p-6">
-                <button 
+                <button
                   onClick={handleDownloadInvoice}
                   className="flex items-center justify-center gap-2 w-full py-3.5 px-4 
                            bg-secondary hover:bg-secondary-light text-white rounded-xl font-semibold 
@@ -445,7 +445,7 @@ const OrderDetailPage = () => {
               <p className="text-sm text-text-secondary mb-4">
                 Have questions about your order? Our support team is here to help.
               </p>
-              <Link 
+              <Link
                 to="/contact"
                 className="inline-flex items-center gap-2 text-primary hover:text-primary-dark 
                          font-medium text-sm transition-colors duration-300 cursor-pointer"

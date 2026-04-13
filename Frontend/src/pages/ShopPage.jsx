@@ -9,11 +9,11 @@ import Pagination from '../components/common/Pagination';
 import Loader from '../components/common/Loader';
 import EmptyState from '../components/common/EmptyState';
 import SEO from '../components/common/SEO';
-import { 
-  FiGrid, 
-  FiList, 
-  FiFilter, 
-  FiX, 
+import {
+  FiGrid,
+  FiList,
+  FiFilter,
+  FiX,
   FiSearch,
   FiSliders,
   FiPackage,
@@ -49,7 +49,7 @@ const ShopPage = () => {
   useEffect(() => {
     // Build query params for API - Remove empty values
     const queryParams = {};
-    
+
     if (filters.keyword) queryParams.keyword = filters.keyword;
     if (filters.category) queryParams.category = filters.category;
     if (filters.subCategory) queryParams.subCategory = filters.subCategory; // ✅ Added
@@ -61,7 +61,7 @@ const ShopPage = () => {
     if (filters.minPrice) queryParams.minPrice = filters.minPrice;
     if (filters.maxPrice) queryParams.maxPrice = filters.maxPrice;
     if (filters.page) queryParams.page = filters.page;
-    
+
     // Update URL params
     const urlParams = new URLSearchParams();
     Object.keys(queryParams).forEach(key => {
@@ -70,7 +70,7 @@ const ShopPage = () => {
       }
     });
     setSearchParams(urlParams);
-    
+
     // Fetch products with all filters
     dispatch(fetchProducts(queryParams));
     console.log('Fetching with filters:', queryParams);
@@ -145,14 +145,14 @@ const ShopPage = () => {
 
   return (
     <div className="bg-bg-secondary py-5">
-      <SEO 
+      <SEO
         title="Shop All Products - AR Hobby"
         description="Browse our complete collection of hobby products. Find collectibles, rare items, and quality hobby supplies with fast shipping across India."
         keywords="shop hobby products, buy collectibles online, hobby store India"
         url="https://www.arhobby.in/shop"
         type="website"
       />
-      
+
       {/* Page Header */}
       <div className="bg-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -161,10 +161,10 @@ const ShopPage = () => {
               Shop All <span className="text-primary">Products</span>
             </h1>
             <p className="text-text-secondary max-w-2xl mx-auto">
-              Discover our extensive collection of rare coins, vintage notes, and collectible stamps. 
+              Discover our extensive collection of rare coins, vintage notes, and collectible stamps.
               Each item is verified for authenticity.
             </p>
-            
+
             {/* Search Bar - Desktop */}
             <div className="mt-8 max-w-xl mx-auto hidden sm:block">
               <div className="relative">
@@ -256,10 +256,10 @@ const ShopPage = () => {
                         onClick={() => handleSortChange(option.value)}
                         className={`w-full flex items-center justify-between px-4 py-2.5 text-left
                                   transition-colors duration-200 cursor-pointer
-                                  ${filters.sort === option.value 
-                                    ? 'bg-primary/10 text-primary' 
-                                    : 'text-text-secondary hover:bg-bg-secondary'
-                                  }`}
+                                  ${filters.sort === option.value
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-text-secondary hover:bg-bg-secondary'
+                          }`}
                       >
                         <span>{option.label}</span>
                         {filters.sort === option.value && <FiCheck className="w-4 h-4" />}
@@ -274,20 +274,20 @@ const ShopPage = () => {
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2.5 rounded-lg transition-all duration-300 cursor-pointer
-                            ${viewMode === 'grid' 
-                              ? 'bg-primary text-white shadow-md' 
-                              : 'text-text-secondary hover:text-primary'
-                            }`}
+                            ${viewMode === 'grid'
+                      ? 'bg-primary text-white shadow-md'
+                      : 'text-text-secondary hover:text-primary'
+                    }`}
                 >
                   <FiGrid className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2.5 rounded-lg transition-all duration-300 cursor-pointer
-                            ${viewMode === 'list' 
-                              ? 'bg-primary text-white shadow-md' 
-                              : 'text-text-secondary hover:text-primary'
-                            }`}
+                            ${viewMode === 'list'
+                      ? 'bg-primary text-white shadow-md'
+                      : 'text-text-secondary hover:text-primary'
+                    }`}
                 >
                   <FiList className="w-5 h-5" />
                 </button>
@@ -324,7 +324,7 @@ const ShopPage = () => {
           {activeFiltersCount > 0 && (
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-sm text-text-secondary">Active filters:</span>
-              
+
               {filters.keyword && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
                                text-primary text-sm font-medium rounded-lg">
@@ -337,7 +337,7 @@ const ShopPage = () => {
                   </button>
                 </span>
               )}
-              
+
               {filters.category && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 
                                text-primary text-sm font-medium rounded-lg">
@@ -445,7 +445,7 @@ const ShopPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
-          
+
           {/* Desktop Sidebar Filters */}
           <aside className="hidden lg:block w-72 flex-shrink-0">
             <div className="sticky top-24">
@@ -468,8 +468,8 @@ const ShopPage = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  <ProductFilters 
-                    filters={filters} 
+                  <ProductFilters
+                    filters={filters}
                     onFilterChange={handleFilterChange}
                     showCategoryFilter={true}
                   />
@@ -518,10 +518,10 @@ const ShopPage = () => {
                 {/* Pagination */}
                 {pages > 1 && (
                   <div className="mt-12 flex justify-center">
-                    <Pagination 
-                      page={page} 
-                      pages={pages} 
-                      onPageChange={handlePageChange} 
+                    <Pagination
+                      page={page}
+                      pages={pages}
+                      onPageChange={handlePageChange}
                     />
                   </div>
                 )}
@@ -539,11 +539,11 @@ const ShopPage = () => {
       {/* Mobile Filter Drawer */}
       {showFilters && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-secondary/50 z-40 lg:hidden"
             onClick={() => setShowFilters(false)}
           />
-          
+
           <div className="fixed inset-y-0 left-0 w-full max-w-sm bg-white z-50 lg:hidden 
                         shadow-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-bg-secondary/50">
@@ -567,8 +567,8 @@ const ShopPage = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-              <ProductFilters 
-                filters={filters} 
+              <ProductFilters
+                filters={filters}
                 onFilterChange={handleFilterChange}
                 showCategoryFilter={true}
               />

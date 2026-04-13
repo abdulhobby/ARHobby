@@ -83,11 +83,11 @@ const Header = () => {
                   Free delivery on orders above ₹1000!
                 </span>
               </div>
-              
+
               {/* WhatsApp Contact */}
-              <a 
-                href="https://wa.me/917081434589" 
-                target="_blank" 
+              <a
+                href="https://wa.me/917081434589"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition-all duration-300 group"
               >

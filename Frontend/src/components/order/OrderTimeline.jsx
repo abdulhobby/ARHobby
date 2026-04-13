@@ -1,11 +1,11 @@
 // OrderTimeline.jsx
 import { formatDateTime } from '../../utils/helpers';
-import { 
-  FiCheck, 
-  FiClock, 
-  FiPackage, 
-  FiTruck, 
-  FiCheckCircle, 
+import {
+  FiCheck,
+  FiClock,
+  FiPackage,
+  FiTruck,
+  FiCheckCircle,
   FiAlertCircle,
   FiShoppingCart,
   FiCreditCard,
@@ -48,7 +48,7 @@ const OrderTimeline = ({ statusHistory }) => {
   // Get color based on status
   const getStatusColors = (status, isLatest) => {
     const statusLower = status?.toLowerCase();
-    
+
     if (statusLower === 'cancelled' || statusLower === 'failed') {
       return {
         bg: 'bg-red-100',
@@ -57,7 +57,7 @@ const OrderTimeline = ({ statusHistory }) => {
         line: 'bg-red-200'
       };
     }
-    
+
     if (isLatest) {
       return {
         bg: 'bg-primary',
@@ -66,7 +66,7 @@ const OrderTimeline = ({ statusHistory }) => {
         line: 'bg-primary-200'
       };
     }
-    
+
     return {
       bg: 'bg-primary-100',
       border: 'border-primary',
@@ -96,27 +96,27 @@ const OrderTimeline = ({ statusHistory }) => {
             const isLast = index === statusHistory.length - 1;
             const IconComponent = getStatusIcon(entry.status);
             const colors = getStatusColors(entry.status, isLatest);
-            
+
             return (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`relative flex gap-4 ${!isLast ? 'pb-6 sm:pb-8' : ''}`}
               >
                 {/* Timeline Line */}
                 {!isLast && (
-                  <div 
+                  <div
                     className={`absolute left-5 sm:left-6 top-12 sm:top-14 w-0.5 h-[calc(100%-3rem)] sm:h-[calc(100%-3.5rem)] ${colors.line}`}
                   ></div>
                 )}
 
                 {/* Icon Circle */}
                 <div className="relative z-10 flex-shrink-0">
-                  <div 
+                  <div
                     className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${colors.bg} ${colors.border} border-2 flex items-center justify-center shadow-md transition-all duration-300 ${isLatest ? 'animate-pulse-green scale-110' : ''}`}
                   >
                     <IconComponent className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.icon}`} />
                   </div>
-                  
+
                   {/* Checkmark for completed steps */}
                   {!isLatest && entry.status?.toLowerCase() !== 'cancelled' && (
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center border-2 border-white">
@@ -127,16 +127,14 @@ const OrderTimeline = ({ statusHistory }) => {
 
                 {/* Content */}
                 <div className={`flex-1 pt-1 ${isLatest ? 'animate-fade-in' : ''}`}>
-                  <div className={`p-3 sm:p-4 rounded-xl transition-all duration-300 ${
-                    isLatest 
-                      ? 'bg-primary-50 border-2 border-primary-200 shadow-md shadow-primary/10' 
+                  <div className={`p-3 sm:p-4 rounded-xl transition-all duration-300 ${isLatest
+                      ? 'bg-primary-50 border-2 border-primary-200 shadow-md shadow-primary/10'
                       : 'bg-bg-secondary border border-border-light hover:border-primary-200'
-                  }`}>
+                    }`}>
                     {/* Status and Time */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 mb-2">
-                      <p className={`font-bold text-sm sm:text-base ${
-                        isLatest ? 'text-primary' : 'text-text-primary'
-                      }`}>
+                      <p className={`font-bold text-sm sm:text-base ${isLatest ? 'text-primary' : 'text-text-primary'
+                        }`}>
                         {entry.status}
                         {isLatest && (
                           <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-white text-xs font-medium">
@@ -149,7 +147,7 @@ const OrderTimeline = ({ statusHistory }) => {
                         {formatDateTime(entry.date)}
                       </p>
                     </div>
-                    
+
                     {/* Note */}
                     {entry.note && (
                       <div className="mt-2 pt-2 border-t border-border-light">
@@ -174,17 +172,17 @@ const OrderTimeline = ({ statusHistory }) => {
               {statusHistory.length} update{statusHistory.length > 1 ? 's' : ''}
             </span>
           </div>
-          
+
           {/* Progress Bar */}
           <div className="mt-3 h-2 bg-bg-tertiary rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-all duration-500"
-              style={{ 
-                width: `${Math.min((statusHistory.length / 5) * 100, 100)}%` 
+              style={{
+                width: `${Math.min((statusHistory.length / 5) * 100, 100)}%`
               }}
             ></div>
           </div>
-          
+
           {/* Status Labels */}
           <div className="mt-2 flex justify-between text-xs text-text-light">
             <span>Placed</span>

@@ -17,7 +17,7 @@ const CartItem = ({ item }) => {
       toast.error(`Only ${item.product?.stock} items available`);
       return;
     }
-    
+
     setIsUpdating(true);
     try {
       await dispatch(
@@ -44,7 +44,7 @@ const CartItem = ({ item }) => {
   return (
     <div className="group bg-white hover:bg-gray-50/50 transition-all duration-300">
       <div className="flex flex-col sm:flex-row gap-4 p-4 sm:p-5 relative">
-        
+
         {/* Remove Button - Top Right Corner */}
         <button
           onClick={handleRemove}
@@ -94,7 +94,7 @@ const CartItem = ({ item }) => {
                 {item.product?.name}
               </h3>
             </Link>
-            
+
             {/* Mobile Price Display */}
             <div className="sm:hidden flex items-baseline gap-2 mb-2">
               <span className="text-lg font-bold text-primary">
@@ -106,7 +106,7 @@ const CartItem = ({ item }) => {
                 </span>
               )}
             </div>
-            
+
             {/* Product Meta Info */}
             <div className="flex flex-wrap gap-2 text-xs text-gray-500">
               {item.product?.category && (
@@ -132,9 +132,9 @@ const CartItem = ({ item }) => {
                 className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center 
                           cursor-pointer transition-all duration-200
                           ${(item.quantity <= 1 || isUpdating)
-                            ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-gray-600 hover:bg-primary hover:text-white'
-                          }`}
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-gray-600 hover:bg-primary hover:text-white'
+                  }`}
               >
                 <FiMinus className="text-xs sm:text-sm" />
               </button>

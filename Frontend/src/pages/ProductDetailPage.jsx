@@ -10,11 +10,11 @@ import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
 import Breadcrumb from '../components/common/Breadcrumb';
 import { formatCurrency, generateProductSchema } from '../utils/helpers';
-import { 
-  FiShoppingCart, 
-  FiMinus, 
-  FiPlus, 
-  FiChevronRight, 
+import {
+  FiShoppingCart,
+  FiMinus,
+  FiPlus,
+  FiChevronRight,
   FiHome,
   FiPackage,
   FiShield,
@@ -43,7 +43,7 @@ const ProductDetailPage = () => {
   useEffect(() => {
     dispatch(fetchProductBySlug(slug));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    return () => { 
+    return () => {
       dispatch(clearProduct());
     };
   }, [slug, dispatch]);
@@ -79,7 +79,7 @@ const ProductDetailPage = () => {
       text: `Check out this amazing collectible: ${product.name}`,
       url: window.location.href,
     };
-    
+
     if (navigator.share) {
       try {
         await navigator.share(shareData);
@@ -112,7 +112,7 @@ const ProductDetailPage = () => {
         message: `Only ${stock} left in stock!`
       };
     }
-    
+
     const configs = {
       'In Stock': {
         status: 'In Stock',
@@ -137,7 +137,7 @@ const ProductDetailPage = () => {
   // Generate SEO schema data
   const getProductSchema = () => {
     if (!product) return null;
-    
+
     return {
       name: product.name,
       description: product.description,
@@ -188,7 +188,7 @@ const ProductDetailPage = () => {
           </div>
           <h2 className="text-2xl font-bold text-text-primary mb-2">Product Not Found</h2>
           <p className="text-text-secondary mb-6">{error}</p>
-          <Link 
+          <Link
             to="/shop"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary-dark 
                      text-white rounded-xl font-semibold transition-all duration-300 cursor-pointer
@@ -253,12 +253,12 @@ const ProductDetailPage = () => {
       {/* Main Product Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          
+
           {/* Product Images */}
           <div className="lg:sticky lg:top-24 lg:self-start">
             <div className="relative bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
               <ProductImageGallery images={product.images} />
-              
+
               {/* Discount Badge */}
               {discountPercentage > 0 && (
                 <div className="absolute top-4 left-4 z-10">
@@ -267,7 +267,7 @@ const ProductDetailPage = () => {
                   </span>
                 </div>
               )}
-              
+
               {/* Trust Badge */}
               <div className="absolute bottom-4 left-4 right-4 z-10">
                 <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-1.5 text-white text-xs text-center">
@@ -281,7 +281,7 @@ const ProductDetailPage = () => {
           <div className="space-y-6">
             {/* Category Badge */}
             {product.category && (
-              <Link 
+              <Link
                 to={`/category/${product.category?.slug}`}
                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary 
                          text-sm font-medium rounded-lg hover:bg-primary/20 transition-colors 
@@ -326,7 +326,7 @@ const ProductDetailPage = () => {
               </div>
               {product.stock > 0 && product.stock <= 10 && (
                 <div className="w-full bg-error/10 rounded-full h-1.5">
-                  <div 
+                  <div
                     className="bg-error h-1.5 rounded-full transition-all duration-500"
                     style={{ width: `${(product.stock / 10) * 100}%` }}
                   />
@@ -363,7 +363,7 @@ const ProductDetailPage = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-text-primary">Quantity</span>
                   <div className="flex items-center gap-1 bg-bg-secondary rounded-xl p-1">
-                    <button 
+                    <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       disabled={quantity <= 1}
                       className="w-10 h-10 flex items-center justify-center rounded-lg
@@ -376,7 +376,7 @@ const ProductDetailPage = () => {
                     <span className="w-12 text-center font-semibold text-text-primary">
                       {quantity}
                     </span>
-                    <button 
+                    <button
                       onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                       disabled={quantity >= product.stock}
                       className="w-10 h-10 flex items-center justify-center rounded-lg
@@ -399,7 +399,7 @@ const ProductDetailPage = () => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3">
-                  <button 
+                  <button
                     onClick={handleAddToCart}
                     className="flex-1 flex items-center justify-center gap-3 py-4 px-6
                              bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold
@@ -410,21 +410,21 @@ const ProductDetailPage = () => {
                     <FiShoppingCart className="w-5 h-5" />
                     Add to Cart
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={handleWishlist}
                     className={`w-14 h-14 flex items-center justify-center rounded-xl border-2
                              transition-all duration-300 cursor-pointer
-                             ${isWishlisted 
-                               ? 'border-error bg-error/10 text-error' 
-                               : 'border-border text-text-secondary hover:text-error hover:border-error/30 hover:bg-error/5'
-                             }`}
+                             ${isWishlisted
+                        ? 'border-error bg-error/10 text-error'
+                        : 'border-border text-text-secondary hover:text-error hover:border-error/30 hover:bg-error/5'
+                      }`}
                     title="Add to Wishlist"
                   >
                     <FiHeart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={handleShare}
                     className="w-14 h-14 flex items-center justify-center rounded-xl border-2 border-border
                              text-text-secondary hover:text-primary hover:border-primary/30 hover:bg-primary/5
@@ -445,7 +445,7 @@ const ProductDetailPage = () => {
                 <p className="text-sm text-text-secondary">
                   This item is out of stock. Please check back later or browse similar products.
                 </p>
-                <button 
+                <button
                   onClick={() => toast.success('We\'ll notify you when back in stock!')}
                   className="mt-4 px-6 py-2 bg-primary/10 text-primary rounded-lg text-sm font-medium hover:bg-primary hover:text-white transition-all duration-300"
                 >
@@ -495,10 +495,10 @@ const ProductDetailPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium whitespace-nowrap 
                             transition-all duration-300 cursor-pointer relative
-                            ${activeTab === tab.id 
-                              ? 'text-primary' 
-                              : 'text-text-secondary hover:text-text-primary'
-                            }`}
+                            ${activeTab === tab.id
+                      ? 'text-primary'
+                      : 'text-text-secondary hover:text-text-primary'
+                    }`}
                 >
                   <tab.icon className="w-4 h-4" />
                   {tab.label}
@@ -527,14 +527,14 @@ const ProductDetailPage = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Historical Context */}
                   {product.year && product.country && (
                     <div className="mt-6 p-4 bg-bg-secondary rounded-xl">
                       <h4 className="font-semibold text-text-primary mb-2">Historical Context</h4>
                       <p className="text-sm text-text-secondary">
-                        This {product.denomination || 'coin'} from {product.country} dates back to {product.year}, 
-                        representing a significant piece of numismatic history. {product.condition} condition 
+                        This {product.denomination || 'coin'} from {product.country} dates back to {product.year},
+                        representing a significant piece of numismatic history. {product.condition} condition
                         makes it a valuable addition to any collection.
                       </p>
                     </div>
@@ -547,7 +547,7 @@ const ProductDetailPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {specifications.length > 0 ? (
                       specifications.map((spec, index) => (
-                        <div 
+                        <div
                           key={index}
                           className="flex items-center gap-4 py-3 px-4 bg-bg-secondary rounded-xl border border-border"
                         >
@@ -591,7 +591,7 @@ const ProductDetailPage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4 p-4 bg-bg-secondary rounded-xl">
                     <FiPackage className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                     <div>
@@ -601,14 +601,14 @@ const ProductDetailPage = () => {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-start gap-4 p-4 bg-bg-secondary rounded-xl">
                     <FiRefreshCw className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Returns & Refunds</h4>
                       <p className="text-sm text-text-secondary">
-                        Once an item has been shipped, returns will not be accepted. Please contact us 
-                        immediately if there are any issues with your order. We will do our best to 
+                        Once an item has been shipped, returns will not be accepted. Please contact us
+                        immediately if there are any issues with your order. We will do our best to
                         resolve any problems, but we cannot accept returns or cancellations after shipping.
                       </p>
                     </div>
@@ -629,7 +629,7 @@ const ProductDetailPage = () => {
                 </h2>
                 <p className="text-text-secondary mt-1">Discover similar collectibles from our collection</p>
               </div>
-              <Link 
+              <Link
                 to="/shop"
                 className="hidden sm:flex items-center gap-2 text-primary hover:text-primary-dark 
                          font-medium transition-colors duration-300 cursor-pointer"
@@ -638,7 +638,7 @@ const ProductDetailPage = () => {
                 <FiChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {relatedProducts.map((p) => (
                 <ProductCard key={p._id} product={p} />
@@ -646,7 +646,7 @@ const ProductDetailPage = () => {
             </div>
 
             <div className="mt-6 text-center sm:hidden">
-              <Link 
+              <Link
                 to="/shop"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary
                          rounded-xl font-medium transition-all duration-300 cursor-pointer

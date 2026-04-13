@@ -1,13 +1,13 @@
 // AboutPage.jsx
 import { Link } from 'react-router-dom';
 import SEO from '../components/common/SEO';
-import { 
-  FiGlobe, 
-  FiCircle, 
-  FiDollarSign, 
-  FiStar, 
-  FiShield, 
-  FiHeart, 
+import {
+  FiGlobe,
+  FiCircle,
+  FiDollarSign,
+  FiStar,
+  FiShield,
+  FiHeart,
   FiAward,
   FiArrowRight,
   FiCheckCircle,
@@ -78,7 +78,7 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-bg-primary">
       <SEO title="About Us" description="Learn about AR Hobby and our passion for numismatics" />
-      
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white overflow-hidden">
         {/* Background Pattern */}
@@ -88,7 +88,7 @@ const AboutPage = () => {
           <div className="absolute bottom-20 left-1/4 w-40 h-40 border-4 border-white rounded-full"></div>
           <div className="absolute bottom-10 right-1/3 w-20 h-20 border-4 border-white rounded-full"></div>
         </div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 animate-fade-in">
@@ -103,11 +103,11 @@ const AboutPage = () => {
             </p>
           </div>
         </div>
-        
+
         {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white" />
           </svg>
         </div>
       </section>
@@ -119,7 +119,7 @@ const AboutPage = () => {
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-                <div 
+                <div
                   key={index}
                   className="text-center p-4 sm:p-6 bg-primary-50 rounded-2xl border border-primary-100 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
@@ -177,22 +177,22 @@ const AboutPage = () => {
               </h2>
               <div className="space-y-4 text-text-secondary leading-relaxed">
                 <p>
-                  AR Hobby was born from a deep passion for numismatics and the rich history 
-                  embedded in every coin and banknote. What started as a personal collection has grown 
+                  AR Hobby was born from a deep passion for numismatics and the rich history
+                  embedded in every coin and banknote. What started as a personal collection has grown
                   into a trusted marketplace for collectors worldwide.
                 </p>
                 <p>
-                  We are a dedicated hobby marketplace that connects collectors with rare and fascinating 
-                  currencies from India and around the world. Every piece in our collection tells a story 
+                  We are a dedicated hobby marketplace that connects collectors with rare and fascinating
+                  currencies from India and around the world. Every piece in our collection tells a story
                   of civilizations, economies, and the art of currency design.
                 </p>
                 <p>
-                  Our team consists of passionate numismatists who understand the thrill of finding that 
-                  perfect piece for your collection. We personally verify each item and provide detailed 
+                  Our team consists of passionate numismatists who understand the thrill of finding that
+                  perfect piece for your collection. We personally verify each item and provide detailed
                   information to help you make informed decisions.
                 </p>
               </div>
-              
+
               {/* Features List */}
               <div className="mt-6 space-y-3">
                 {['Expert Authentication', 'India Post Shipping', 'Secure Packaging', 'Collector Community'].map((feature, i) => (
@@ -229,7 +229,7 @@ const AboutPage = () => {
             {offerings.map((item, index) => {
               const IconComponent = item.icon;
               return (
-                <div 
+                <div
                   key={index}
                   className="group bg-white rounded-2xl p-6 border border-border-light shadow-sm hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
@@ -271,7 +271,7 @@ const AboutPage = () => {
               {promises.map((item, index) => {
                 const IconComponent = item.icon;
                 return (
-                  <div 
+                  <div
                     key={index}
                     className="bg-white rounded-2xl p-5 sm:p-6 shadow-lg shadow-primary/10 hover:shadow-xl transition-all duration-300 text-center group"
                   >
@@ -287,7 +287,7 @@ const AboutPage = () => {
 
             {/* CTA */}
             <div className="text-center mt-10">
-              <Link 
+              <Link
                 to="/shop"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-95 text-lg group"
               >

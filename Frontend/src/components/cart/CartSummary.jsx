@@ -1,11 +1,11 @@
 // CartSummary.jsx
 import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../utils/helpers';
-import { 
-  FiTruck, 
-  FiShield, 
-  FiGift, 
-  FiClock, 
+import {
+  FiTruck,
+  FiShield,
+  FiGift,
+  FiClock,
   FiCheckCircle,
   FiLock,
   FiArrowRight,
@@ -137,8 +137,8 @@ const CartSummary = ({ subtotal, totalItems, shipping, total, onClearCart }) => 
             <FiTrash2 className="w-5 h-5" />
             Clear Cart
           </button>
-          
-          <Link 
+
+          <Link
             to="/shop"
             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 font-semibold rounded-xl border border-gray-200 cursor-pointer transition-all duration-300 hover:bg-gray-100 hover:border-gray-300 active:scale-[0.98]"
           >

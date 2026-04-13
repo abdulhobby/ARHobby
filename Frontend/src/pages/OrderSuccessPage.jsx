@@ -32,7 +32,7 @@ const OrderSuccessPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-bg-secondary">
       <SEO title="Order Placed Successfully" />
-      
+
       {/* Simple Success Header - Single instance only */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4">
         <div className="text-center">

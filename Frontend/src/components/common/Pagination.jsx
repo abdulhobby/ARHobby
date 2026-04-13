@@ -23,10 +23,9 @@ const Pagination = ({ page, pages, onPageChange }) => {
         className={`
           px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium cursor-pointer
           transition-all duration-300 select-none
-          ${
-            page === 1
-              ? 'bg-bg-tertiary text-text-light cursor-not-allowed opacity-50'
-              : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
+          ${page === 1
+            ? 'bg-bg-tertiary text-text-light cursor-not-allowed opacity-50'
+            : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
           }
         `}
       >
@@ -62,10 +61,9 @@ const Pagination = ({ page, pages, onPageChange }) => {
           className={`
             w-9 h-9 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-semibold
             cursor-pointer transition-all duration-300 flex items-center justify-center
-            ${
-              num === page
-                ? 'bg-primary text-text-white shadow-lg shadow-primary/30 scale-110 cursor-default'
-                : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
+            ${num === page
+              ? 'bg-primary text-text-white shadow-lg shadow-primary/30 scale-110 cursor-default'
+              : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
             }
           `}
         >
@@ -99,10 +97,9 @@ const Pagination = ({ page, pages, onPageChange }) => {
         className={`
           px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium cursor-pointer
           transition-all duration-300 select-none
-          ${
-            page === pages
-              ? 'bg-bg-tertiary text-text-light cursor-not-allowed opacity-50'
-              : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
+          ${page === pages
+            ? 'bg-bg-tertiary text-text-light cursor-not-allowed opacity-50'
+            : 'bg-bg-primary border-2 border-border-light text-text-secondary hover:border-primary hover:text-primary hover:bg-primary-50 shadow-sm hover:shadow-md'
           }
         `}
       >

@@ -5,11 +5,11 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { login, clearError } from '../features/auth/authSlice';
 import SEO from '../components/common/SEO';
 import toast from 'react-hot-toast';
-import { 
-  FiMail, 
-  FiLock, 
-  FiEye, 
-  FiEyeOff, 
+import {
+  FiMail,
+  FiLock,
+  FiEye,
+  FiEyeOff,
   FiLogIn,
   FiArrowRight,
   FiShield,
@@ -45,7 +45,7 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex">
       <SEO title="Login" />
-      
+
       {/* Left Side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12 bg-gradient-to-br from-primary-50 via-white to-primary-100">
         {/* Background Decorations */}
@@ -80,10 +80,10 @@ const LoginPage = () => {
                 Email Address
               </label>
               <div className="relative">
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="Enter your email"
                   className="w-full px-4 py-3.5 pl-12 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 group-hover:border-primary-300"
@@ -99,10 +99,10 @@ const LoginPage = () => {
                 Password
               </label>
               <div className="relative">
-                <input 
+                <input
                   type={showPassword ? 'text' : 'password'}
-                  value={password} 
-                  onChange={(e) => setPassword(e.target.value)} 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Enter your password"
                   className="w-full px-4 py-3.5 pl-12 pr-12 rounded-xl border border-border bg-white text-text-primary placeholder:text-text-light transition-all duration-300 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 group-hover:border-primary-300"
@@ -122,7 +122,7 @@ const LoginPage = () => {
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="relative">
-                  <input 
+                  <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
@@ -140,7 +140,7 @@ const LoginPage = () => {
                   Remember me
                 </span>
               </label>
-              <Link 
+              <Link
                 to="/forgot-password"
                 className="text-sm font-medium text-primary hover:text-primary-dark transition-colors cursor-pointer"
               >
@@ -149,8 +149,8 @@ const LoginPage = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-primary text-white font-bold rounded-xl cursor-pointer transition-all duration-300 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -181,7 +181,7 @@ const LoginPage = () => {
           </div>
 
           {/* Register Link */}
-          <Link 
+          <Link
             to="/register"
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white text-primary font-semibold rounded-xl border-2 border-primary cursor-pointer transition-all duration-300 hover:bg-primary-50 active:scale-[0.98] group"
           >

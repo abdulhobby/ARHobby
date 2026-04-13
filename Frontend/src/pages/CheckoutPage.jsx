@@ -12,10 +12,10 @@ import OrderTerms from '../components/checkout/OrderTerms';
 import Loader from '../components/common/Loader';
 import SEO from '../components/common/SEO';
 import toast from 'react-hot-toast';
-import { 
-  FiShoppingBag, 
-  FiLock, 
-  FiArrowLeft, 
+import {
+  FiShoppingBag,
+  FiLock,
+  FiArrowLeft,
   FiPackage,
   FiFileText,
   FiCheckCircle,
@@ -174,21 +174,19 @@ const CheckoutPage = () => {
                   const StepIcon = step.icon;
                   const isActive = currentStep >= step.id;
                   const isCompleted = currentStep > step.id;
-                  
+
                   return (
                     <div key={step.id} className="flex items-center">
-                      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${
-                        isActive 
-                          ? 'bg-primary-50 text-primary' 
-                          : 'text-text-light'
-                      }`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                          isCompleted 
-                            ? 'bg-primary text-white' 
-                            : isActive 
-                              ? 'bg-primary-100 text-primary' 
-                              : 'bg-gray-100 text-text-light'
+                      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${isActive
+                        ? 'bg-primary-50 text-primary'
+                        : 'text-text-light'
                         }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
+                          ? 'bg-primary text-white'
+                          : isActive
+                            ? 'bg-primary-100 text-primary'
+                            : 'bg-gray-100 text-text-light'
+                          }`}>
                           {isCompleted ? (
                             <FiCheckCircle className="w-5 h-5" />
                           ) : (
@@ -214,10 +212,10 @@ const CheckoutPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          
+
           {/* Left Column - Forms */}
           <div className="flex-1 space-y-6">
-            <Link 
+            <Link
               to="/cart"
               className="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors cursor-pointer group"
             >
@@ -226,9 +224,9 @@ const CheckoutPage = () => {
             </Link>
 
             <div className="animate-fade-in">
-              <AddressSelector 
-                selectedAddress={selectedAddress} 
-                onSelectAddress={setSelectedAddress} 
+              <AddressSelector
+                selectedAddress={selectedAddress}
+                onSelectAddress={setSelectedAddress}
               />
             </div>
 
@@ -246,13 +244,13 @@ const CheckoutPage = () => {
 
               <div className="divide-y divide-border-light">
                 {cart.items.map((item, index) => (
-                  <div 
+                  <div
                     key={item._id || index}
                     className="flex items-center gap-4 p-4 hover:bg-bg-secondary transition-colors"
                   >
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-bg-secondary border border-border-light flex-shrink-0">
-                      <img 
-                        src={item.product?.images?.[0]?.url || '/placeholder.png'} 
+                      <img
+                        src={item.product?.images?.[0]?.url || '/placeholder.png'}
                         alt={item.product?.name}
                         className="w-full h-full object-cover"
                       />
@@ -276,7 +274,7 @@ const CheckoutPage = () => {
                   </div>
                 ))}
               </div>
-              
+
               {/* Order Summary inside items */}
               <div className="p-4 bg-gray-50 border-t border-border-light">
                 <div className="space-y-2">
@@ -330,9 +328,9 @@ const CheckoutPage = () => {
 
             {/* Terms & Conditions */}
             <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <OrderTerms 
-                accepted={termsAccepted} 
-                onAcceptChange={setTermsAccepted} 
+              <OrderTerms
+                accepted={termsAccepted}
+                onAcceptChange={setTermsAccepted}
               />
             </div>
           </div>
@@ -343,7 +341,7 @@ const CheckoutPage = () => {
               <CouponInput orderAmount={subtotal} />
 
               {/* Cart Summary with calculated values */}
-              <CartSummary 
+              <CartSummary
                 subtotal={subtotal}
                 totalItems={totalItems}
                 shipping={shipping}
@@ -366,14 +364,13 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                <button 
-                  onClick={handlePlaceOrder} 
+                <button
+                  onClick={handlePlaceOrder}
                   disabled={orderLoading || !canPlaceOrder}
-                  className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 cursor-pointer ${
-                    canPlaceOrder
-                      ? 'bg-primary text-white hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
+                  className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 cursor-pointer ${canPlaceOrder
+                    ? 'bg-primary text-white hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                   {orderLoading ? (
                     <>
@@ -417,14 +414,13 @@ const CheckoutPage = () => {
             <p className="text-xs text-text-light">Total Amount</p>
             <p className="text-xl font-bold text-primary">{formatCurrency(total)}</p>
           </div>
-          <button 
-            onClick={handlePlaceOrder} 
+          <button
+            onClick={handlePlaceOrder}
             disabled={orderLoading || !canPlaceOrder}
-            className={`flex-1 max-w-[180px] flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 cursor-pointer ${
-              canPlaceOrder
-                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            }`}
+            className={`flex-1 max-w-[180px] flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 cursor-pointer ${canPlaceOrder
+              ? 'bg-primary text-white hover:bg-primary-dark active:scale-95'
+              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              }`}
           >
             {orderLoading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
