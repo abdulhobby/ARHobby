@@ -34,6 +34,8 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL, 
     process.env.ADMIN_URL,
+    "https://www.arhobby.in",
+    "https://admin.arhobby.in",
     "https://arhobby.onrender.com",
     "https://adminarhobby.onrender.com"
   ],

@@ -507,8 +507,8 @@ class EmailService {
         </div>
 
         <div class="btn-group">
-          <a href="${process.env.FRONTEND_URL || 'https://currencycorner.com'}/orders/${order._id}" class="btn">View Order Details</a>
-          <a href="${process.env.FRONTEND_URL || 'https://currencycorner.com'}/shop" class="btn btn-secondary" style="margin-left: 10px;">Continue Shopping</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/orders/${order._id}" class="btn">View Order Details</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/shop" class="btn btn-secondary" style="margin-left: 10px;">Continue Shopping</a>
         </div>
 
         <hr class="divider">
@@ -616,7 +616,7 @@ class EmailService {
         ` : ''}
 
         <div class="btn-group">
-          <a href="${process.env.FRONTEND_URL || 'https://currencycorner.com'}/orders/${order._id}" class="btn">View Full Order</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/orders/${order._id}" class="btn">View Full Order</a>
         </div>
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
@@ -668,8 +668,8 @@ class EmailService {
         </div>
 
         <div class="btn-group">
-          <a href="${process.env.FRONTEND_URL || 'https://currencycorner.com'}/shop" class="btn">Start Shopping</a>
-          <a href="${process.env.FRONTEND_URL || 'https://currencycorner.com'}/account" class="btn btn-secondary" style="margin-left: 10px;">View Profile</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/shop" class="btn">Start Shopping</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/account" class="btn btn-secondary" style="margin-left: 10px;">View Profile</a>
         </div>
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">
@@ -745,7 +745,7 @@ class EmailService {
     const productList = Array.isArray(products) ? products : [];
     
     const productsHTML = productList.slice(0, 6).map(product => `
-      <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/product/${product._id}" style="text-decoration: none; color: inherit;">
+      <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/product/${product._id}" style="text-decoration: none; color: inherit;">
         <div style="background: white; padding: 16px; border-radius: 10px; margin-bottom: 16px; border: 2px solid #e5e7eb; transition: all 0.3s ease; overflow: hidden;">
           <div style="height: 200px; background: #f3f4f6; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
             ${product.images && product.images.length > 0 && product.images[0].url 
@@ -762,8 +762,8 @@ class EmailService {
       </a>
     `).join('');
 
-    const unsubscribeLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/unsubscribe?email=${encodeURIComponent(subscriber.email)}`;
-    const preferencesLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/newsletter-preferences?email=${encodeURIComponent(subscriber.email)}`;
+    const unsubscribeLink = `${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/unsubscribe?email=${encodeURIComponent(subscriber.email)}`;
+    const preferencesLink = `${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/newsletter-preferences?email=${encodeURIComponent(subscriber.email)}`;
 
     const content = `
       <div class="email-header">
@@ -787,7 +787,7 @@ class EmailService {
         </div>
 
         <div class="btn-group">
-          <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/shop" class="btn">Shop All Products</a>
+          <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/shop" class="btn">Shop All Products</a>
         </div>
 
         <hr class="divider">
