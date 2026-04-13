@@ -18,8 +18,8 @@ console.log('✅ Brevo API configured successfully');
 class EmailService {
   constructor() {
     this.sender = {
-      email: process.env.BREVO_FROM_EMAIL || 'noreply@yourdomain.com',
-      name: process.env.BREVO_FROM_NAME || 'Your Store'
+      email: process.env.BREVO_FROM_EMAIL || 'noreply@arhobby.in',
+      name: process.env.BREVO_FROM_NAME || 'AR Hobby'
     };
     this.apiInstance = apiInstance;
     this.brandColor = '#10b981'; // Emerald Green
