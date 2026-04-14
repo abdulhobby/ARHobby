@@ -528,7 +528,7 @@ const ShopPage = () => {
 
                 {/* Results Summary */}
                 <div className="mt-8 text-center text-sm text-text-secondary">
-                  Showing {((page - 1) * 12) + 1} - {Math.min(page * 12, totalProducts)} of {totalProducts} products
+                  Showing {((page - 1) * 15) + 1} - {Math.min(page * 15, totalProducts)} of {totalProducts} products
                 </div>
               </>
             )}

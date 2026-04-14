@@ -52,7 +52,7 @@ export const getFilterOptions = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const resultPerPage = 12;
+    const resultPerPage = 15;
     const page = Number(req.query.page) || 1;
 
     // Build filter object
@@ -569,7 +569,7 @@ export const getProductsByCategory = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Category not found' });
     }
 
-    const resultPerPage = 12;
+    const resultPerPage = 15;
     const page = Number(req.query.page) || 1;
 
     // Build filter

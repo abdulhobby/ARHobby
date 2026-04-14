@@ -131,12 +131,15 @@ const CategoryPage = () => {
   return (
     <div className="min-h-screen bg-bg-secondary">
       <SEO
-        title={`${category.name} - Shop ${category.name} Products`}
-        description={category.description || `Browse our collection of ${category.name} products. Quality hobby items with fast delivery.`}
-        keywords={`${category.name}, hobby products, ${category.name} online, AR Hobby`}
-        url={`https://www.arhobby.in/category/${category.slug}`}
+        title={`${category?.name || 'Category'} - Shop ${category?.name || 'Products'}`}
+        description={
+          category?.description ||
+          `Browse our collection of ${category?.name || 'products'}.`
+        }
+        keywords={`${category?.name || 'products'}, hobby products, ${category?.name || 'products'} online, AR Hobby`}
+        url={`https://www.arhobby.in/category/${category?.slug || ''}`}
         type="website"
-        section={category.name}
+        section={category?.name || 'Category'}
       />
 
       {/* Hero Banner */}
@@ -225,8 +228,8 @@ const CategoryPage = () => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${viewMode === 'grid'
-                    ? 'bg-primary text-white'
-                    : 'text-text-light hover:text-primary'
+                  ? 'bg-primary text-white'
+                  : 'text-text-light hover:text-primary'
                   }`}
               >
                 <FiGrid className="w-5 h-5" />
@@ -234,8 +237,8 @@ const CategoryPage = () => {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg cursor-pointer transition-all duration-300 ${viewMode === 'list'
-                    ? 'bg-primary text-white'
-                    : 'text-text-light hover:text-primary'
+                  ? 'bg-primary text-white'
+                  : 'text-text-light hover:text-primary'
                   }`}
               >
                 <FiList className="w-5 h-5" />

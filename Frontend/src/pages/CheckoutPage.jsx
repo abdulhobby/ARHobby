@@ -380,7 +380,7 @@ const CheckoutPage = () => {
                   ) : (
                     <>
                       <FiLock className="w-5 h-5" />
-                      <span>Place Order ₹{formatCurrency(total)}</span>
+                      <span>Place Order {formatCurrency(total)}</span>
                     </>
                   )}
                 </button>

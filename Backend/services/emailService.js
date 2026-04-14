@@ -659,7 +659,7 @@ class EmailService {
         <div class="info-grid" style="margin: 25px 0;">
           <div style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); padding: 20px; border-radius: 8px; border-left: 3px solid #10b981;">
             <h3 style="color: #10b981; margin-bottom: 10px;">🏆 First Purchase Deal</h3>
-            <p style="margin: 0; font-size: 14px;">Use code <strong>WELCOME10</strong> for <strong>10% off</strong> your first order!</p>
+            <p style="margin: 0; font-size: 14px;">Get 10% off on your first order! - contact us for Coupon</p>
           </div>
           <div style="background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%); padding: 20px; border-radius: 8px; border-left: 3px solid #f59e0b;">
             <h3 style="color: #d97706; margin-bottom: 10px;">📱 Need Help?</h3>
