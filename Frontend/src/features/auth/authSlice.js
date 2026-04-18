@@ -4,15 +4,9 @@ import { authAPI, userAPI } from '../../services/api';
 export const register = createAsyncThunk('auth/register', async (data, { rejectWithValue }) => {
   try {
     const response = await authAPI.register(data);
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.user));
-    return response.data;
+    return response.data;   // { success, requiresVerification, email }
   } catch (error) {
-    return rejectWithValue(
-      error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message ||
-      'Registration failed'
-    );
+    return rejectWithValue(error.response?.data?.message || 'Registration failed');
   }
 });
 
@@ -23,11 +17,7 @@ export const login = createAsyncThunk('auth/login', async (data, { rejectWithVal
     localStorage.setItem('user', JSON.stringify(response.data.user));
     return response.data;
   } catch (error) {
-    return rejectWithValue(
-      error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message ||
-      'Login failed'
-    );
+    return rejectWithValue(error.response?.data?.message || 'Login failed');
   }
 });
 
@@ -61,32 +51,47 @@ export const forgotPassword = createAsyncThunk('auth/forgotPassword', async (dat
     const response = await authAPI.forgotPassword(data);
     return response.data;
   } catch (error) {
-    return rejectWithValue(
-      error.response?.data?.errors?.[0]?.message ||
-      error.response?.data?.message ||
-      'Failed to send reset email'
-    );
+    return rejectWithValue(error.response?.data?.message || 'Failed to send reset email');
   }
 });
 
-// ✅ FIXED: Include confirmPassword in the request
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ token, password, confirmPassword }, { rejectWithValue }) => {
     try {
-      const response = await authAPI.resetPassword(token, {
-        password,
-        confirmPassword
-      });
+      const response = await authAPI.resetPassword(token, { password, confirmPassword });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.errors?.[0]?.message ||
-        error.response?.data?.message ||
-        'Password reset failed'
-      );
+      return rejectWithValue(error.response?.data?.message || 'Password reset failed');
+    }
+  }
+);
+
+// ==================== NEW OTP THUNKS ====================
+export const verifyEmail = createAsyncThunk(
+  'auth/verifyEmail',
+  async ({ email, otp }, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.verifyEmail({ email, otp });
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Verification failed');
+    }
+  }
+);
+
+export const resendOtp = createAsyncThunk(
+  'auth/resendOtp',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await authAPI.resendOtp({ email });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to resend OTP');
     }
   }
 );
@@ -162,45 +167,41 @@ const authSlice = createSlice({
     errors: []
   },
   reducers: {
-    clearError: (state) => {
-      state.error = null;
-      state.errors = [];
+    clearError: (state) => { state.error = null; },
+    clearMessage: (state) => { state.message = null; },
+    setVerificationRequired: (state, action) => {
+      state.verificationRequired = true;
+      state.verificationEmail = action.payload.email;
     },
-    clearMessage: (state) => { state.message = null; }
+    clearVerificationState: (state) => {
+      state.verificationRequired = false;
+      state.verificationEmail = null;
+    }
   },
   extraReducers: (builder) => {
     builder
       // Register
-      .addCase(register.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(register.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
+        if (action.payload.requiresVerification) {
+          state.verificationRequired = true;
+          state.verificationEmail = action.payload.email;
+        }
       })
-      .addCase(register.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(register.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       // Login
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(login.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
+        state.verificationRequired = false;
+        state.verificationEmail = null;
       })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(login.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       // Logout
       .addCase(logout.fulfilled, (state) => {
@@ -211,9 +212,7 @@ const authSlice = createSlice({
       })
 
       // Load User
-      .addCase(loadUser.pending, (state) => {
-        state.loading = true;
-      })
+      .addCase(loadUser.pending, (state) => { state.loading = true; })
       .addCase(loadUser.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.isAuthenticated = true;
@@ -227,36 +226,37 @@ const authSlice = createSlice({
       })
 
       // Forgot Password
-      .addCase(forgotPassword.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(forgotPassword.fulfilled, (state, action) => {
-        state.loading = false;
-        state.message = action.payload.message;
-      })
-      .addCase(forgotPassword.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(forgotPassword.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(forgotPassword.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
+      .addCase(forgotPassword.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
 
       // Reset Password
-      .addCase(resetPassword.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      .addCase(resetPassword.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
-        state.message = action.payload.message || 'Password reset successfully';
+        state.message = action.payload.message;
       })
-      .addCase(resetPassword.rejected, (state, action) => {
+      .addCase(resetPassword.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // Verify Email
+      .addCase(verifyEmail.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(verifyEmail.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-        state.isAuthenticated = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.verificationRequired = false;
+        state.verificationEmail = null;
+        state.message = 'Email verified successfully!';
       })
+      .addCase(verifyEmail.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // Resend OTP
+      .addCase(resendOtp.fulfilled, (state, action) => { state.message = action.payload.message; })
+      .addCase(resendOtp.rejected, (state, action) => { state.error = action.payload; })
 
       // Change Password
       .addCase(changePassword.pending, (state) => {

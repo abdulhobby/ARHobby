@@ -34,8 +34,20 @@ const LoginPage = () => {
   }, [isAuthenticated, navigate, from]);
 
   useEffect(() => {
-    if (error) { toast.error(error); dispatch(clearError()); }
-  }, [error, dispatch]);
+  if (error) {
+    // Check if the error indicates email not verified
+    if (error.toLowerCase().includes('verify your email') || error.toLowerCase().includes('please verify')) {
+      // Extract email from the error message (if present) or use the input email
+      const emailMatch = error.match(/email:?\s*([^\s]+)/i);
+      const emailToVerify = emailMatch ? emailMatch[1] : email;
+      navigate(`/verify-email?email=${encodeURIComponent(emailToVerify || email)}`);
+      toast.error('Please verify your email first. Check your inbox.');
+    } else {
+      toast.error(error);
+    }
+    dispatch(clearError());
+  }
+}, [error, dispatch, navigate, email]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

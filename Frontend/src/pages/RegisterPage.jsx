@@ -37,8 +37,9 @@ const RegisterPage = () => {
   const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/');
-  }, [isAuthenticated, navigate]);
+  // Only redirect if authenticated (will happen after OTP verification)
+  if (isAuthenticated) navigate('/');
+}, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (error) {
@@ -51,31 +52,40 @@ const RegisterPage = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!agreedToTerms) {
+    toast.error('Please agree to the Terms & Conditions');
+    return;
+  }
+  if (formData.password !== formData.confirmPassword) {
+    toast.error('Passwords do not match');
+    return;
+  }
+  if (formData.password.length < 6) {
+    toast.error('Password must be at least 6 characters');
+    return;
+  }
 
-    if (!agreedToTerms) {
-      toast.error('Please agree to the Terms & Conditions');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-
-    dispatch(register({
+  try {
+    const result = await dispatch(register({
       name: formData.name,
       email: formData.email,
       password: formData.password,
       phone: formData.phone
-    }));
-  };
+    })).unwrap();
+    
+    if (result.requiresVerification) {
+      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      toast.success('Registration successful! Please verify your email.');
+    } else {
+      // Fallback (should not happen)
+      navigate('/');
+    }
+  } catch (err) {
+    // Error already handled by slice and toast
+  }
+};
 
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, label: '', color: '' };
