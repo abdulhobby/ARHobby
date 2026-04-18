@@ -50,6 +50,28 @@ export const validateRegistration = [
   handleValidationErrors
 ];
 
+export const validateEmailVerification = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please enter a valid email address')
+    .normalizeEmail(),
+  body('otp')
+    .notEmpty().withMessage('OTP is required')
+    .isLength({ min: 6, max: 6 }).withMessage('OTP must be exactly 6 digits')
+    .matches(/^\d+$/).withMessage('OTP must contain only numbers'),
+  handleValidationErrors
+];
+
+export const validateResendOtp = [
+  body('email')
+    .trim()
+    .notEmpty().withMessage('Email is required')
+    .isEmail().withMessage('Please enter a valid email address')
+    .normalizeEmail(),
+  handleValidationErrors
+];
+
 export const validateLogin = [
   body('email')
     .trim()

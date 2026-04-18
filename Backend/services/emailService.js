@@ -328,6 +328,44 @@ class EmailService {
     });
   }
 
+  async sendOtpEmail(user, otp) {
+    return this.sendEmail({
+      to: { email: user.email, name: user.name },
+      subject: "🔐 Email Verification OTP - AR Hobby",
+      html: this.getOtpEmailHTML(user, otp)
+    });
+  }
+
+  getOtpEmailHTML(user, otp) {
+    const content = `
+    <div class="email-header">
+      <div class="email-header-content">
+        <h1>🔐 Email Verification</h1>
+        <p>Complete your registration</p>
+      </div>
+    </div>
+
+    <div class="email-body">
+      <p>Hello <strong>${user.name}</strong>,</p>
+      <p>Thank you for registering with AR Hobby! Please use the 6-digit OTP below to verify your email address.</p>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <div style="font-size: 36px; font-weight: 700; letter-spacing: 8px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 12px; display: inline-block;">
+          ${otp}
+        </div>
+      </div>
+
+      <p style="color: #6b7280;">This OTP is valid for <strong>10 minutes</strong>. Do not share it with anyone.</p>
+      <p>If you did not create an account, please ignore this email.</p>
+    </div>
+
+    <div class="email-footer">
+      <p>© ${new Date().getFullYear()} AR Hobby. All rights reserved.</p>
+    </div>
+  `;
+    return this.getBaseTemplate(content);
+  }
+
   async sendPasswordResetEmail(user, resetUrl) {
     return this.sendEmail({
       to: { email: user.email, name: user.name },
@@ -743,14 +781,14 @@ class EmailService {
 
   getCampaignHTML(subscriber, campaign, products) {
     const productList = Array.isArray(products) ? products : [];
-    
+
     const productsHTML = productList.slice(0, 6).map(product => `
       <a href="${process.env.FRONTEND_URL || 'https://www.arhobby.in'}/product/${product._id}" style="text-decoration: none; color: inherit;">
         <div style="background: white; padding: 16px; border-radius: 10px; margin-bottom: 16px; border: 2px solid #e5e7eb; transition: all 0.3s ease; overflow: hidden;">
           <div style="height: 200px; background: #f3f4f6; border-radius: 8px; margin-bottom: 12px; overflow: hidden;">
-            ${product.images && product.images.length > 0 && product.images[0].url 
-              ? `<img src="${product.images[0].url}" style="width: 100%; height: 100%; object-fit: cover;" />` 
-              : '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af;">No Image</div>'}
+            ${product.images && product.images.length > 0 && product.images[0].url
+        ? `<img src="${product.images[0].url}" style="width: 100%; height: 100%; object-fit: cover;" />`
+        : '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af;">No Image</div>'}
           </div>
           <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 700; color: #1f2937;">${this.escapeHtml(product.name || 'Product')}</h3>
           <p style="margin: 0 0 12px 0; color: #6b7280; font-size: 13px; line-height: 1.5;">${this.escapeHtml((product.description || '').substring(0, 80))}...</p>
