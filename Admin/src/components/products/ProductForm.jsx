@@ -11,13 +11,16 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
   const { categories } = useSelector((state) => state.adminCategory);
   const { subCategories } = useSelector((state) => state.adminSubCategory);
 
+  // const DEFAULT_DESCRIPTION = "📌 Please Note: Image is for reference only. The actual banknote may differ in serial number, signature, year, or prefix.";
+  const DEFAULT_DESCRIPTION ="📌 Please Note: Image is for reference only. The actual coin may differ from the coin shown in image."
+
   const [formData, setFormData] = useState({
-    name: '', description: '', category: '', country: '', year: '',
-    condition: 'Good', denomination: '', material: '', weight: '',
+    name: '', description: DEFAULT_DESCRIPTION, category: '', country: '', year: '',
+    condition: 'Very Fine', denomination: '', material: '', weight: '',
     dimensions: '', rarity: 'Common', additionalInfo: '', price: '',
     comparePrice: '', stock: '', isFeatured: false, isActive: true, isNew: false, tags: '',
     // SEO Fields
-    seoMetaTitle: '', seoMetaDescription: '', seoMetaKeywords: '',
+    seoMetaTitle: '', seoMetaDescription: ' For Collection', seoMetaKeywords: '',
     seoOgTitle: '', seoOgDescription: '', seoCanonicalUrl: ''
   });
 
@@ -230,7 +233,7 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
                 required
                 rows={5}
                 className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all duration-200 resize-none"
-                placeholder="Enter detailed product description"
+                placeholder="📌 Please Note: Image is for reference only. The actual banknote may differ in serial number, signature, year, or prefix."
               />
               <p className="text-xs text-gray-500 mt-1">
                 {5000 - formData.description.length} characters remaining

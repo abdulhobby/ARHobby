@@ -69,9 +69,9 @@ const AboutPage = () => {
   ];
 
   const stats = [
-    { number: "500+", label: "Items Sold", icon: FiPackage },
-    { number: "1000+", label: "Happy Collectors", icon: FiUsers },
-    { number: "80+", label: "Countries", icon: FiGlobe },
+    { number: "300+", label: "Items Sold", icon: FiPackage },
+    { number: "100+", label: "Happy Collectors", icon: FiUsers },
+    { number: "120+", label: "Countries", icon: FiGlobe },
     { number: "100%", label: "Authentic", icon: FiShield }
   ];
 
