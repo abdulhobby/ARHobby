@@ -40,6 +40,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  // Email verification fields
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  otpCode: String,
+  otpExpire: Date,
+  // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpire: Date
 }, {
@@ -48,7 +56,6 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
-
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
 });

@@ -32,6 +32,7 @@ import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 import NewArrivals from './components/home/NewArrivals';
 import TermsAndConditions from './pages/TermsAndConditions';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -83,6 +84,7 @@ function App() {
           {/* Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
