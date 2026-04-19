@@ -52,7 +52,7 @@ export const getFilterOptions = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const resultPerPage = 15;
+    const resultPerPage = 12;
     const page = Number(req.query.page) || 1;
 
     // Build filter object
@@ -663,10 +663,12 @@ export const getNewProducts = async (req, res) => {
     const page = Number(req.query.page) || 1;
 
     // ✅ Only get products that are marked as new AND have a marking date
+    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
     const query = {
       isActive: true,
       isNew: true,
-      newMarkedAt: { $ne: null }
+      newMarkedAt: { $gte: twoDaysAgo }
     };
 
     // Add optional filters
@@ -696,13 +698,13 @@ export const getNewProducts = async (req, res) => {
       let remainingHours = 0;
       let isNewValid = false;
       let remainingTime = null;
-      
+
       if (product.newMarkedAt) {
         const markedDate = new Date(product.newMarkedAt);
         const hoursSinceMarked = (now - markedDate) / (1000 * 60 * 60);
         remainingHours = Math.max(0, 48 - hoursSinceMarked);
         isNewValid = remainingHours > 0;
-        
+
         if (isNewValid) {
           if (remainingHours < 24) {
             remainingTime = `${Math.floor(remainingHours)}h remaining`;
@@ -712,7 +714,7 @@ export const getNewProducts = async (req, res) => {
           }
         }
       }
-      
+
       return {
         ...product,
         newRemainingHours: Math.floor(remainingHours),

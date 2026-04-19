@@ -11,12 +11,12 @@ const ProductForm = ({ initialData, onSubmit, loading }) => {
   const { categories } = useSelector((state) => state.adminCategory);
   const { subCategories } = useSelector((state) => state.adminSubCategory);
 
-  // const DEFAULT_DESCRIPTION = "📌 Please Note: Image is for reference only. The actual banknote may differ in serial number, signature, year, or prefix.";
-  const DEFAULT_DESCRIPTION ="📌 Please Note: Image is for reference only. The actual coin may differ from the coin shown in image."
+  const DEFAULT_DESCRIPTION = "📌 Please Note: Image is for reference only. The actual banknote may differ in serial number, signature, year, or prefix.";
+  // const DEFAULT_DESCRIPTION ="📌 Please Note: Image is for reference only. The actual coin may differ from the coin shown in image."
 
   const [formData, setFormData] = useState({
     name: '', description: DEFAULT_DESCRIPTION, category: '', country: '', year: '',
-    condition: 'Very Fine', denomination: '', material: '', weight: '',
+    condition: 'Uncirculated', denomination: '', material: 'Paper', weight: '',
     dimensions: '', rarity: 'Common', additionalInfo: '', price: '',
     comparePrice: '', stock: '', isFeatured: false, isActive: true, isNew: false, tags: '',
     // SEO Fields

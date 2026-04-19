@@ -172,7 +172,7 @@ const SubCategoryList = () => {
             </button>
           ) : (
             <Link
-              to="/admin/subcategories/new"
+              to="/subcategories/new"
               className="inline-flex items-center gap-2 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-200"
             >
               <FiPlus className="w-5 h-5" />
@@ -203,7 +203,7 @@ const SubCategoryList = () => {
                   )}
                   <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <Link
-                      to={`/admin/subcategories/edit/${subCategory._id}`}
+                      to={`/subcategories/edit/${subCategory._id}`}
                       className="p-2 bg-white rounded-lg shadow-md hover:bg-gray-100 transition-all duration-200"
                     >
                       <FiEdit2 className="w-4 h-4 text-gray-700" />

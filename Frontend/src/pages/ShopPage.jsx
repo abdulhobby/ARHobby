@@ -222,7 +222,8 @@ const ShopPage = () => {
               <div className="hidden sm:flex items-center gap-2 text-text-secondary">
                 <FiPackage className="w-5 h-5 text-primary" />
                 <span>
-                  <span className="font-semibold text-text-primary">{totalProducts}</span> products found
+                  {/* <span className="font-semibold text-text-primary">{totalProducts}</span> products found */}
+                  Wide Collection
                 </span>
               </div>
             </div>
@@ -507,10 +508,10 @@ const ShopPage = () => {
             ) : (
               <>
                 {/* Products Count - Mobile */}
-                <div className="sm:hidden mb-4 text-center text-text-secondary">
+                {/* <div className="sm:hidden mb-4 text-center text-text-secondary">
                   Showing <span className="font-semibold text-text-primary">{products.length}</span> of{' '}
                   <span className="font-semibold text-text-primary">{totalProducts}</span> products
-                </div>
+                </div> */}
 
                 {/* Product Grid */}
                 <ProductGrid products={products} viewMode={viewMode} />
@@ -527,9 +528,9 @@ const ShopPage = () => {
                 )}
 
                 {/* Results Summary */}
-                <div className="mt-8 text-center text-sm text-text-secondary">
-                  Showing {((page - 1) * 15) + 1} - {Math.min(page * 15, totalProducts)} of {totalProducts} products
-                </div>
+                {/* <div className="mt-8 text-center text-sm text-text-secondary">
+                  Showing {((page - 1) * 12) + 1} - {Math.min(page * 12, totalProducts)} of {totalProducts} products
+                </div> */}
               </>
             )}
           </main>
