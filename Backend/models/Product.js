@@ -1,4 +1,3 @@
-// models/Product.js - Add subCategories field
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
@@ -20,46 +19,14 @@ const productSchema = new mongoose.Schema({
   },
   // SEO Fields
   seo: {
-    metaTitle: {
-      type: String,
-      trim: true,
-      maxlength: [70, 'Meta title should be less than 70 characters'],
-      default: function() {
-        return this.name;
-      }
-    },
-    metaDescription: {
-      type: String,
-      trim: true,
-      maxlength: [160, 'Meta description should be less than 160 characters'],
-      default: function() {
-        return this.description?.substring(0, 160);
-      }
-    },
-    metaKeywords: {
-      type: [String],
-      default: []
-    },
-    ogTitle: {
-      type: String,
-      trim: true
-    },
-    ogDescription: {
-      type: String,
-      trim: true
-    },
-    ogImage: {
-      type: String,
-      trim: true
-    },
-    canonicalUrl: {
-      type: String,
-      trim: true
-    },
-    schemaMarkup: {
-      type: mongoose.Schema.Types.Mixed,
-      default: null
-    }
+    metaTitle: { type: String, trim: true, maxlength: [70, 'Meta title should be less than 70 characters'] },
+    metaDescription: { type: String, trim: true, maxlength: [160, 'Meta description should be less than 160 characters'] },
+    metaKeywords: { type: [String], default: [] },
+    ogTitle: { type: String, trim: true },
+    ogDescription: { type: String, trim: true },
+    ogImage: { type: String, trim: true },
+    canonicalUrl: { type: String, trim: true },
+    schemaMarkup: { type: mongoose.Schema.Types.Mixed, default: null }
   },
   images: [{
     public_id: { type: String, required: true },
@@ -70,92 +37,38 @@ const productSchema = new mongoose.Schema({
     ref: 'Category',
     required: [true, 'Product category is required']
   },
-  // ✅ NEW: Multiple sub-categories support
   subCategories: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'SubCategory'
   }],
-  country: {
-    type: String,
-    trim: true
-  },
-  year: {
-    type: String,
-    trim: true
-  },
+  country: { type: String, trim: true },
+  year: { type: String, trim: true },
   condition: {
     type: String,
     enum: ['Uncirculated', 'Extremely Fine', 'Very Fine', 'Fine', 'Very Good', 'Good', 'Fair', 'Poor'],
     default: 'Good'
   },
-  denomination: {
-    type: String,
-    trim: true
-  },
-  material: {
-    type: String,
-    trim: true
-  },
-  weight: {
-    type: String,
-    trim: true
-  },
-  dimensions: {
-    type: String,
-    trim: true
-  },
+  denomination: { type: String, trim: true },
+  material: { type: String, trim: true },
+  weight: { type: String, trim: true },
+  dimensions: { type: String, trim: true },
   rarity: {
     type: String,
     enum: ['Common', 'Uncommon', 'Rare', 'Very Rare', 'Extremely Rare'],
     default: 'Common'
   },
-  additionalInfo: {
-    type: String,
-    maxlength: [2000, 'Additional info cannot exceed 2000 characters']
-  },
-  price: {
-    type: Number,
-    required: [true, 'Product price is required'],
-    min: [0, 'Price cannot be negative']
-  },
-  comparePrice: {
-    type: Number,
-    min: [0, 'Compare price cannot be negative']
-  },
-  stock: {
-    type: Number,
-    min: [0, 'Stock cannot be negative'],
-    default: 0
-  },
-  stockStatus: {
-    type: String,
-    enum: ['In Stock', 'Out of Stock'],
-    default: 'In Stock'
-  },
-  isFeatured: {
-    type: Boolean,
-    default: false
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  isNew: {
-    type: Boolean,
-    default: false
-  },
-  newMarkedAt: {
-    type: Date,
-    default: null
-  },
+  additionalInfo: { type: String, maxlength: [2000, 'Additional info cannot exceed 2000 characters'] },
+  price: { type: Number, required: [true, 'Product price is required'], min: [0, 'Price cannot be negative'] },
+  comparePrice: { type: Number, min: [0, 'Compare price cannot be negative'] },
+  stock: { type: Number, min: [0, 'Stock cannot be negative'], default: 0 },
+  stockStatus: { type: String, enum: ['In Stock', 'Out of Stock'], default: 'In Stock' },
+  isFeatured: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
+  isNew: { type: Boolean, default: false },
+  newMarkedAt: { type: Date, default: null },
   tags: [String],
-  views: {
-    type: Number,
-    default: 0
-  }
-}, {
-  timestamps: true
-});
+  views: { type: Number, default: 0 }
+}, { timestamps: true });
 
 // Pre-save middleware
 productSchema.pre('save', function(next) {
@@ -174,13 +87,14 @@ productSchema.pre('save', function(next) {
     this.stockStatus = this.stock <= 0 ? 'Out of Stock' : 'In Stock';
   }
 
-  // Handle isNew marking
-  if (this.isModified('isNew') && this.isNew === true && !this.newMarkedAt) {
-    this.newMarkedAt = new Date();
-  }
-  
-  if (this.isModified('isNew') && this.isNew === false) {
-    this.newMarkedAt = null;
+  // ✅ Handle isNew marking - reset timer when marking as new
+  if (this.isModified('isNew')) {
+    if (this.isNew === true) {
+      // When marking as new, reset the timer
+      this.newMarkedAt = new Date();
+    } else if (this.isNew === false) {
+      this.newMarkedAt = null;
+    }
   }
 
   // Auto-generate SEO metadata
@@ -188,13 +102,10 @@ productSchema.pre('save', function(next) {
     this.seo = this.seo || {};
     this.seo.metaTitle = this.name.substring(0, 70);
   }
-
   if (!this.seo?.metaDescription && this.description) {
     this.seo = this.seo || {};
     this.seo.metaDescription = this.description?.substring(0, 160);
   }
-
-  // Set OG image
   if (this.images && this.images.length > 0 && !this.seo?.ogImage) {
     this.seo = this.seo || {};
     this.seo.ogImage = this.images[0].url;
@@ -203,7 +114,7 @@ productSchema.pre('save', function(next) {
   // next();
 });
 
-// Virtual for isNewValid
+// ✅ Virtual for checking if product is still new (within 48 hours)
 productSchema.virtual('isNewValid').get(function() {
   if (!this.isNew || !this.newMarkedAt) return false;
   const now = new Date();
@@ -211,9 +122,35 @@ productSchema.virtual('isNewValid').get(function() {
   return hoursSinceMarked <= 48;
 });
 
+// ✅ Method to get remaining new hours
+productSchema.methods.getNewRemainingHours = function() {
+  if (!this.isNew || !this.newMarkedAt) return 0;
+  const now = new Date();
+  const hoursSinceMarked = (now - this.newMarkedAt) / (1000 * 60 * 60);
+  return Math.max(0, 48 - hoursSinceMarked);
+};
+
+// ✅ Static method to auto-expire old new products
+productSchema.statics.autoExpireNewProducts = async function() {
+  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+  
+  const result = await this.updateMany(
+    {
+      isNew: true,
+      newMarkedAt: { $lt: fortyEightHoursAgo }
+    },
+    {
+      $set: { isNew: false, newMarkedAt: null }
+    }
+  );
+  
+  return result.modifiedCount;
+};
+
 // Generate Product Schema Markup
 productSchema.methods.generateSchemaMarkup = function() {
   const baseUrl = process.env.FRONTEND_URL || 'https://yourdomain.com';
+  const remainingHours = this.getNewRemainingHours();
   
   return {
     "@context": "https://schema.org/",
@@ -223,10 +160,7 @@ productSchema.methods.generateSchemaMarkup = function() {
     "image": this.images.map(img => img.url),
     "sku": this._id.toString(),
     "mpn": this._id.toString(),
-    "brand": {
-      "@type": "Brand",
-      "name": "AR Hobby"
-    },
+    "brand": { "@type": "Brand", "name": "AR Hobby" },
     "offers": {
       "@type": "Offer",
       "url": `${baseUrl}/products/${this.slug}`,
@@ -235,10 +169,7 @@ productSchema.methods.generateSchemaMarkup = function() {
       "priceValidUntil": new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       "itemCondition": "https://schema.org/UsedCondition",
       "availability": this.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "AR Hobby"
-      }
+      "seller": { "@type": "Organization", "name": "AR Hobby" }
     }
   };
 };
@@ -255,5 +186,6 @@ productSchema.index({ createdAt: -1, _id: -1 });
 productSchema.index({ isActive: 1, createdAt: -1 });
 productSchema.index({ isFeatured: -1, createdAt: -1 });
 productSchema.index({ category: 1, isActive: 1, createdAt: -1 });
+productSchema.index({ isNew: 1, newMarkedAt: -1 });
 
 export default mongoose.model('Product', productSchema);

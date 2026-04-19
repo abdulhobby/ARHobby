@@ -39,7 +39,11 @@ export const productAPI = {
   update: (id, formData) => API.put(`/products/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
-  delete: (id) => API.delete(`/products/${id}`)
+  delete: (id) => API.delete(`/products/${id}`),
+  // ✅ NEW: Mark product as new (for restocking)
+  markAsNew: (id) => API.put(`/products/admin/${id}/mark-new`),
+  removeNewStatus: (id) => API.put(`/products/admin/${id}/remove-new`),
+  autoExpireNew: () => API.post('/products/admin/auto-expire-new')
 };
 
 export const categoryAPI = {

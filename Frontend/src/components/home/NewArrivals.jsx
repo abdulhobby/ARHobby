@@ -1,16 +1,15 @@
-// frontend/src/components/home/NewArrivals.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-// ✅ FIXED: Correct import path
 import { fetchNewProducts } from '../../features/product/productSlice';
 import ProductCard from '../product/ProductCard';
-import { FiArrowRight } from 'react-icons/fi';
+import { FiArrowRight, FiClock } from 'react-icons/fi';
 import { IoSparklesSharp } from "react-icons/io5";
 
 const NewArrivals = () => {
   const dispatch = useDispatch();
   const { newProducts, loading, error } = useSelector((state) => state.product);
+  const [sortedProducts, setSortedProducts] = useState([]);
 
   useEffect(() => {
     console.log('Fetching new products...');
@@ -18,6 +17,14 @@ const NewArrivals = () => {
       .unwrap()
       .then((result) => {
         console.log('New products fetched:', result);
+        // Ensure products are sorted by newMarkedAt (most recent first)
+        if (result.products && result.products.length > 0) {
+          const sorted = [...result.products].sort((a, b) => {
+            return new Date(b.newMarkedAt) - new Date(a.newMarkedAt);
+          });
+          setSortedProducts(sorted);
+          console.log('Sorted products:', sorted.map(p => ({ name: p.name, newMarkedAt: p.newMarkedAt })));
+        }
       })
       .catch((err) => {
         console.error('Error fetching new products:', err);
@@ -26,12 +33,16 @@ const NewArrivals = () => {
 
   // Debug logging
   useEffect(() => {
-    console.log('Current newProducts state:', newProducts);
-    console.log('Loading state:', loading);
-    console.log('Error state:', error);
-  }, [newProducts, loading, error]);
+    if (newProducts && newProducts.length > 0) {
+      console.log('New products from API:', newProducts.map(p => ({ 
+        name: p.name, 
+        newMarkedAt: p.newMarkedAt,
+        // remainingTime: p.newRemainingTime
+      })));
+    }
+  }, [newProducts]);
 
-  if (loading && newProducts.length === 0) {
+  if (loading && sortedProducts.length === 0) {
     return (
       <div className="py-16 sm:py-20 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,7 +68,7 @@ const NewArrivals = () => {
   }
 
   // Don't show section if no new products
-  if (!newProducts || newProducts.length === 0) {
+  if (!sortedProducts || sortedProducts.length === 0) {
     return (
       <div className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-green-50 via-white to-emerald-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -99,8 +110,10 @@ const NewArrivals = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {newProducts.slice(0, 20).map((product) => (
-            <ProductCard key={product._id} product={product} />
+          {sortedProducts.slice(0, 20).map((product) => (
+            <div key={product._id} className="relative">
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
 
@@ -114,7 +127,7 @@ const NewArrivals = () => {
             <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <p className="text-sm text-gray-600 mt-4">
-            {newProducts.length}+ new products added
+            {sortedProducts.length}+ new products added
           </p>
         </div>
       </div>

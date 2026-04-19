@@ -37,6 +37,30 @@ export const updateProduct = createAsyncThunk('adminProduct/update', async ({ id
   }
 });
 
+export const markProductAsNew = createAsyncThunk(
+  'adminProduct/markAsNew',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await productAPI.markAsNew(id);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to mark product as new');
+    }
+  }
+);
+
+export const removeNewStatus = createAsyncThunk(
+  'adminProduct/removeNewStatus',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await productAPI.removeNewStatus(id);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to remove new status');
+    }
+  }
+);
+
 export const deleteProduct = createAsyncThunk('adminProduct/delete', async (id, { rejectWithValue }) => {
   try {
     await productAPI.delete(id);
@@ -113,6 +137,40 @@ const adminProductSlice = createSlice({
         state.totalProducts -= 1;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      // Inside extraReducers builder
+      .addCase(markProductAsNew.fulfilled, (state, action) => {
+        state.success = true;
+        state.message = action.payload.message;
+        // Update the product in the list
+        const index = state.products.findIndex(p => p._id === action.payload.product._id);
+        if (index !== -1) {
+          state.products[index].isNew = true;
+          state.products[index].newMarkedAt = action.payload.product.newMarkedAt;
+        }
+        if (state.product && state.product._id === action.payload.product._id) {
+          state.product.isNew = true;
+          state.product.newMarkedAt = action.payload.product.newMarkedAt;
+        }
+      })
+      .addCase(markProductAsNew.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(removeNewStatus.fulfilled, (state, action) => {
+        state.success = true;
+        state.message = action.payload.message;
+        const index = state.products.findIndex(p => p._id === action.payload.product._id);
+        if (index !== -1) {
+          state.products[index].isNew = false;
+          state.products[index].newMarkedAt = null;
+        }
+        if (state.product && state.product._id === action.payload.product._id) {
+          state.product.isNew = false;
+          state.product.newMarkedAt = null;
+        }
+      })
+      .addCase(removeNewStatus.rejected, (state, action) => {
         state.error = action.payload;
       });
   }

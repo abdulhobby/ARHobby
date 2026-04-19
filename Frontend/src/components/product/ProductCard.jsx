@@ -4,13 +4,50 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../features/cart/cartSlice';
 import { formatCurrency } from '../../utils/helpers';
 import { FiShoppingCart, FiEye, FiClock, FiStar } from 'react-icons/fi';
+import { IoSparklesSharp } from "react-icons/io5";
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(null);
+  const [isNewValid, setIsNewValid] = useState(false);
+
+  // Calculate remaining time for NEW badge
+  useEffect(() => {
+    if (product.isNew && product.newMarkedAt) {
+      const updateRemainingTime = () => {
+        const now = new Date();
+        const markedDate = new Date(product.newMarkedAt);
+        const hoursSinceMarked = (now - markedDate) / (1000 * 60 * 60);
+        const remainingHours = Math.max(0, 48 - hoursSinceMarked);
+        const isValid = remainingHours > 0;
+
+        setIsNewValid(isValid);
+
+        if (isValid) {
+          if (remainingHours < 1) {
+            // Less than 1 hour, show minutes
+            const minutes = Math.floor(remainingHours * 60);
+            setRemainingTime(`${minutes}m left`);
+          } else if (remainingHours < 24) {
+            setRemainingTime(`${Math.floor(remainingHours)}h left`);
+          } else {
+            setRemainingTime(`${Math.floor(remainingHours / 24)}d left`);
+          }
+        } else {
+          setRemainingTime(null);
+        }
+      };
+
+      updateRemainingTime();
+      // Update every minute
+      const interval = setInterval(updateRemainingTime, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [product.isNew, product.newMarkedAt]);
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -32,14 +69,12 @@ const ProductCard = ({ product }) => {
   const discountPercent =
     product.comparePrice && product.comparePrice > product.price
       ? Math.round(
-        ((product.comparePrice - product.price) / product.comparePrice) * 100
-      )
+          ((product.comparePrice - product.price) / product.comparePrice) * 100
+        )
       : 0;
 
   // ✅ Check if product is marked as new and still valid
-  const isNewProduct = product.isNew === true && product.isNewValid !== false;
-  const showNewBadge = isNewProduct;
-  const remainingTime = product.newRemainingTime;
+  const showNewBadge = product.isNew === true && isNewValid;
 
   return (
     <div
@@ -75,12 +110,14 @@ const ProductCard = ({ product }) => {
                 {discountPercent}% OFF
               </span>
             )}
-            {/* ✅ Show NEW badge when product.isNew === true */}
+            {/* ✅ Enhanced NEW badge with timer */}
             {showNewBadge && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
-                <FiStar className="w-3 h-3" />
-                NEW
-              </span>
+              <div className="flex flex-col gap-1">
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
+                  <IoSparklesSharp className="w-3 h-3 animate-pulse" />
+                  NEW ARRIVAL
+                </span>
+              </div>
             )}
           </div>
 
@@ -124,7 +161,6 @@ const ProductCard = ({ product }) => {
 
         {/* Content */}
         <div className="p-4">
-
           {/* Product Name */}
           <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 
                     group-hover:text-primary transition-colors duration-300 

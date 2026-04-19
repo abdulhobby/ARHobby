@@ -306,13 +306,22 @@ export const updateProduct = async (req, res) => {
     if (additionalInfo !== undefined) product.additionalInfo = additionalInfo;
     if (price !== undefined) product.price = price;
     if (comparePrice !== undefined) product.comparePrice = comparePrice;
+    
+    // ✅ Handle stock update - if stock increases from 0 to >0, optionally mark as new
+    const oldStock = product.stock;
     if (stock !== undefined) {
       product.stock = stock;
       product.stockStatus = stock > 0 ? 'In Stock' : 'Out of Stock';
     }
+    
     if (isFeatured !== undefined) product.isFeatured = isFeatured === 'true' || isFeatured === true;
     if (isActive !== undefined) product.isActive = isActive === 'true' || isActive === true;
-    if (isNew !== undefined) product.isNew = isNew === 'true' || isNew === true;
+    
+    // ✅ Handle isNew marking - this will automatically reset the timer
+    if (isNew !== undefined) {
+      product.isNew = isNew === 'true' || isNew === true;
+    }
+    
     if (tags) product.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : tags;
 
     // Update SEO fields
@@ -359,8 +368,13 @@ export const updateProduct = async (req, res) => {
     await product.save();
     await product.populate('subCategories', 'name slug');
 
-    res.status(200).json({ success: true, product, message: 'Product updated successfully' });
+    res.status(200).json({ 
+      success: true, 
+      product, 
+      message: 'Product updated successfully' 
+    });
   } catch (error) {
+    console.error('Error in updateProduct:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -483,20 +497,16 @@ export const getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // First try to find by exact slug
     let product = await Product.findOne({ slug: slug, isActive: true })
       .populate('category', 'name slug description')
-      .populate('subCategories', 'name slug')
-      .select('-__v'); // Exclude version field
+      .populate('subCategories', 'name slug');
 
-    // If not found, try to find by name (for backward compatibility)
     if (!product) {
       const lastDashIndex = slug.lastIndexOf('-');
       let productName = slug;
       if (lastDashIndex > -1) {
         productName = slug.substring(0, lastDashIndex);
       }
-
       product = await Product.findOne({
         name: { $regex: new RegExp(`^${productName.replace(/-/g, ' ')}$`, 'i') },
         isActive: true
@@ -512,7 +522,7 @@ export const getProductBySlug = async (req, res) => {
       });
     }
 
-    // ✅ Calculate new product validity
+    // ✅ Calculate remaining time
     const now = new Date();
     const markedDate = product.newMarkedAt ? new Date(product.newMarkedAt) : null;
     let remainingHours = 0;
@@ -524,14 +534,13 @@ export const getProductBySlug = async (req, res) => {
       isNewValid = remainingHours > 0;
     }
 
-    // Update schema markup with current data
+    // Update schema markup
     product.seo.schemaMarkup = product.generateSchemaMarkup();
 
     // Increment views
     product.views += 1;
     await product.save({ validateBeforeSave: false });
 
-    // Convert to object and add computed fields
     const productObj = product.toObject();
     productObj.isNewValid = isNewValid;
     productObj.newRemainingHours = Math.floor(remainingHours);
@@ -657,25 +666,25 @@ export const getFeaturedProducts = async (req, res) => {
 
 // controllers/productController.js (Updated getNewProducts function)
 
+// ==================== GET NEW PRODUCTS (with remaining time) ====================
 export const getNewProducts = async (req, res) => {
   try {
     const resultPerPage = Number(req.query.limit) || 20;
     const page = Number(req.query.page) || 1;
 
-    // ✅ Only get products that are marked as new AND have a marking date
-    const twoDaysAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    // ✅ Only get products marked as new AND within 48 hours
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
     const query = {
       isActive: true,
       isNew: true,
-      newMarkedAt: { $gte: twoDaysAgo }
+      newMarkedAt: { $gte: fortyEightHoursAgo }
     };
 
     // Add optional filters
     if (req.query.category) {
       query.category = req.query.category;
     }
-
     if (req.query.minPrice || req.query.maxPrice) {
       query.price = {};
       if (req.query.minPrice) query.price.$gte = parseFloat(req.query.minPrice);
@@ -684,10 +693,12 @@ export const getNewProducts = async (req, res) => {
 
     const totalProducts = await Product.countDocuments(query);
 
+    // ✅ CRITICAL: Sort by newMarkedAt descending (newest first)
     const products = await Product.find(query)
       .populate('category', 'name slug')
+      .populate('subCategories', 'name slug')
       .select('name slug description price comparePrice images stock stockStatus isNew newMarkedAt createdAt category country material condition')
-      .sort({ newMarkedAt: -1, _id: -1 })
+      .sort({ newMarkedAt: -1, _id: -1 })  // Most recently marked new comes first
       .limit(resultPerPage)
       .skip((page - 1) * resultPerPage)
       .lean();
@@ -723,8 +734,10 @@ export const getNewProducts = async (req, res) => {
       };
     });
 
-    // ✅ Filter out expired products (optional - if you want to hide expired ones)
+    // ✅ Filter out expired products
     const validProducts = productsWithRemainingTime.filter(p => p.isNewValid === true);
+
+    console.log(`✅ Found ${validProducts.length} new products, sorted by newest first`);
 
     res.status(200).json({
       success: true,
@@ -745,6 +758,89 @@ export const getNewProducts = async (req, res) => {
   }
 };
 
+// ==================== MARK PRODUCT AS NEW (Admin) ====================
+export const markProductAsNew = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // ✅ Mark as new - this will reset the timer via pre-save hook
+    product.isNew = true;
+    // The pre-save hook will automatically set newMarkedAt to new Date()
+    await product.save();
+
+    // Calculate remaining hours
+    const remainingHours = product.getNewRemainingHours();
+    const remainingTime = remainingHours < 24 
+      ? `${Math.floor(remainingHours)}h remaining` 
+      : `${Math.floor(remainingHours / 24)}d remaining`;
+
+    res.status(200).json({
+      success: true,
+      message: 'Product marked as New! It will be displayed for 48 hours.',
+      product: {
+        _id: product._id,
+        name: product.name,
+        isNew: product.isNew,
+        newMarkedAt: product.newMarkedAt,
+        newRemainingHours: Math.floor(remainingHours),
+        newRemainingTime: remainingTime
+      }
+    });
+  } catch (error) {
+    console.error('Error in markProductAsNew:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==================== REMOVE NEW STATUS (Admin) ====================
+export const removeNewStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    product.isNew = false;
+    product.newMarkedAt = null;
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'New status removed from product',
+      product: {
+        _id: product._id,
+        name: product.name,
+        isNew: false
+      }
+    });
+  } catch (error) {
+    console.error('Error in removeNewStatus:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==================== AUTO-EXPIRE ALL NEW PRODUCTS (Cron Job) ====================
+export const autoExpireNewProducts = async (req, res) => {
+  try {
+    const modifiedCount = await Product.autoExpireNewProducts();
+    res.status(200).json({
+      success: true,
+      message: `Auto-expired ${modifiedCount} products`,
+      modifiedCount
+    });
+  } catch (error) {
+    console.error('Error in autoExpireNewProducts:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // ✅ NEW: Endpoint to manually expire a product's new status
 export const expireNewProduct = async (req, res) => {
   try {
@@ -761,20 +857,6 @@ export const expireNewProduct = async (req, res) => {
       success: true,
       message: 'Product new status expired',
       product
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// ✅ NEW: Auto-expire all expired new products (can be called by cron job)
-export const autoExpireNewProducts = async (req, res) => {
-  try {
-    const modifiedCount = await Product.autoExpireNewProducts();
-    res.status(200).json({
-      success: true,
-      message: `Auto-expired ${modifiedCount} products`,
-      modifiedCount
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
