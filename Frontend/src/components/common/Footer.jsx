@@ -117,7 +117,7 @@ const Footer = () => {
               </div>
               <div className="mt-2 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
                 <p className="text-xs text-green-400 text-center">
-                  🚚 Free shipping on orders above ₹1000
+                  🚚 Free shipping on orders above ₹1500
                 </p>
               </div>
             </div>

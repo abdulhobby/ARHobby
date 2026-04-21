@@ -107,7 +107,7 @@ const RegisterPage = () => {
 
   const benefits = [
     { icon: FiGift, title: 'Exclusive Offers', description: 'Get special discounts on rare collectibles' },
-    { icon: FiTruck, title: 'Free Shipping', description: 'Free delivery on orders above ₹1000' },
+    { icon: FiTruck, title: 'Free Shipping', description: 'Free delivery on orders above ₹1500' },
     { icon: FiShield, title: 'Secure Shopping', description: '100% authentic products guaranteed' },
     { icon: FiAward, title: 'Loyalty Rewards', description: 'Earn points on every purchase' },
   ];

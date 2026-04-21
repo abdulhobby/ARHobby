@@ -49,11 +49,11 @@ const HomePage = () => {
               <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 leading-tight">
                 Free Shipping on Orders Above
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
-                  ₹1000
+                  ₹1500
                 </span>
               </h2>
               <p className="text-lg text-gray-300 mb-8 max-w-xl leading-relaxed">
-                Start building your collection today! Enjoy free delivery on all orders over ₹1000. Premium packaging guaranteed.
+                Start building your collection today! Enjoy free delivery on all orders over ₹1500. Premium packaging guaranteed.
               </p>
 
               {/* Feature List */}

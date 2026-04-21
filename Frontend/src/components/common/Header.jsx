@@ -80,7 +80,7 @@ const Header = () => {
               <div className="flex items-center gap-2">
                 <FiTruck className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span className="font-medium text-center sm:text-left">
-                  Free delivery on orders above ₹1000!
+                  Free delivery on orders above ₹1500!
                 </span>
               </div>
 

@@ -75,7 +75,7 @@ const CheckoutPage = () => {
     // Calculate order totals
     const subtotal = cart?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
     const discount = appliedCoupon?.discount || 0;
-    const shipping = subtotal >= 1000 ? 0 : 80;
+    const shipping = subtotal >= 1500 ? 0 : 79;
     const total = subtotal - discount + shipping;
 
     const orderData = {
@@ -127,7 +127,7 @@ const CheckoutPage = () => {
   const subtotal = cart.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
   const totalItems = cart.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const discount = appliedCoupon?.discount || 0;
-  const shipping = subtotal >= 1000 ? 0 : 80;
+  const shipping = subtotal >= 1500 ? 0 : 79;
   const total = subtotal - discount + shipping;
 
   const steps = [

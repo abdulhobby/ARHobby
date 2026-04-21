@@ -90,7 +90,7 @@ const TermsAndConditions = () => {
       id: 8,
       icon: <FiGift className="w-6 h-6" />,
       title: "Free Shipping",
-      description: "Free shipping on orders above ₹1000.",
+      description: "Free shipping on orders above ₹1500.",
       color: "from-pink-500 to-pink-600",
       bgColor: "bg-pink-50",
       textColor: "text-pink-600"
@@ -354,7 +354,7 @@ const TermsAndConditions = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <FiChevronRight className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">Free shipping on orders ₹1000+</span>
+                    <span className="text-gray-700">Free shipping on orders ₹1500+</span>
                   </li>
                 </ul>
               </div>

@@ -14,9 +14,9 @@ import {
 } from 'react-icons/fi';
 
 const CartSummary = ({ subtotal, totalItems, shipping, total, onClearCart }) => {
-  const freeShippingRemaining = Math.max(0, 1000 - subtotal);
-  const freeShippingProgress = Math.min((subtotal / 1000) * 100, 100);
-  const isFreeShipping = subtotal >= 1000;
+  const freeShippingRemaining = Math.max(0, 1500 - subtotal);
+  const freeShippingProgress = Math.min((subtotal / 1500) * 100, 100);
+  const isFreeShipping = subtotal >= 1500;
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">

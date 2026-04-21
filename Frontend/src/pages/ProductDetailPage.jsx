@@ -464,7 +464,7 @@ const ProductDetailPage = () => {
               <div className="flex flex-col items-center text-center p-3 bg-bg-secondary rounded-xl">
                 <FiTruck className="w-6 h-6 text-primary mb-2" />
                 <span className="text-xs font-medium text-text-primary">Free Shipping</span>
-                <span className="text-xs text-text-light">On ₹1000+</span>
+                <span className="text-xs text-text-light">On ₹1500+</span>
               </div>
               <div className="flex flex-col items-center text-center p-3 bg-bg-secondary rounded-xl">
                 <FiPackage className="w-6 h-6 text-primary mb-2" />
@@ -587,7 +587,7 @@ const ProductDetailPage = () => {
                     <div>
                       <h4 className="font-semibold text-text-primary mb-1">Free Shipping</h4>
                       <p className="text-sm text-text-secondary">
-                        Free shipping on all orders above ₹1000. Standard delivery takes 5-7 business days.
+                        Free shipping on all orders above ₹1500. Standard delivery takes 5-7 business days.
                       </p>
                     </div>
                   </div>
