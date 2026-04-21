@@ -1,9 +1,17 @@
 // OrderTerms.jsx
-import { FiFileText, FiCheck, FiAlertCircle, FiTruck, FiCreditCard, FiPackage, FiRefreshCw, FiGift } from 'react-icons/fi';
+import { FiFileText, FiCheck, FiAlertCircle, FiTruck, FiCreditCard, FiPackage, FiRefreshCw, FiGift, FiUser } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const OrderTerms = ({ accepted, onAcceptChange }) => {
   const terms = [
+    {
+      icon: FiUser,
+      text: "Customer information (such as phone number, address, and email) is collected and used solely for order processing, shipping, and providing updates related to products and the website."
+    },
+    {
+      icon: FiRefreshCw,
+      text: "Once an item has been shipped, returns will not be accepted. Please contact us immediately if there are any issues with your order. We will do our best to resolve any problems, but we cannot accept returns or cancellations after shipping."
+    },
     {
       icon: FiPackage,
       text: "All items are collectible currencies/coins sold as-is based on the described condition."
@@ -23,10 +31,6 @@ const OrderTerms = ({ accepted, onAcceptChange }) => {
     {
       icon: FiPackage,
       text: "Tracking number will be provided once the order is shipped."
-    },
-    {
-      icon: FiRefreshCw,
-      text: "Once an item has been shipped, returns will not be accepted. Please contact us immediately if there are any issues with your order. We will do our best to resolve any problems, but we cannot accept returns or cancellations after shipping."
     },
     {
       icon: FiGift,

@@ -16,13 +16,23 @@ import {
   FiPhone,
   FiAlertTriangle,
   FiCheckCircle,
-  FiInfo
+  FiInfo,
+  FiUser
 } from 'react-icons/fi';
 import { FaWhatsapp, FaRegGem } from 'react-icons/fa';
 import SEO from '../components/common/SEO';
 
 const TermsAndConditions = () => {
   const terms = [
+    {
+      id: 9,
+      icon: <FiUser className="w-6 h-6" />,
+      title: "Customer Informations",
+      description: "Customer information (such as phone number, address, and email) is collected and used solely for order processing, shipping, and providing updates related to products and the website.",
+      color: "from-cyan-500 to-cyan-600",
+      bgColor: "bg-cyan-50",
+      textColor: "text-cyan-600"
+    },
     {
       id: 1,
       icon: <FiShield className="w-6 h-6" />,
