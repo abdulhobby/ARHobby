@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiInfo } from 'react-icons/fi';
+import { FiArrowRight, FiInfo, FiTruck, FiShield, FiClock } from 'react-icons/fi';
 import HomeImg1 from '../../assets/home4.jpg';
 import HomeImg2 from '../../assets/home3.jpg';
 import HomeImg3 from '../../assets/home2.jpg';
@@ -36,7 +36,7 @@ const HeroBanner = () => {
 
       {/* Main Content - Ensure higher z-index */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full py-20">
-        <div className=" text-center lg:text-left">
+        <div className="text-center lg:text-left">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-100/90 backdrop-blur-sm 
                         border border-green-200 rounded-full mb-6 sm:mb-8 
@@ -74,6 +74,56 @@ const HeroBanner = () => {
             Explore our curated collection of world currencies, coins, and numismatic
             treasures from across the globe. Each piece tells a story of history and heritage.
           </p>
+
+          {/* Shipping Info Cards - NEW SECTION */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto lg:mx-0 mb-10
+                        animate-[fadeIn_1s_ease-out_0.5s_both]">
+            
+            {/* Free Shipping Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 
+                          hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <FiTruck className="text-green-400 text-xl" />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-lg">₹1500+</p>
+                  <p className="text-gray-300 text-sm">Free Shipping</p>
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs">On orders above ₹1500</p>
+            </div>
+
+            {/* Delivery Time Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 
+                          hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <FiClock className="text-blue-400 text-xl" />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-lg">India Post shipping</p>
+                  <p className="text-gray-300 text-sm">Delivery</p>
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs">We will ship within 1-3 business days</p>
+            </div>
+
+            {/* Trust & Safety Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 
+                          hover:bg-white/15 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <FiShield className="text-purple-400 text-xl" />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-lg">Secure</p>
+                  <p className="text-gray-300 text-sm">Packaging</p>
+                </div>
+              </div>
+              <p className="text-gray-400 text-xs">Trackable & insured delivery</p>
+            </div>
+          </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center lg:justify-start
